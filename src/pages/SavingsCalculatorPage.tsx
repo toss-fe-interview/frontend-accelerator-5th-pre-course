@@ -26,6 +26,14 @@ type SavingsProduct = {
   availableTerms: number;
 };
 
+const savingsCalculatorSchema = z.object({
+  minMonthlyAmount: z.number().min(0),
+  maxMonthlyAmount: z.number().min(0),
+  availableTerms: z.number().min(0),
+});
+
+type SavingsCalculatorFormData = z.infer<typeof savingsCalculatorSchema>;
+
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<'products' | 'results'>('products');
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
@@ -34,13 +42,7 @@ export function SavingsCalculatorPage() {
     defaultValues: {
       availableTerms: 12,
     },
-    resolver: zodResolver(
-      z.object({
-        minMonthlyAmount: z.number().min(0),
-        maxMonthlyAmount: z.number().min(0),
-        availableTerms: z.number().min(0),
-      })
-    ),
+    resolver: zodResolver(savingsCalculatorSchema),
   });
 
   return (
@@ -151,11 +153,7 @@ export function SavingsCalculatorPage() {
 }
 
 type SavingsCalculatorFormProps = {
-  control: Control<{
-    minMonthlyAmount: number;
-    maxMonthlyAmount: number;
-    availableTerms: number;
-  }>;
+  control: Control<SavingsCalculatorFormData>;
 };
 
 function SavingsCalculatorForm({ control }: SavingsCalculatorFormProps) {
