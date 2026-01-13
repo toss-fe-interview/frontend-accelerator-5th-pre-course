@@ -67,4 +67,8 @@ useCalculationResult (훅)
 - 개별 함수 단위 테스트 용이
 - 계산 로직 재사용 가능
 
-. api 응답 타입 -> SavingsProduct에 제네릭 타입 적용하기?
+**코드 디벨롭에 대한 질문 포인트**
+
+1. api 응답 타입 -> SavingsProduct에 제네릭 타입 적용하기?
+
+**예외 처리**
