@@ -20,7 +20,7 @@ export function InputSection({ values, onChange }: InputSectionProps) {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={values.targetAmount}
-        onChange={e => onChange({ targetAmount: e.target.value })}
+        onChange={e => onChange({ targetAmount: e.target.value.replace(/[^0-9]/g, '') })}
       />
       <Spacing size={16} />
       <TextField
@@ -28,7 +28,7 @@ export function InputSection({ values, onChange }: InputSectionProps) {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={values.monthlyDeposit}
-        onChange={e => onChange({ monthlyDeposit: e.target.value })}
+        onChange={e => onChange({ monthlyDeposit: e.target.value.replace(/[^0-9]/g, '') })}
       />
       <Spacing size={16} />
       <SelectBottomSheet
