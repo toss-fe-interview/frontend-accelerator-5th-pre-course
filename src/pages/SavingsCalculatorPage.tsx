@@ -254,46 +254,58 @@ function SavingsCalculatorResults({
       <Border height={16} />
       <Spacing size={8} />
 
-      <RecommendedProductList selectedProduct={selectedProduct} />
+      <RecommendedProductList
+        monthlyAmount={monthlyAmount}
+        availableTerms={availableTerms}
+        selectedProductId={selectedProduct?.id}
+      />
 
       <Spacing size={40} />
     </>
   );
 }
 
-type RecommendedProductListProps = {
-  selectedProduct: SavingsProduct;
+type RecommendedProductListProps = Omit<SavingsCalculatorFormData, 'targetAmount'> & {
+  selectedProductId?: string;
 };
 
-function RecommendedProductList({ selectedProduct }: RecommendedProductListProps) {
+function RecommendedProductList({ monthlyAmount, availableTerms, selectedProductId }: RecommendedProductListProps) {
   const { data } = useSuspenseQuery({
     queryKey: ['savings-products'],
     queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
-    select: data => data.filter(product => product.id !== selectedProduct.id),
   });
+
+  const filteredData = data
+    .filter(
+      product =>
+        product.minMonthlyAmount <= monthlyAmount &&
+        product.maxMonthlyAmount >= monthlyAmount &&
+        product.availableTerms <= availableTerms
+    )
+    .sort((a, b) => b.annualRate - a.annualRate)
+    .slice(0, 2);
+
   return (
     <>
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
-      {data
-        .filter(product => product.id !== selectedProduct.id)
-        .map((product: SavingsProduct) => (
-          <ListRow
-            key={product.id}
-            contents={
-              <ListRow.Texts
-                type="3RowTypeA"
-                top={product.name}
-                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                middle={`연 이자율: ${product.annualRate}%`}
-                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${formatCurrency(product.minMonthlyAmount)} ~ ${formatCurrency(product.maxMonthlyAmount)} | ${product.availableTerms}개월`}
-                bottomProps={{ fontSize: 13, color: colors.grey600 }}
-              />
-            }
-            onClick={() => {}}
-          />
-        ))}
+      {filteredData.map((product: SavingsProduct) => (
+        <ListRow
+          key={product.id}
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={product.name}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${product.annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${formatCurrency(product.minMonthlyAmount)} ~ ${formatCurrency(product.maxMonthlyAmount)} | ${product.availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+        />
+      ))}
     </>
   );
 }
