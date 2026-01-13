@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, colors, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 import { useCalculationResult } from 'hooks/useCalculationResult';
 import { InputSection, ProductList, CalculationResultSection, InputValues } from 'components/savings';
@@ -12,7 +12,7 @@ const TAB_VALUES = {
 type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
 export function SavingsCalculatorPage() {
-  const { products } = useSavingsProducts();
+  const { products, isLoading, error } = useSavingsProducts();
   const [inputValues, setInputValues] = useState<InputValues>({
     targetAmount: '',
     monthlyDeposit: '',
@@ -42,6 +42,26 @@ export function SavingsCalculatorPage() {
     targetAmount: inputValues.targetAmount,
     term: inputValues.term,
   });
+
+  if (isLoading) {
+    return (
+      <>
+        <NavigationBar title="적금 계산기" />
+        <Spacing size={100} />
+        <div style={{ textAlign: 'center', color: colors.grey500, fontSize: 14 }}>로딩 중...</div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <NavigationBar title="적금 계산기" />
+        <Spacing size={100} />
+        <div style={{ textAlign: 'center', color: colors.grey500, fontSize: 14 }}>상품을 불러올 수 없어요</div>
+      </>
+    );
+  }
 
   return (
     <>
