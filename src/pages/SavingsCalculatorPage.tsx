@@ -1,30 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Border, colors, http, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
-
-interface SavingsProduct {
-  id: string;
-  name: string;
-  annualRate: number;
-  minMonthlyAmount: number;
-  maxMonthlyAmount: number;
-  availableTerms: number;
-}
+import { useMemo, useState } from 'react';
+import { Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { useSavingsProducts } from 'hooks/queries';
 
 const formatNumber = (num: number) => num.toLocaleString('ko-KR');
 
 export function SavingsCalculatorPage() {
-  const [products, setProducts] = useState<SavingsProduct[]>([]);
+  const { products } = useSavingsProducts();
   const [targetAmount, setTargetAmount] = useState<string>('');
   const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
   const [term, setTerm] = useState<number>(12);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const data = await http.get<SavingsProduct[]>('/api/savings-products');
-      setProducts(data);
-    };
-    fetchProducts();
-  }, []);
 
   const filteredProducts = useMemo(() => {
     const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
