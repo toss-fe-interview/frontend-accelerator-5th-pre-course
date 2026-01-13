@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { Suspense, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Assets,
@@ -29,11 +29,6 @@ type SavingsProduct = {
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<'products' | 'results'>('products');
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
-
-  const { data } = useQuery({
-    queryKey: ['savings-products'],
-    queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
-  });
 
   const form = useForm({
     defaultValues: {
@@ -116,25 +111,11 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {/* 라디오 선택 영역 */}
-      {tab === 'products' &&
-        data?.map((product: SavingsProduct) => (
-          <ListRow
-            key={product.id}
-            contents={
-              <ListRow.Texts
-                type="3RowTypeA"
-                top={product.name}
-                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                middle={`연 이자율: ${product.annualRate}%`}
-                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${product.minMonthlyAmount}원 ~ ${product.maxMonthlyAmount}원 | ${product.availableTerms}개월`}
-                bottomProps={{ fontSize: 13, color: colors.grey600 }}
-              />
-            }
-            right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-            onClick={() => setSelectedProduct(product)}
-          />
-        ))}
+      {tab === 'products' && (
+        <Suspense>
+          <SavingsProductList selectedProductId={selectedProduct?.id} onSelectedProduct={setSelectedProduct} />
+        </Suspense>
+      )}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {tab === 'results' && (
@@ -219,4 +200,35 @@ export function SavingsCalculatorPage() {
       {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
     </>
   );
+}
+
+type SavingsProductListProps = {
+  selectedProductId?: string;
+  onSelectedProduct: (product: SavingsProduct) => void;
+};
+
+function SavingsProductList({ selectedProductId, onSelectedProduct }: SavingsProductListProps) {
+  const { data } = useSuspenseQuery({
+    queryKey: ['savings-products'],
+    queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
+  });
+
+  return data.map((product: SavingsProduct) => (
+    <ListRow
+      key={product.id}
+      contents={
+        <ListRow.Texts
+          type="3RowTypeA"
+          top={product.name}
+          topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+          middle={`연 이자율: ${product.annualRate}%`}
+          middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+          bottom={`${product.minMonthlyAmount}원 ~ ${product.maxMonthlyAmount}원 | ${product.availableTerms}개월`}
+          bottomProps={{ fontSize: 13, color: colors.grey600 }}
+        />
+      }
+      right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+      onClick={() => onSelectedProduct(product)}
+    />
+  ));
 }
