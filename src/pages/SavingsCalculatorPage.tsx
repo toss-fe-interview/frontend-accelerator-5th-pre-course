@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 
@@ -19,28 +19,20 @@ export function SavingsCalculatorPage() {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
 
-  const filteredProducts = useMemo(() => {
-    const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
-
-    return products.filter(product => {
-      // 저축 기간 필터
-      const termMatch = product.availableTerms === term;
-
-      // 월 납입액 필터 (입력값이 있을 때만)
-      const depositMatch =
-        depositAmount === 0 || (depositAmount > product.minMonthlyAmount && depositAmount < product.maxMonthlyAmount);
-
-      return termMatch && depositMatch;
-    });
-  }, [products, monthlyDeposit, term]);
+  // 필터링된 상품 목록
+  const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
+  const filteredProducts = products.filter(product => {
+    const termMatch = product.availableTerms === term;
+    const depositMatch =
+      depositAmount === 0 || (depositAmount > product.minMonthlyAmount && depositAmount < product.maxMonthlyAmount);
+    return termMatch && depositMatch;
+  });
 
   // 선택된 상품 찾기
-  const selectedProduct = useMemo(() => {
-    return products.find(product => product.id === selectedProductId) ?? null;
-  }, [products, selectedProductId]);
+  const selectedProduct = products.find(product => product.id === selectedProductId) ?? null;
 
   // 계산 결과
-  const calculationResult = useMemo(() => {
+  const calculationResult = (() => {
     if (!selectedProduct) {
       return null;
     }
@@ -63,7 +55,7 @@ export function SavingsCalculatorPage() {
       difference,
       recommendedDeposit,
     };
-  }, [selectedProduct, monthlyDeposit, targetAmount, term]);
+  })();
 
   return (
     <>
