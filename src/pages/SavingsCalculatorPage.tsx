@@ -1,7 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
 import {
   Assets,
   Border,
   colors,
+  http,
   ListHeader,
   ListRow,
   NavigationBar,
@@ -11,13 +13,27 @@ import {
   TextField,
 } from 'tosslib';
 
+type SavingsProduct = {
+  id: string;
+  name: string;
+  annualRate: number;
+  minMonthlyAmount: number;
+  maxMonthlyAmount: number;
+  availableTerms: number;
+};
+
 export function SavingsCalculatorPage() {
+  const { data } = useQuery({
+    queryKey: ['savings-products'],
+    queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
+  });
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
+      {/* 적금 계산기 입력 폼 */}
       <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
       <Spacing size={16} />
       <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
@@ -32,6 +48,7 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
+      {/* 탭 메뉴 */}
       <Tab onChange={() => {}}>
         <Tab.Item value="products" selected={true}>
           적금 상품
@@ -41,35 +58,25 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 3.2%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'100,000원 ~ 500,000원 | 12개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        right={<Assets.Icon name="icon-check-circle-green" />}
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 2.8%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'50,000원 ~ 1,000,000원 | 24개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+      {/* 라디오 선택 영역 */}
+      {data?.map((product: SavingsProduct) => (
+        <ListRow
+          key={product.id}
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={product.name}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${product.annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${product.minMonthlyAmount}원 ~ ${product.maxMonthlyAmount}원 | ${product.availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          right={<Assets.Icon name="icon-check-circle-green" />}
+          onClick={() => {}}
+        />
+      ))}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
