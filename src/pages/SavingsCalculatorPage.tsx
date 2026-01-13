@@ -67,6 +67,7 @@ export function SavingsCalculatorPage() {
           products={filteredProducts}
           selectedProductId={selectedProductId}
           onProductSelect={setSelectedProductId}
+          emptyMessage="조회 결과가 없어요"
         />
       )}
 
@@ -85,6 +86,7 @@ export function SavingsCalculatorPage() {
             products={recommendedProducts}
             selectedProductId={selectedProductId}
             onProductSelect={setSelectedProductId}
+            emptyMessage="추천 상품이 없어요"
           />
 
           <Spacing size={40} />
