@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Control, Controller, useForm, UseFormReturn } from 'react-hook-form';
 import {
   Assets,
   Border,
@@ -46,60 +46,11 @@ export function SavingsCalculatorPage() {
   return (
     <>
       <NavigationBar title="적금 계산기" />
-
       <Spacing size={16} />
-
-      {/* 적금 계산기 입력 폼 */}
-      <Controller
-        name="minMonthlyAmount"
-        control={form.control}
-        render={({ field }) => (
-          <TextField
-            label="목표 금액"
-            placeholder="목표 금액을 입력하세요"
-            suffix="원"
-            value={field.value?.toString()}
-            onChange={event => field.onChange(Number(event.target.value))}
-          />
-        )}
-      />
-
-      <Spacing size={16} />
-      <Controller
-        name="maxMonthlyAmount"
-        control={form.control}
-        render={({ field }) => (
-          <TextField
-            label="월 납입액"
-            placeholder="희망 월 납입액을 입력하세요"
-            suffix="원"
-            value={field.value?.toString()}
-            onChange={event => field.onChange(Number(event.target.value))}
-          />
-        )}
-      />
-      <Spacing size={16} />
-      <Controller
-        name="availableTerms"
-        control={form.control}
-        render={({ field }) => (
-          <SelectBottomSheet
-            label="저축 기간"
-            title="저축 기간을 선택해주세요"
-            value={field.value}
-            onChange={value => field.onChange(value)}
-          >
-            <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-          </SelectBottomSheet>
-        )}
-      />
-
+      <SavingsCalculatorForm control={form.control} />
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
-
       {/* 탭 메뉴 */}
       <Tab onChange={value => setTab(value as 'products' | 'results')}>
         <Tab.Item value="products" selected={tab === 'products'}>
@@ -109,7 +60,6 @@ export function SavingsCalculatorPage() {
           계산 결과
         </Tab.Item>
       </Tab>
-
       {/* 라디오 선택 영역 */}
       {tab === 'products' && (
         <Suspense>
@@ -117,7 +67,6 @@ export function SavingsCalculatorPage() {
         </Suspense>
       )}
 
-      {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {tab === 'results' && (
         <>
           <Spacing size={8} />
@@ -195,9 +144,68 @@ export function SavingsCalculatorPage() {
           <Spacing size={40} />
         </>
       )}
-
       {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
       {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
+    </>
+  );
+}
+
+type SavingsCalculatorFormProps = {
+  control: Control<{
+    minMonthlyAmount: number;
+    maxMonthlyAmount: number;
+    availableTerms: number;
+  }>;
+};
+
+function SavingsCalculatorForm({ control }: SavingsCalculatorFormProps) {
+  return (
+    <>
+      <Controller
+        name="minMonthlyAmount"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            label="목표 금액"
+            placeholder="목표 금액을 입력하세요"
+            suffix="원"
+            value={field.value?.toString()}
+            onChange={event => field.onChange(Number(event.target.value))}
+          />
+        )}
+      />
+
+      <Spacing size={16} />
+      <Controller
+        name="maxMonthlyAmount"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            label="월 납입액"
+            placeholder="희망 월 납입액을 입력하세요"
+            suffix="원"
+            value={field.value?.toString()}
+            onChange={event => field.onChange(Number(event.target.value))}
+          />
+        )}
+      />
+      <Spacing size={16} />
+      <Controller
+        name="availableTerms"
+        control={control}
+        render={({ field }) => (
+          <SelectBottomSheet
+            label="저축 기간"
+            title="저축 기간을 선택해주세요"
+            value={field.value}
+            onChange={value => field.onChange(value)}
+          >
+            <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
+            <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
+            <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+          </SelectBottomSheet>
+        )}
+      />
     </>
   );
 }
