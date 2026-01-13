@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
+import { useCalculationResult } from 'hooks/useCalculationResult';
 
 const TAB_VALUES = {
   PRODUCTS: 'products',
@@ -28,34 +29,14 @@ export function SavingsCalculatorPage() {
     return termMatch && depositMatch;
   });
 
-  // 선택된 상품 찾기
   const selectedProduct = products.find(product => product.id === selectedProductId) ?? null;
 
-  // 계산 결과
-  const calculationResult = (() => {
-    if (!selectedProduct) {
-      return null;
-    }
-
-    const deposit = Number(monthlyDeposit.replace(/,/g, '')) || 0;
-    const target = Number(targetAmount.replace(/,/g, '')) || 0;
-    const annualRate = selectedProduct.annualRate / 100;
-
-    // 예상 수익 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
-    const expectedReturn = deposit * term * (1 + annualRate * 0.5);
-
-    // 목표 금액과의 차이 = 목표 금액 - 예상 수익 금액
-    const difference = target - expectedReturn;
-
-    // 추천 월 납입 금액 = 목표 금액 ÷ (저축 기간 * (1 + 연이자율 * 0.5)), 1000원 단위 반올림
-    const recommendedDeposit = Math.round(target / (term * (1 + annualRate * 0.5)) / 1000) * 1000;
-
-    return {
-      expectedReturn,
-      difference,
-      recommendedDeposit,
-    };
-  })();
+  const calculationResult = useCalculationResult({
+    selectedProduct,
+    monthlyDeposit,
+    targetAmount,
+    term,
+  });
 
   return (
     <>
