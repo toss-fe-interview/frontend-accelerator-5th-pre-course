@@ -2,7 +2,7 @@ import { Border, colors, ListRow, Spacing } from 'tosslib';
 import { calculateDifference, calculateExpectedAmount, calculateRecommendedMonthlyAmount } from '../utils/savings';
 import { formatCurrency } from 'utils/format';
 import { SavingsCalculatorFormData } from 'hooks/useSavingsCalculatorForm';
-import { SavingsProduct } from 'type';
+import type { SavingsProduct } from 'api/savings';
 import { RecommendedProductList } from './RecommendedProductList';
 
 type SavingsCalculatorResultsProps = SavingsCalculatorFormData & {

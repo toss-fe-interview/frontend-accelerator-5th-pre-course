@@ -1,7 +1,7 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { SavingsCalculatorFormData } from 'hooks/useSavingsCalculatorForm';
-import { Assets, colors, http, ListRow } from 'tosslib';
-import { SavingsProduct } from 'type';
+import { useSavingsProducts } from 'hooks/useSavingsProducts';
+import { Assets, colors, ListRow } from 'tosslib';
+import type { SavingsProduct } from 'api/savings';
 import { formatCurrency } from 'utils/format';
 
 type SavingsProductListProps = Omit<SavingsCalculatorFormData, 'targetAmount'> & {
@@ -15,19 +15,9 @@ export function SavingsProductList({
   selectedProductId,
   onSelectedProduct,
 }: SavingsProductListProps) {
-  const { data } = useSuspenseQuery({
-    queryKey: ['savings-products'],
-    queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
-  });
+  const { products } = useSavingsProducts({ monthlyAmount, availableTerms });
 
-  const filteredData = data.filter(
-    product =>
-      product.minMonthlyAmount <= monthlyAmount &&
-      product.maxMonthlyAmount >= monthlyAmount &&
-      product.availableTerms <= availableTerms
-  );
-
-  return filteredData.map((product: SavingsProduct) => (
+  return products.map((product: SavingsProduct) => (
     <ListRow
       key={product.id}
       contents={

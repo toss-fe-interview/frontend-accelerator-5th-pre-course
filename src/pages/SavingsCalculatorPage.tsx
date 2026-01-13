@@ -1,7 +1,7 @@
 import { Suspense, useState } from 'react';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsCalculatorForm } from 'hooks/useSavingsCalculatorForm';
-import { SavingsProduct } from 'type';
+import type { SavingsProduct } from 'api/savings';
 import { SavingsProductList } from 'components/SavingsProductList';
 import { SavingsCalculatorForm } from 'components/SavingsCalculatorForm';
 import { SavingsCalculatorResults } from 'components/SavingsCalculatorResults';

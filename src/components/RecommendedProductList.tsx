@@ -1,8 +1,8 @@
-import { Assets, colors, http, ListHeader, ListRow, Spacing } from 'tosslib';
+import { Assets, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { formatCurrency } from 'utils/format';
 import { SavingsCalculatorFormData } from 'hooks/useSavingsCalculatorForm';
-import { SavingsProduct } from 'type';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import type { SavingsProduct } from 'api/savings';
+import { useSavingsProducts } from 'hooks/useSavingsProducts';
 
 type RecommendedProductListProps = Omit<SavingsCalculatorFormData, 'targetAmount'> & {
   selectedProductId?: string;
@@ -13,20 +13,9 @@ export function RecommendedProductList({
   availableTerms,
   selectedProductId,
 }: RecommendedProductListProps) {
-  const { data } = useSuspenseQuery({
-    queryKey: ['savings-products'],
-    queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
-  });
+  const { products } = useSavingsProducts({ monthlyAmount, availableTerms });
 
-  const filteredData = data
-    .filter(
-      product =>
-        product.minMonthlyAmount <= monthlyAmount &&
-        product.maxMonthlyAmount >= monthlyAmount &&
-        product.availableTerms <= availableTerms
-    )
-    .sort((a, b) => b.annualRate - a.annualRate)
-    .slice(0, 2);
+  const filteredData = products.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
     <>
