@@ -2,6 +2,13 @@ import { useMemo, useState } from 'react';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 
+const TAB_VALUES = {
+  PRODUCTS: 'products',
+  RESULTS: 'results',
+} as const;
+
+type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
+
 const formatNumber = (num: number) => num.toLocaleString('ko-KR');
 
 export function SavingsCalculatorPage() {
@@ -10,6 +17,7 @@ export function SavingsCalculatorPage() {
   const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
   const [term, setTerm] = useState<number>(12);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
 
   const filteredProducts = useMemo(() => {
     const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
@@ -58,33 +66,38 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={value => setActiveTab(value as TabValue)}>
+        <Tab.Item value={TAB_VALUES.PRODUCTS} selected={activeTab === TAB_VALUES.PRODUCTS}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value={TAB_VALUES.RESULTS} selected={activeTab === TAB_VALUES.RESULTS}>
           계산 결과
         </Tab.Item>
       </Tab>
 
-      {filteredProducts.map(product => (
-        <ListRow
-          key={product.id}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={product.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: ${product.annualRate}%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          onClick={() => setSelectedProductId(product.id)}
-          right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-        />
-      ))}
+      {activeTab === TAB_VALUES.PRODUCTS &&
+        filteredProducts.map(product => (
+          <ListRow
+            key={product.id}
+            contents={
+              <ListRow.Texts
+                type="3RowTypeA"
+                top={product.name}
+                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                middle={`연 이자율: ${product.annualRate}%`}
+                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+              />
+            }
+            onClick={() => setSelectedProductId(product.id)}
+            right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+          />
+        ))}
+
+      {activeTab === TAB_VALUES.RESULTS && (
+        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="계산 결과 탭 (구현 예정)" />} />
+      )}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
