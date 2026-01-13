@@ -34,6 +34,37 @@ export function SavingsCalculatorPage() {
     });
   }, [products, monthlyDeposit, term]);
 
+  // 선택된 상품 찾기
+  const selectedProduct = useMemo(() => {
+    return products.find(product => product.id === selectedProductId) ?? null;
+  }, [products, selectedProductId]);
+
+  // 계산 결과
+  const calculationResult = useMemo(() => {
+    if (!selectedProduct) {
+      return null;
+    }
+
+    const deposit = Number(monthlyDeposit.replace(/,/g, '')) || 0;
+    const target = Number(targetAmount.replace(/,/g, '')) || 0;
+    const annualRate = selectedProduct.annualRate / 100;
+
+    // 예상 수익 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
+    const expectedReturn = deposit * term * (1 + annualRate * 0.5);
+
+    // 목표 금액과의 차이 = 목표 금액 - 예상 수익 금액
+    const difference = target - expectedReturn;
+
+    // 추천 월 납입 금액 = 목표 금액 ÷ (저축 기간 * (1 + 연이자율 * 0.5)), 1000원 단위 반올림
+    const recommendedDeposit = Math.round(target / (term * (1 + annualRate * 0.5)) / 1000) * 1000;
+
+    return {
+      expectedReturn,
+      difference,
+      recommendedDeposit,
+    };
+  }, [selectedProduct, monthlyDeposit, targetAmount, term]);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -95,9 +126,47 @@ export function SavingsCalculatorPage() {
           />
         ))}
 
-      {activeTab === TAB_VALUES.RESULTS && (
-        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="계산 결과 탭 (구현 예정)" />} />
-      )}
+      {activeTab === TAB_VALUES.RESULTS &&
+        (selectedProduct && calculationResult ? (
+          <>
+            <Spacing size={8} />
+            <ListRow
+              contents={
+                <ListRow.Texts
+                  type="2RowTypeA"
+                  top="예상 수익 금액"
+                  topProps={{ color: colors.grey600 }}
+                  bottom={`${formatNumber(Math.round(calculationResult.expectedReturn))}원`}
+                  bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                />
+              }
+            />
+            <ListRow
+              contents={
+                <ListRow.Texts
+                  type="2RowTypeA"
+                  top="목표 금액과의 차이"
+                  topProps={{ color: colors.grey600 }}
+                  bottom={`${formatNumber(Math.round(calculationResult.difference))}원`}
+                  bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                />
+              }
+            />
+            <ListRow
+              contents={
+                <ListRow.Texts
+                  type="2RowTypeA"
+                  top="추천 월 납입 금액"
+                  topProps={{ color: colors.grey600 }}
+                  bottom={`${formatNumber(calculationResult.recommendedDeposit)}원`}
+                  bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                />
+              }
+            />
+          </>
+        ) : (
+          <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+        ))}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
