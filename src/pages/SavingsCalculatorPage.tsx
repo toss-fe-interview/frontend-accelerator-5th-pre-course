@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 import { useCalculationResult } from 'hooks/useCalculationResult';
-import { InputSection, ProductList, CalculationResultSection } from 'components/savings';
+import { InputSection, ProductList, CalculationResultSection, InputValues } from 'components/savings';
 
 const TAB_VALUES = {
   PRODUCTS: 'products',
@@ -13,15 +13,21 @@ type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
 export function SavingsCalculatorPage() {
   const { products } = useSavingsProducts();
-  const [targetAmount, setTargetAmount] = useState<string>('');
-  const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
-  const [term, setTerm] = useState<number>(12);
+  const [inputValues, setInputValues] = useState<InputValues>({
+    targetAmount: '',
+    monthlyDeposit: '',
+    term: 12,
+  });
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
 
-  const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
+  const handleInputChange = (partial: Partial<InputValues>) => {
+    setInputValues(prev => ({ ...prev, ...partial }));
+  };
+
+  const depositAmount = Number(inputValues.monthlyDeposit.replace(/,/g, '')) || 0;
   const filteredProducts = products.filter(product => {
-    const termMatch = product.availableTerms === term;
+    const termMatch = product.availableTerms === inputValues.term;
     const depositMatch =
       depositAmount === 0 || (depositAmount > product.minMonthlyAmount && depositAmount < product.maxMonthlyAmount);
     return termMatch && depositMatch;
@@ -32,23 +38,16 @@ export function SavingsCalculatorPage() {
 
   const calculationResult = useCalculationResult({
     selectedProduct,
-    monthlyDeposit,
-    targetAmount,
-    term,
+    monthlyDeposit: inputValues.monthlyDeposit,
+    targetAmount: inputValues.targetAmount,
+    term: inputValues.term,
   });
 
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
-      <InputSection
-        targetAmount={targetAmount}
-        monthlyDeposit={monthlyDeposit}
-        term={term}
-        onTargetAmountChange={setTargetAmount}
-        onMonthlyDepositChange={setMonthlyDeposit}
-        onTermChange={setTerm}
-      />
+      <InputSection values={inputValues} onChange={handleInputChange} />
 
       <Spacing size={24} />
       <Border height={16} />
