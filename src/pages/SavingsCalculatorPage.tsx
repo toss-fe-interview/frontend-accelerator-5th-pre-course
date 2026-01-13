@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState } from 'react';
-import { Control, Controller, useForm, UseFormReturn } from 'react-hook-form';
+import { Control, Controller, useForm } from 'react-hook-form';
 import {
   Assets,
   Border,
@@ -16,6 +16,8 @@ import {
   TextField,
 } from 'tosslib';
 import { z } from 'zod';
+import { calculateDifference, calculateExpectedAmount, calculateRecommendedMonthlyAmount } from '../utils/savings';
+import { formatCurrency } from 'utils/format';
 
 type SavingsProduct = {
   id: string;
@@ -27,8 +29,11 @@ type SavingsProduct = {
 };
 
 const savingsCalculatorSchema = z.object({
-  minMonthlyAmount: z.number().min(0),
-  maxMonthlyAmount: z.number().min(0),
+  // 목표 금액
+  targetAmount: z.number().min(0),
+  // 월 납입액
+  monthlyAmount: z.number().min(0),
+  // 저축 기간
   availableTerms: z.number().min(0),
 });
 
@@ -36,10 +41,12 @@ type SavingsCalculatorFormData = z.infer<typeof savingsCalculatorSchema>;
 
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<'products' | 'results'>('products');
-  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct>(undefined);
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | undefined>(undefined);
 
   const form = useForm({
     defaultValues: {
+      targetAmount: 1000000,
+      monthlyAmount: 50000,
       availableTerms: 12,
     },
     resolver: zodResolver(savingsCalculatorSchema),
@@ -67,12 +74,17 @@ export function SavingsCalculatorPage() {
 
       {tab === 'products' && (
         <Suspense>
-          <SavingsProductList selectedProductId={selectedProduct?.id} onSelectedProduct={setSelectedProduct} />
+          <SavingsProductList
+            monthlyAmount={form.watch('monthlyAmount')}
+            availableTerms={form.watch('availableTerms')}
+            selectedProductId={selectedProduct?.id}
+            onSelectedProduct={setSelectedProduct}
+          />
         </Suspense>
       )}
       {tab === 'results' && (
         <Suspense>
-          <SavingsCalculatorResults selectedProduct={selectedProduct} />
+          <SavingsCalculatorResults {...form.watch()} selectedProduct={selectedProduct} />
         </Suspense>
       )}
     </>
@@ -87,14 +99,14 @@ function SavingsCalculatorForm({ control }: SavingsCalculatorFormProps) {
   return (
     <>
       <Controller
-        name="minMonthlyAmount"
+        name="targetAmount"
         control={control}
         render={({ field }) => (
           <TextField
             label="목표 금액"
             placeholder="목표 금액을 입력하세요"
             suffix="원"
-            value={field.value?.toString()}
+            value={field.value ? field.value.toString() : ''}
             onChange={event => field.onChange(Number(event.target.value))}
           />
         )}
@@ -102,7 +114,7 @@ function SavingsCalculatorForm({ control }: SavingsCalculatorFormProps) {
 
       <Spacing size={16} />
       <Controller
-        name="maxMonthlyAmount"
+        name="monthlyAmount"
         control={control}
         render={({ field }) => (
           <TextField
@@ -135,18 +147,30 @@ function SavingsCalculatorForm({ control }: SavingsCalculatorFormProps) {
   );
 }
 
-type SavingsProductListProps = {
+type SavingsProductListProps = Omit<SavingsCalculatorFormData, 'targetAmount'> & {
   selectedProductId?: string;
   onSelectedProduct: (product: SavingsProduct) => void;
 };
 
-function SavingsProductList({ selectedProductId, onSelectedProduct }: SavingsProductListProps) {
+function SavingsProductList({
+  monthlyAmount,
+  availableTerms,
+  selectedProductId,
+  onSelectedProduct,
+}: SavingsProductListProps) {
   const { data } = useSuspenseQuery({
     queryKey: ['savings-products'],
     queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
   });
 
-  return data.map((product: SavingsProduct) => (
+  const filteredData = data.filter(
+    product =>
+      product.minMonthlyAmount <= monthlyAmount &&
+      product.maxMonthlyAmount >= monthlyAmount &&
+      product.availableTerms <= availableTerms
+  );
+
+  return filteredData.map((product: SavingsProduct) => (
     <ListRow
       key={product.id}
       contents={
@@ -156,7 +180,7 @@ function SavingsProductList({ selectedProductId, onSelectedProduct }: SavingsPro
           topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
           middle={`연 이자율: ${product.annualRate}%`}
           middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-          bottom={`${product.minMonthlyAmount}원 ~ ${product.maxMonthlyAmount}원 | ${product.availableTerms}개월`}
+          bottom={`${formatCurrency(product.minMonthlyAmount)} ~ ${formatCurrency(product.maxMonthlyAmount)} | ${product.availableTerms}개월`}
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
@@ -166,14 +190,27 @@ function SavingsProductList({ selectedProductId, onSelectedProduct }: SavingsPro
   ));
 }
 
-type SavingsCalculatorResultsProps = {
+type SavingsCalculatorResultsProps = SavingsCalculatorFormData & {
   selectedProduct?: SavingsProduct;
 };
 
-function SavingsCalculatorResults({ selectedProduct }: SavingsCalculatorResultsProps) {
+function SavingsCalculatorResults({
+  targetAmount,
+  monthlyAmount,
+  availableTerms,
+  selectedProduct,
+}: SavingsCalculatorResultsProps) {
   if (!selectedProduct) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
+
+  const expectedAmount = calculateExpectedAmount(monthlyAmount, availableTerms, selectedProduct.annualRate);
+  const difference = calculateDifference(targetAmount, expectedAmount);
+  const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(
+    targetAmount,
+    availableTerms,
+    selectedProduct.annualRate
+  );
 
   return (
     <>
@@ -185,7 +222,7 @@ function SavingsCalculatorResults({ selectedProduct }: SavingsCalculatorResultsP
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`1,000,000원`}
+            bottom={formatCurrency(expectedAmount)}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -196,7 +233,7 @@ function SavingsCalculatorResults({ selectedProduct }: SavingsCalculatorResultsP
             type="2RowTypeA"
             top="목표 금액과의 차이"
             topProps={{ color: colors.grey600 }}
-            bottom={`-500,000원`}
+            bottom={formatCurrency(difference)}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -207,7 +244,7 @@ function SavingsCalculatorResults({ selectedProduct }: SavingsCalculatorResultsP
             type="2RowTypeA"
             top="추천 월 납입 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`100,000원`}
+            bottom={formatCurrency(recommendedMonthlyAmount)}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -250,7 +287,7 @@ function RecommendedProductList({ selectedProduct }: RecommendedProductListProps
                 topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                 middle={`연 이자율: ${product.annualRate}%`}
                 middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${product.minMonthlyAmount}원 ~ ${product.maxMonthlyAmount}원 | ${product.availableTerms}개월`}
+                bottom={`${formatCurrency(product.minMonthlyAmount)} ~ ${formatCurrency(product.maxMonthlyAmount)} | ${product.availableTerms}개월`}
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
