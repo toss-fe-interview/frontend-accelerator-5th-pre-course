@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 
 const formatNumber = (num: number) => num.toLocaleString('ko-KR');
@@ -9,6 +9,7 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<string>('');
   const [monthlyDeposit, setMonthlyDeposit] = useState<string>('');
   const [term, setTerm] = useState<number>(12);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   const filteredProducts = useMemo(() => {
     const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
@@ -80,7 +81,8 @@ export function SavingsCalculatorPage() {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          onClick={() => {}}
+          onClick={() => setSelectedProductId(product.id)}
+          right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
         />
       ))}
 
