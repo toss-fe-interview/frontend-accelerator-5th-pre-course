@@ -2,6 +2,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useSavingProductsQuery } from 'queries/useSavingProductsQuery';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { CalculatorFormInputs } from 'components/pages/SavingCalulatorPage/CalculatorFormInputs';
+import { useState } from 'react';
+import { SavingProduct } from 'queries/types';
 
 type CaluculatorForm = {
   monthlyAmount: number | null;
@@ -11,6 +13,7 @@ type CaluculatorForm = {
 
 export function SavingsCalculatorPage() {
   const { data: savingProducts } = useSavingProductsQuery();
+  const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
   const methods = useForm<CaluculatorForm>({
     defaultValues: {
       monthlyAmount: null,
@@ -56,8 +59,10 @@ export function SavingsCalculatorPage() {
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
-            right={<Assets.Icon name="icon-check-circle-green" />}
-            onClick={() => {}}
+            right={selectedProduct?.id === savingProduct.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+            onClick={() => {
+              setSelectedProduct(savingProduct);
+            }}
           />
         ))}
       </FormProvider>
