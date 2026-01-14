@@ -514,6 +514,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hookform/resolvers@npm:^5.2.2":
+  version: 5.2.2
+  resolution: "@hookform/resolvers@npm:5.2.2"
+  dependencies:
+    "@standard-schema/utils": "npm:^0.3.0"
+  peerDependencies:
+    react-hook-form: ^7.55.0
+  checksum: 10c0/0692cd61dcc2a70cbb27b88a37f733c39e97f555c036ba04a81bd42b0467461cfb6bafacb46c16f173672f9c8a216bd7928a2330d4e49c700d130622bf1defaf
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.13.0":
   version: 0.13.0
   resolution: "@humanwhocodes/config-array@npm:0.13.0"
@@ -827,6 +838,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@standard-schema/utils@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@standard-schema/utils@npm:0.3.0"
+  checksum: 10c0/6eb74cd13e52d5fc74054df51e37d947ef53f3ab9e02c085665dcca3c38c60ece8d735cebbdf18fbb13c775fbcb9becb3f53109b0e092a63f0f7389ce0993fd0
+  languageName: node
+  linkType: hard
+
 "@swc/core-darwin-arm64@npm:1.13.20":
   version: 1.13.20
   resolution: "@swc/core-darwin-arm64@npm:1.13.20"
@@ -956,6 +974,24 @@ __metadata:
   dependencies:
     "@swc/counter": "npm:^0.1.3"
   checksum: 10c0/847a5b20b131281f89d640a7ed4887fb65724807d53d334b230e84b98c21097aa10cd28a074f9ed287a6ce109e443dd4bafbe7dcfb62333d7806c4ea3e7f8aca
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-core@npm:5.90.17":
+  version: 5.90.17
+  resolution: "@tanstack/query-core@npm:5.90.17"
+  checksum: 10c0/f10ba6d82d21fab5a3ad5df028090255f0da5368dad2a78cdb57426519bdb3608d284fbfe733ece139382f60ae17deb5eef14249fbff854b3791795effd8f06f
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.90.17":
+  version: 5.90.17
+  resolution: "@tanstack/react-query@npm:5.90.17"
+  dependencies:
+    "@tanstack/query-core": "npm:5.90.17"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/af722dbfbdfaa85d298963a175945d5089c714d83721320d24c3bd96ca5b74120ffff27866dfc6a45195ac6ec7ffe7e55cefd521fc03de55021bf997735d21cd
   languageName: node
   linkType: hard
 
@@ -3699,6 +3735,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-hook-form@npm:^7.71.1":
+  version: 7.71.1
+  resolution: "react-hook-form@npm:7.71.1"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18 || ^19
+  checksum: 10c0/6c8fc0fa740d299481de3ed32bae98f7c6331240822c602363e5cd221746d875dc3c5e65d0039902b7f7a44dc9ac9a4932e00e9ad9af3051bed1987858ce78c7
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -4392,6 +4437,8 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
     "@hono/vite-dev-server": "npm:^0.18.0"
+    "@hookform/resolvers": "npm:^5.2.2"
+    "@tanstack/react-query": "npm:^5.90.17"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8.18.2"
@@ -4407,11 +4454,13 @@ __metadata:
     prettier: "npm:^3.4.2"
     react: "npm:^18"
     react-dom: "npm:^18"
+    react-hook-form: "npm:^7.71.1"
     react-router-dom: "npm:^7.1.1"
     tosslib: "file:./tosslib.tgz"
     typescript: "npm:~5.7.2"
     vite: "npm:^6.0.6"
     vite-tsconfig-paths: "npm:^5.1.4"
+    zod: "npm:^4.3.5"
   languageName: unknown
   linkType: soft
 
@@ -4808,5 +4857,12 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^4.3.5":
+  version: 4.3.5
+  resolution: "zod@npm:4.3.5"
+  checksum: 10c0/5a2db7e59177a3d7e202543f5136cb87b97b047b77c8a3d824098d3fa8b80d3aa40a0a5f296965c3b82dfdccdd05dbbfacce91347f16a39c675680fd7b1ab109
   languageName: node
   linkType: hard
