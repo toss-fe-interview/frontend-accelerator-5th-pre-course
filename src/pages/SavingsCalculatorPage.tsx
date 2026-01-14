@@ -4,20 +4,10 @@ import SuspenseFallback from 'components/SuspenseFallback';
 import SavingsInputs from 'features/savings/components/SavingsInputs';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
+import { SavingsTabs } from 'features/savings/types/tabs';
 import { parseNumberInput } from 'features/savings/utils/parse/number';
 import { ChangeEvent, useState } from 'react';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Assets, Border, colors, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [savingsValues, setSavingsValues] = useState<SavingsValues>({
@@ -25,6 +15,7 @@ export function SavingsCalculatorPage() {
     monthlyPaymentAmount: 0,
     savingsPeriod: 6,
   });
+  const [selectedTab, setSelectedTab] = useState<SavingsTabs>('products');
   const { data: savingsProducts } = useSuspenseSavingsProducts();
 
   const handleChagneTargetAmount = (e: ChangeEvent<HTMLInputElement>) => {
@@ -68,11 +59,15 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab
+        onChange={(newValue: string) => {
+          setSelectedTab(newValue as SavingsTabs);
+        }}
+      >
+        <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={selectedTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
