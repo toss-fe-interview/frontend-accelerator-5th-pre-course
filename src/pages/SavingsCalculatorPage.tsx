@@ -1,19 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Border,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from '../hooks/useSavingsProducts';
-import { formatNumber } from '../utils/format';
 import { ApiStateHandler } from '../components/ApiStateHandler';
 import { SavingsProductListItem } from '../components/SavingsProductListItem';
 import { CalculationResults } from '../components/CalculationResults';
+import { SavingsInputForm } from '../components/SavingsInputForm';
 import { filterProducts } from '../utils/productFilter';
 import {
   calculateDifference,
@@ -102,32 +93,14 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField
-        label="목표 금액"
-        placeholder="목표 금액을 입력하세요"
-        suffix="원"
-        value={targetAmount > 0 ? formatNumber(targetAmount) : ''}
-        onChange={e => handleTargetAmountChange(e.target.value)}
+      <SavingsInputForm
+        targetAmount={targetAmount}
+        monthlyAmount={monthlyAmount}
+        savingTerm={savingTerm}
+        onTargetAmountChange={handleTargetAmountChange}
+        onMonthlyAmountChange={handleMonthlyAmountChange}
+        onSavingTermChange={handleSavingTermChange}
       />
-      <Spacing size={16} />
-      <TextField
-        label="월 납입액"
-        placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
-        value={monthlyAmount > 0 ? formatNumber(monthlyAmount) : ''}
-        onChange={e => handleMonthlyAmountChange(e.target.value)}
-      />
-      <Spacing size={16} />
-      <SelectBottomSheet
-        label="저축 기간"
-        title="저축 기간을 선택해주세요"
-        value={savingTerm}
-        onChange={handleSavingTermChange}
-      >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
 
       <Spacing size={24} />
       <Border height={16} />
