@@ -1,5 +1,6 @@
 import MoneyTextField from 'components/MoneyTextField';
 import { useSavingsProducts } from 'hooks/queries/savings';
+import { useDebounce } from 'hooks/useDebounce';
 import { useState } from 'react';
 import { useSavingsFilterStore } from 'stores/savingsFilterStore';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
@@ -71,8 +72,10 @@ const SavingsTab = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const allSavingsList = data ?? [];
 
+  const debouncedMonthlyPay = useDebounce(monthlyPay, 300);
+
   const filterdSavingsList = allSavingsList
-    .filter(item => item.minMonthlyAmount <= monthlyPay && monthlyPay <= item.maxMonthlyAmount)
+    .filter(item => item.minMonthlyAmount <= debouncedMonthlyPay && debouncedMonthlyPay <= item.maxMonthlyAmount)
     .filter(item => item.availableTerms === terms);
 
   return (
