@@ -4,7 +4,7 @@ import { CalculatorFormInputs } from 'components/pages/SavingCalulatorPage/Calcu
 import { Suspense, useState } from 'react';
 import { SavingProduct } from 'queries/types';
 import { SavingProductList } from 'components/pages/SavingCalulatorPage/SavingProductList';
-import { isTabType, TAB_STATE, useSavingCalculatorTab } from 'hooks/useSavingCalculatorTab';
+import { TAB_STATE, useSavingCalculatorTab } from 'hooks/useSavingCalculatorTab';
 import { Loading } from 'components/common/Loading';
 import { CalculationResult } from 'components/pages/SavingCalulatorPage/CalculationResult';
 
@@ -16,7 +16,7 @@ type CalculatorForm = {
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
-  const [tabState, setTabState] = useSavingCalculatorTab();
+  const { tabState, handleTabState } = useSavingCalculatorTab();
   const methods = useForm<CalculatorForm>({
     defaultValues: {
       monthlyAmount: null,
@@ -38,13 +38,7 @@ export function SavingsCalculatorPage() {
         <Border height={16} />
         <Spacing size={8} />
 
-        <Tab
-          onChange={value => {
-            if (isTabType(value)) {
-              setTabState(value);
-            }
-          }}
-        >
+        <Tab onChange={handleTabState}>
           <Tab.Item value={TAB_STATE.PRODUCTS} selected={tabState === TAB_STATE.PRODUCTS}>
             적금 상품
           </Tab.Item>

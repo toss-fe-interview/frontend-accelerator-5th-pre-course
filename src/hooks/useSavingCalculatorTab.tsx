@@ -14,5 +14,11 @@ export const isTabType = (value: string): value is TabType => {
 export const useSavingCalculatorTab = () => {
   const [tabState, setTabState] = useState<TabType>(TAB_STATE.PRODUCTS);
 
-  return [tabState, setTabState] as const;
+  const handleTabState = (value: string) => {
+    if (isTabType(value)) {
+      setTabState(value);
+    }
+  };
+
+  return { tabState, handleTabState };
 };
