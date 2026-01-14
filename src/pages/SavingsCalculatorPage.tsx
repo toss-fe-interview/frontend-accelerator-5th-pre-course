@@ -1,5 +1,6 @@
 import { useSavingsProducts } from 'apis/savings';
 import { ProductList } from 'components/ProductList';
+import { SavingsForm } from 'components/SavingsForm';
 import { useMemo, useState } from 'react';
 import {
   Assets,
@@ -42,15 +43,6 @@ export function SavingsCalculatorPage() {
     });
   }, [products, formData.monthlyAmount, formData.savingPeriod]);
 
-  // 숫자 입력 처리 (콤마 포맷팅)
-  const handleNumberInput = (field: 'targetAmount' | 'monthlyAmount', value: string) => {
-    // 숫자만 추출
-    const numbers = value.replace(/[^\d]/g, '');
-    // 콤마 포맷팅
-    const formatted = numbers ? Number(numbers).toLocaleString('ko-KR') : '';
-    handleChangeInput(field, formatted);
-  };
-
   const handleChangeInput = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -61,32 +53,7 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField
-        label="목표 금액"
-        placeholder="목표 금액을 입력하세요"
-        suffix="원"
-        value={formData.targetAmount}
-        onChange={e => handleNumberInput('targetAmount', e.target.value)}
-      />
-      <Spacing size={16} />
-      <TextField
-        label="월 납입액"
-        placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
-        value={formData.monthlyAmount}
-        onChange={e => handleNumberInput('monthlyAmount', e.target.value)}
-      />
-      <Spacing size={16} />
-      <SelectBottomSheet
-        label="저축 기간"
-        title="저축 기간을 선택해주세요"
-        value={formData.savingPeriod}
-        onChange={value => handleChangeInput('savingPeriod', value)}
-      >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <SavingsForm formData={formData} onChangeInput={handleChangeInput} />
 
       <Spacing size={24} />
       <Border height={16} />
