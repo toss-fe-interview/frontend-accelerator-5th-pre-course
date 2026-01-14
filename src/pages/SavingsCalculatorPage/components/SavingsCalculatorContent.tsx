@@ -115,6 +115,7 @@ function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct
 
   return (
     <>
+      <Spacing size={8} />
       <ListRow
         contents={
           <ListRow.Texts
@@ -172,21 +173,6 @@ function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct
           onClick={() => {}}
         />
       ))}
-
-      {/* <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      /> */}
 
       <Spacing size={40} />
     </>
