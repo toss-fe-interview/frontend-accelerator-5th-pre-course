@@ -6,13 +6,25 @@ import { Suspense, useState } from 'react';
 
 type SelectedTab = 'products' | 'results';
 
+export interface CalculInputs {
+  targetAmount: number;
+  monthlyAmount: number;
+  term: number;
+}
+
 function SavingsCalculator() {
   const [selectedTab, setSelectedTab] = useState<SelectedTab>('products');
+  const [calculInputs, setCalculInputs] = useState<CalculInputs>({
+    targetAmount: 0,
+    monthlyAmount: 0,
+    term: 0,
+  });
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
-      <SavingCalculatorInput />
+      <SavingCalculatorInput calculInputs={calculInputs} onChange={setCalculInputs} />
       <Border height={16} />
       <Spacing size={8} />
       <Tab onChange={value => setSelectedTab(value as SelectedTab)}>
