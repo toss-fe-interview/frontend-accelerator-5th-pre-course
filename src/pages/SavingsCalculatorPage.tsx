@@ -7,10 +7,10 @@ import { SavingsProductItem } from 'features/saving-products/components/Item';
 import { useState } from 'react';
 import { NumberInput } from 'shared/components/NumberInput';
 import { SavingsProductTab } from 'features/saving-products/components/Tab';
-import { formatPrice } from 'shared/utils/price';
 import { SavingsCalculateItem } from 'features/saving-products-calculate/components/Item';
 import { SavingsProduct } from 'features/saving-products/types';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/saving-products-calculate/utils';
+import { toNumber } from 'shared/utils/format';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -97,34 +97,30 @@ export function SavingsCalculatorPage() {
             <>
               <SavingsCalculateItem
                 label="예상 수익 금액"
-                value={formatPrice(
-                  calculateExpectedAmount({
-                    annualRate: selectedSavingsProduct?.annualRate || 0,
-                    monthlyPayment: parseInt(monthlyPayment),
-                    terms: parseInt(terms),
-                  })
-                )}
+                value={calculateExpectedAmount({
+                  annualRate: selectedSavingsProduct?.annualRate || 0,
+                  monthlyPayment: toNumber(monthlyPayment),
+                  terms: toNumber(terms),
+                })}
               />
               <SavingsCalculateItem
                 label="목표 금액과의 차이"
-                value={formatPrice(
-                  parseInt(targetAmount) -
-                    calculateExpectedAmount({
-                      annualRate: selectedSavingsProduct?.annualRate || 0,
-                      monthlyPayment: parseInt(monthlyPayment),
-                      terms: parseInt(terms),
-                    })
-                )}
+                value={
+                  toNumber(targetAmount) -
+                  calculateExpectedAmount({
+                    annualRate: selectedSavingsProduct?.annualRate || 0,
+                    monthlyPayment: toNumber(monthlyPayment),
+                    terms: toNumber(terms),
+                  })
+                }
               />
               <SavingsCalculateItem
                 label="추천 월 납입 금액"
-                value={formatPrice(
-                  calculateRecommendedMonthlyPayment({
-                    targetAmount: parseInt(targetAmount),
-                    annualRate: selectedSavingsProduct?.annualRate || 0,
-                    terms: parseInt(terms),
-                  })
-                )}
+                value={calculateRecommendedMonthlyPayment({
+                  targetAmount: toNumber(targetAmount),
+                  annualRate: selectedSavingsProduct?.annualRate || 0,
+                  terms: toNumber(terms),
+                })}
               />
             </>
           ) : (
