@@ -19,6 +19,7 @@ export function SavingsCalculatorPage() {
   const [targetPrice, setTargetPrice] = useState('');
   const [monthlyDeposit, setMonthlyDeposit] = useState('');
   const [savingDuration, setSavingDuration] = useState(12);
+  const [selectedSavingsProductId, setSelectedSavingsProductId] = useState('');
 
   const filteredSavingsProducts = savingsProductsQuery.data
     ?.filter(product => product.availableTerms === savingDuration)
@@ -95,8 +96,10 @@ export function SavingsCalculatorPage() {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          // right={<Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {}}
+          right={product.id === selectedSavingsProductId && <Assets.Icon name="icon-check-circle-green" />}
+          onClick={() => {
+            setSelectedSavingsProductId(product.id);
+          }}
         />
       ))}
 
