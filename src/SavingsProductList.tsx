@@ -1,12 +1,32 @@
 import { useSavingsProductListQuery } from 'services/useSavingsProductListQuery';
 import { Assets, colors, ListRow } from 'tosslib';
+import { SavingsProduct } from 'types';
+import { Term } from 'useSavingsProductFilters';
 
-export default function SavingsProductList() {
+type Props = {
+  filters: {
+    targetAmount: number;
+    monthlyPayment: number;
+    term: Term;
+  };
+  onSelect: (savingsProduct: SavingsProduct) => void;
+  selectedSavingsProduct: SavingsProduct | null;
+};
+
+export default function SavingsProductList({ filters, onSelect, selectedSavingsProduct }: Props) {
   const { data } = useSavingsProductListQuery();
+
+  const filteredProducts = data?.filter(product => {
+    const isMonthlyPayment =
+      product.minMonthlyAmount < filters.monthlyPayment && product.maxMonthlyAmount > filters.monthlyPayment;
+    const isTerm = product.availableTerms === filters.term;
+
+    return isMonthlyPayment && isTerm;
+  });
 
   return (
     <>
-      {data?.map(product => (
+      {filteredProducts?.map(product => (
         <ListRow
           key={product.id}
           contents={
@@ -16,12 +36,12 @@ export default function SavingsProductList() {
               topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
               middle={`연 이자율: ${product.annualRate}%`}
               middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${product.minMonthlyAmount}원 ~ ${product.maxMonthlyAmount}원 | ${product.availableTerms}개월`}
+              bottom={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`}
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          right={<Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {}}
+          right={selectedSavingsProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+          onClick={() => onSelect(product)}
         />
       ))}
     </>
