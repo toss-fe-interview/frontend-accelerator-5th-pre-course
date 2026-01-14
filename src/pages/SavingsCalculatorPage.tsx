@@ -1,15 +1,15 @@
-import { SAVINGS_PRODUCT_TABS } from 'features/savings-products/constants';
+import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
-import { SavingsProductItem } from 'features/savings-products/components/Item';
+import { SavingsProductItem } from 'features/savings/components/SavingsProductItem';
 import { useState } from 'react';
-import { SavingsProductTab } from 'features/savings-products/components/Tab';
-import { SavingsCalculateItem } from 'features/savings-products-calculate/components/Item';
-import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings-products-calculate/utils';
+import { SavingsProductTab } from 'features/savings/components/Tab';
+import { CalculationResultItem } from 'features/savings/components/CalculationResultItem';
+import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
 import { toNumber } from 'shared/utils/format';
-import { useSavingsProducts } from 'features/savings-products/hooks/useSavingsProducts';
-import { AmountInputSection } from 'features/savings-products/components/AmountInputSection';
-import { TermsSelectBottomSheet } from 'features/savings-products/components/TermsSelectBottomSheet';
+import { useSavingsProducts } from 'features/savings/hooks/useSavingsProducts';
+import { AmountInputSection } from 'features/savings/components/AmountInputSection';
+import { TermsSelectBottomSheet } from 'features/savings/components/TermsSelectBottomSheet';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -61,7 +61,7 @@ export function SavingsCalculatorPage() {
         <>
           {selectedProductId ? (
             <>
-              <SavingsCalculateItem
+              <CalculationResultItem
                 label="예상 수익 금액"
                 value={calculateExpectedAmount({
                   annualRate: selectedSavingsProduct?.annualRate || 0,
@@ -69,7 +69,7 @@ export function SavingsCalculatorPage() {
                   terms: toNumber(terms),
                 })}
               />
-              <SavingsCalculateItem
+              <CalculationResultItem
                 label="목표 금액과의 차이"
                 value={
                   toNumber(targetAmount) -
@@ -80,7 +80,7 @@ export function SavingsCalculatorPage() {
                   })
                 }
               />
-              <SavingsCalculateItem
+              <CalculationResultItem
                 label="추천 월 납입 금액"
                 value={calculateRecommendedMonthlyPayment({
                   targetAmount: toNumber(targetAmount),
