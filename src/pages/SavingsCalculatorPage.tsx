@@ -1,21 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { SavingsQueryOption } from 'domain/savings/api/SavingsQueryOption';
+import { SavingsFilter } from 'domain/savings/components/SavingsFilter';
 import { SavingsList } from 'domain/savings/components/SavingsList';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { useSavingForm } from 'domain/savings/hooks/useSavingForm';
+import { Assets, Border, colors, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const { data: savings } = useQuery(SavingsQueryOption.getSavings);
+  const filterForm = useSavingForm();
 
   return (
     <>
@@ -23,15 +15,7 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <SavingsFilter filterForm={filterForm} />
 
       <Spacing size={24} />
       <Border height={16} />
