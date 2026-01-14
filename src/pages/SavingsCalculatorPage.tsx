@@ -40,53 +40,50 @@ export function SavingsCalculatorPage() {
   });
 
   return (
-    <>
+    <FormProvider {...methods}>
       <NavigationBar title="적금 계산기" />
-
       <Spacing size={16} />
 
-      <FormProvider {...methods}>
-        <CalculatorFormInputs />
+      <CalculatorFormInputs />
 
-        <Spacing size={24} />
-        <Border height={16} />
-        <Spacing size={8} />
+      <Spacing size={24} />
+      <Border height={16} />
+      <Spacing size={8} />
 
-        <Tab onChange={handleTabState}>
-          <Tab.Item value={TAB_STATE.PRODUCTS} selected={tabState === TAB_STATE.PRODUCTS}>
-            적금 상품
-          </Tab.Item>
-          <Tab.Item value={TAB_STATE.RESULTS} selected={tabState === TAB_STATE.RESULTS}>
-            계산 결과
-          </Tab.Item>
-        </Tab>
+      <Tab onChange={handleTabState}>
+        <Tab.Item value={TAB_STATE.PRODUCTS} selected={tabState === TAB_STATE.PRODUCTS}>
+          적금 상품
+        </Tab.Item>
+        <Tab.Item value={TAB_STATE.RESULTS} selected={tabState === TAB_STATE.RESULTS}>
+          계산 결과
+        </Tab.Item>
+      </Tab>
 
-        <Suspense fallback={<Loading />}>
-          {tabState === TAB_STATE.PRODUCTS && (
-            <SavingProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
-          )}
+      <Suspense fallback={<Loading />}>
+        {tabState === TAB_STATE.PRODUCTS && (
+          <SavingProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+        )}
 
-          {tabState === TAB_STATE.RESULTS && (
-            <>
-              <Spacing size={8} />
-              <ResultGuard selectedProduct={selectedProduct}>
-                {product => <CalculationResultSummary selectedProduct={product} />}
-              </ResultGuard>
+        {tabState === TAB_STATE.RESULTS && (
+          <>
+            <Spacing size={8} />
+            <ResultGuard selectedProduct={selectedProduct}>
+              {product => <CalculationResultSummary selectedProduct={product} />}
+            </ResultGuard>
 
-              <Spacing size={8} />
-              <Border height={16} />
-              <Spacing size={8} />
+            <Spacing size={8} />
+            <Border height={16} />
+            <Spacing size={8} />
 
-              <ListHeader
-                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-              />
-              <Spacing size={12} />
-              <RecommendProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
-              <Spacing size={40} />
-            </>
-          )}
-        </Suspense>
-      </FormProvider>
-    </>
+            <ListHeader
+              title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+            />
+            <Spacing size={12} />
+            <RecommendProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+            <Spacing size={40} />
+          </>
+        )}
+      </Suspense>
+    </FormProvider>
   );
 }
