@@ -109,7 +109,6 @@ describe('calculation utilities', () => {
 
     it('추천 월 납입 금액 계산 - format.test.ts 예시', () => {
       // format.test.ts의 명세서 계산 공식 결과와 일치
-      const monthlyAmount = 1000000 / (12 * (1 + 0.032 * 0.5));
       const result = calculateRecommendedMonthlyAmount(1000000, 12, 3.2);
       expect(result).toBe(82000);
     });
