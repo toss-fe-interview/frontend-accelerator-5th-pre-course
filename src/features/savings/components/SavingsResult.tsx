@@ -1,5 +1,5 @@
 import { ListRow, colors } from 'tosslib';
-import { calculateEstimatedEaringsAmount } from '../utils/calculation/savings';
+import { calculateDifferenceWithTargetAmount, calculateEstimatedEaringsAmount } from '../utils/calculation/savings';
 import { SavingsValues } from '../types/savingsValues';
 import { SavingsProduct } from '../schemas/savingsProduct';
 import { formatNumberWithComma } from '../utils/format/number';
@@ -17,17 +17,20 @@ export default function SavingsResult({ savingsValues, savingsProducts, selected
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
 
-  const { monthlyPaymentAmount, savingsPeriod } = savingsValues;
+  const { targetAmount, monthlyPaymentAmount, savingsPeriod } = savingsValues;
   const { annualRate } = selectedProduct;
+
+  const estimatedEaringsAmount = calculateEstimatedEaringsAmount(monthlyPaymentAmount, savingsPeriod, annualRate);
+  const differnceWithTargetAmount = calculateDifferenceWithTargetAmount(targetAmount, estimatedEaringsAmount);
 
   const resultItems = [
     {
       label: '예상 수익 금액',
-      value: calculateEstimatedEaringsAmount(monthlyPaymentAmount, savingsPeriod, annualRate),
+      value: estimatedEaringsAmount,
     },
     {
       label: '목표 금액과의 차이',
-      value: calculateEstimatedEaringsAmount(monthlyPaymentAmount, savingsPeriod, annualRate),
+      value: differnceWithTargetAmount,
     },
     {
       label: '추천 월 납입 금액',

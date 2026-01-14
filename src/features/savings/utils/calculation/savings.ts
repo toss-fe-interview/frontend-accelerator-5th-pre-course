@@ -7,3 +7,9 @@ export const calculateEstimatedEaringsAmount = (
 
   return Math.round(result);
 };
+
+export const calculateDifferenceWithTargetAmount = (targetAmount: number, estimatedEarginsAmount: number) => {
+  const result = targetAmount - estimatedEarginsAmount;
+
+  return Math.round(result);
+};
