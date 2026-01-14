@@ -1,52 +1,17 @@
 import { useState } from 'react';
-import {
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
+import { CalculationResult } from 'components/CalculationResult';
 import { SavingsProductListItem } from 'components/SavingsProductListItem';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
+import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
 import { SavingsProduct } from 'types/SavingsProduct.type';
-import { formatAmount } from 'utils/formatAmount';
+import { filterSavingsProduct } from 'utils/filterSavingsProduct';
+import { formatTextFieldValue } from 'utils/formatTextFieldValue';
 
-type SavingsCalculatorFormState = {
-  targetAmount: number;
-  monthlyAmount: number;
-  term: number;
-};
-
-const filterSavingsProduct = (savingsProduct: SavingsProduct, formState: SavingsCalculatorFormState) => {
-  return (
-    savingsProduct.minMonthlyAmount <= formState.monthlyAmount &&
-    savingsProduct.maxMonthlyAmount >= formState.monthlyAmount &&
-    savingsProduct.availableTerms === formState.term
-  );
-};
-
-const formatTextFieldValue = (amount: number) => {
-  return amount > 0 ? formatAmount(amount) : '';
-};
-
-// TODO: annualRate가 %라서 100으로 나눠줘야 하나?
-const calculateFinalAmount = (monthlyAmount: number, term: number, annualRate: number) => {
-  return monthlyAmount * term * (1 + (annualRate / 100) * 0.5);
-};
-
-const calculateDifferenceAmount = (targetAmount: number, finalAmount: number) => {
-  return targetAmount - finalAmount;
-};
-
-const calculateRecommendedMonthlyAmount = (targetAmount: number, term: number, annualRate: number) => {
-  return Math.round(targetAmount / (term * (1 + (annualRate / 100) * 0.5)) / 1000) * 1000;
-};
-
+/**
+ * 남은 버그 - 기간 변경 했는데, 선택은 남아있어서 계산 결과가 나온다
+ */
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
   const [formState, setFormState] = useState<SavingsCalculatorFormState>({
@@ -131,20 +96,23 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {/* 적금 상품 리스트 영역 */}
-      {/* TODO: 적금 상품 리스트 Empty 컴포넌트 */}
       {selectedTab === 'products' && (
         <>
-          {filteredSavingsProducts.map(savingsProduct => {
-            const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
-            return (
-              <SavingsProductListItem
-                key={savingsProduct.id}
-                savingsProduct={savingsProduct}
-                isSelected={isSelected}
-                setSelectedSavingsProduct={setSelectedSavingsProduct}
-              />
-            );
-          })}
+          {filteredSavingsProducts.length > 0 ? (
+            filteredSavingsProducts.map(savingsProduct => {
+              const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
+              return (
+                <SavingsProductListItem
+                  key={savingsProduct.id}
+                  savingsProduct={savingsProduct}
+                  isSelected={isSelected}
+                  setSelectedSavingsProduct={setSelectedSavingsProduct}
+                />
+              );
+            })
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="적합한 적금 상품이 없습니다." />} />
+          )}
         </>
       )}
 
@@ -155,41 +123,7 @@ export function SavingsCalculatorPage() {
 
           <>
             {selectedSavingsProduct ? (
-              <>
-                <ListRow
-                  contents={
-                    <ListRow.Texts
-                      type="2RowTypeA"
-                      top="예상 수익 금액"
-                      topProps={{ color: colors.grey600 }}
-                      bottom={`${formatAmount(calculateFinalAmount(formState.monthlyAmount, formState.term, selectedSavingsProduct.annualRate))}원`}
-                      bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                    />
-                  }
-                />
-                <ListRow
-                  contents={
-                    <ListRow.Texts
-                      type="2RowTypeA"
-                      top="목표 금액과의 차이"
-                      topProps={{ color: colors.grey600 }}
-                      bottom={`${formatAmount(calculateDifferenceAmount(formState.targetAmount, calculateFinalAmount(formState.monthlyAmount, formState.term, selectedSavingsProduct.annualRate)))}원`}
-                      bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                    />
-                  }
-                />
-                <ListRow
-                  contents={
-                    <ListRow.Texts
-                      type="2RowTypeA"
-                      top="추천 월 납입 금액"
-                      topProps={{ color: colors.grey600 }}
-                      bottom={`${formatAmount(calculateRecommendedMonthlyAmount(formState.targetAmount, formState.term, selectedSavingsProduct.annualRate))}원`}
-                      bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                    />
-                  }
-                />
-              </>
+              <CalculationResult formState={formState} selectedSavingsProduct={selectedSavingsProduct} />
             ) : (
               <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
             )}
@@ -202,17 +136,21 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {recommendedSavingsProducts.map(savingsProduct => {
-            const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
-            return (
-              <SavingsProductListItem
-                key={savingsProduct.id}
-                savingsProduct={savingsProduct}
-                isSelected={isSelected}
-                setSelectedSavingsProduct={setSelectedSavingsProduct}
-              />
-            );
-          })}
+          {recommendedSavingsProducts.length > 0 ? (
+            recommendedSavingsProducts.map(savingsProduct => {
+              const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
+              return (
+                <SavingsProductListItem
+                  key={savingsProduct.id}
+                  savingsProduct={savingsProduct}
+                  isSelected={isSelected}
+                  setSelectedSavingsProduct={setSelectedSavingsProduct}
+                />
+              );
+            })
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="적합한 추천 상품이 없습니다." />} />
+          )}
 
           <Spacing size={40} />
         </>
