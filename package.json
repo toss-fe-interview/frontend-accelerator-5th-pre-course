@@ -3,7 +3,10 @@
   "private": true,
   "packageManager": "yarn@4.6.0",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -20,6 +23,7 @@
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
     "@vitejs/plugin-react-swc": "^3.7.2",
+    "@vitest/ui": "^4.0.17",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-import": "^2.31.0",
@@ -30,6 +34,7 @@
     "prettier": "^3.4.2",
     "typescript": "~5.7.2",
     "vite": "^6.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.17"
   }
 }
