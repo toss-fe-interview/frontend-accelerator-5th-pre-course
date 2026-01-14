@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Assets,
   Border,
@@ -18,6 +18,11 @@ import { addComma } from 'utils/add-comma';
 export function SavingsCalculatorPage() {
   const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
 
+  // 적금 계산기
+  const [targetAmount, setTargetAmount] = useState<number | undefined>(0);
+  const [monthlyAmount, setMonthlyAmount] = useState<number | undefined>(0);
+  const [term, setTerm] = useState<number>(12);
+
   useEffect(() => {
     getSavingsProducts()
       .then(response => {
@@ -30,17 +35,61 @@ export function SavingsCalculatorPage() {
       });
   }, []);
 
+  // 적금계산기를 통한 필터링
+  const filteredSavingsProducts = useMemo(() => {
+    return savingsProducts.filter(product => {
+      if (product.availableTerms !== term) {
+        return false;
+      }
+
+      if (monthlyAmount === undefined) {
+        return true;
+      }
+
+      return product.minMonthlyAmount <= monthlyAmount && product.maxMonthlyAmount >= monthlyAmount;
+    });
+  }, [savingsProducts, monthlyAmount, term]);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      {/* 적금 계산기 */}
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        // TODO: 0 이 아닌 undefined 로 처리
+        value={addComma(targetAmount)}
+        onChange={e => {
+          const numericValue = e.target.value.replace(/\D/g, '');
+          setTargetAmount(numericValue === '' ? undefined : Number(numericValue));
+        }}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        // TODO: 0 이 아닌 undefined 로 처리
+        value={addComma(monthlyAmount)}
+        onChange={e => {
+          // TODO: 공통 함수로 좀 묶기
+          const numericValue = e.target.value.replace(/\D/g, '');
+          setMonthlyAmount(numericValue === '' ? undefined : Number(numericValue));
+        }}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={term}
+        onChange={value => {
+          setTerm(value);
+        }}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
@@ -59,7 +108,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {savingsProducts.map(product => (
+      {filteredSavingsProducts.map(product => (
         <ListRow
           key={product.id}
           contents={
