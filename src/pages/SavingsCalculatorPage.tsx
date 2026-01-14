@@ -1,17 +1,11 @@
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { useQuery } from '@tanstack/react-query';
+import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { getProducts } from 'utils/api';
 
 export function SavingsCalculatorPage() {
+  const { data } = useQuery({ queryKey: ['products'], queryFn: getProducts });
+  console.log(data);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
