@@ -8,10 +8,12 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@tanstack/react-query": "^5.90.17",
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^7.1.1",
-    "tosslib": "file:./tosslib.tgz"
+    "tosslib": "file:./tosslib.tgz",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@hono/vite-dev-server": "^0.18.0",
