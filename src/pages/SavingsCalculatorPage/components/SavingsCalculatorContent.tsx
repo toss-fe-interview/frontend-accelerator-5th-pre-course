@@ -50,7 +50,7 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
                 key={product.id}
                 product={product}
                 selectedProduct={selectedProduct}
-                handleSelectProduct={handleSelectProduct}
+                onSelectProduct={handleSelectProduct}
               />
             ))}
           </>
@@ -62,6 +62,7 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
             term={term}
             selectedProduct={selectedProduct}
             products={filteredSavingsProducts}
+            onSelectProduct={handleSelectProduct}
           />
         ))
         .exhaustive()}
@@ -72,9 +73,9 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
 interface SavingsProductProps {
   product: SavingsProduct;
   selectedProduct: SavingsProduct | null;
-  handleSelectProduct: (product: SavingsProduct) => void;
+  onSelectProduct: (product: SavingsProduct) => void;
 }
-function SavingsProduct({ product, selectedProduct, handleSelectProduct }: SavingsProductProps) {
+function SavingsProduct({ product, selectedProduct, onSelectProduct }: SavingsProductProps) {
   return (
     <ListRow
       key={product.id}
@@ -90,7 +91,7 @@ function SavingsProduct({ product, selectedProduct, handleSelectProduct }: Savin
         />
       }
       right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-      onClick={() => handleSelectProduct(product)}
+      onClick={() => onSelectProduct(product)}
     />
   );
 }

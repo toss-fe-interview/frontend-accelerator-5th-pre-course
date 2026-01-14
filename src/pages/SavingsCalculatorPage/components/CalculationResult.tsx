@@ -1,4 +1,4 @@
-import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { SavingsProduct } from '../models/savings-products.dto';
 import { formatCurrency } from 'utils/format';
 import { SavingsFilterForm } from '../types/saving-filter-form';
@@ -6,9 +6,17 @@ import { SavingsFilterForm } from '../types/saving-filter-form';
 interface Props extends SavingsFilterForm {
   selectedProduct: SavingsProduct | null;
   products: SavingsProduct[];
+  onSelectProduct: (product: SavingsProduct) => void;
 }
 
-export function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct, products }: Props) {
+export function CalculationResult({
+  targetAmount,
+  monthlyPayment,
+  term,
+  selectedProduct,
+  products,
+  onSelectProduct,
+}: Props) {
   if (!selectedProduct) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
@@ -87,7 +95,8 @@ export function CalculationResult({ targetAmount, monthlyPayment, term, selected
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          onClick={() => {}}
+          right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+          onClick={() => onSelectProduct(product)}
         />
       ))}
     </>
