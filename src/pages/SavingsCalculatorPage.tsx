@@ -1,3 +1,6 @@
+import { useQuery } from '@tanstack/react-query';
+import { SavingsQueryOption } from 'domain/savings/api/SavingsQueryOption';
+import { SavingsList } from 'domain/savings/components/SavingsList';
 import {
   Assets,
   Border,
@@ -12,6 +15,8 @@ import {
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
+  const { data: savings } = useQuery(SavingsQueryOption.getSavings);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -40,6 +45,8 @@ export function SavingsCalculatorPage() {
           계산 결과
         </Tab.Item>
       </Tab>
+
+      <SavingsList savings={savings ?? []} />
 
       <ListRow
         contents={
