@@ -2,6 +2,7 @@ import { ErrorBoundary, Suspense } from '@suspensive/react';
 import ErrorFallback from 'components/ErrorFallback';
 import SuspenseFallback from 'components/SuspenseFallback';
 import SavingsInputs from 'features/savings/components/SavingsInputs';
+import SavingsProductList from 'features/savings/components/SavingsProductList';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
@@ -16,6 +17,7 @@ export function SavingsCalculatorPage() {
     savingsPeriod: 6,
   });
   const [selectedTab, setSelectedTab] = useState<SavingsTabs>('products');
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const { data: savingsProducts } = useSuspenseSavingsProducts();
 
   const handleChagneTargetAmount = (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +43,10 @@ export function SavingsCalculatorPage() {
       ...prev,
       savingsPeriod: newValue,
     }));
+  };
+
+  const changeSelectedProduct = (newValue: string) => {
+    setSelectedProductId(newValue);
   };
 
   return (
@@ -74,11 +80,11 @@ export function SavingsCalculatorPage() {
 
       <ErrorBoundary fallback={ErrorFallback}>
         <Suspense fallback={<SuspenseFallback />}>
-          <div>
-            {savingsProducts.map(product => (
-              <div key={product.id}>{product.availableTerms}</div>
-            ))}
-          </div>
+          <SavingsProductList
+            savingsProducts={savingsProducts}
+            selectedProductId={selectedProductId}
+            changeSelectedProduct={changeSelectedProduct}
+          />
         </Suspense>
       </ErrorBoundary>
 
