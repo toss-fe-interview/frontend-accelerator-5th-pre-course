@@ -1,4 +1,6 @@
-import useSavingsProductsQuery from 'queries/useSavingsProductsQuery';
+import { SAVINGS_DURATIONS } from 'entities/savings/config/constant';
+import { extractNumbers, formatNumberWithCommas } from 'entities/savings/lib';
+import { SavingsTab, useSavingsProducts } from 'entities/savings/model';
 import { useState } from 'react';
 import {
   Assets,
@@ -13,29 +15,25 @@ import {
   TextField,
 } from 'tosslib';
 
-type Tab = 'products' | 'result';
-
 export function SavingsCalculatorPage() {
-  const savingsDurations = [6, 12, 24];
-  const savingsProductsQuery = useSavingsProductsQuery();
   const [targetPrice, setTargetPrice] = useState('');
   const [monthlyDeposit, setMonthlyDeposit] = useState('');
   const [savingDuration, setSavingDuration] = useState(12);
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState('');
-  const [tab, setTab] = useState<Tab>('products');
+  const [tab, setTab] = useState<SavingsTab>('products');
+  const { filteredSavingsProducts, recommendedSavingsProducts, selectedSavingsProduct } = useSavingsProducts({
+    savingDuration,
+    monthlyDeposit,
+    selectedSavingsProductId,
+  });
 
-  const filteredSavingsProducts =
-    savingsProductsQuery.data
-      ?.filter(product => product.availableTerms === savingDuration)
-      .filter(
-        product =>
-          product.minMonthlyAmount <= Number(monthlyDeposit) && Number(monthlyDeposit) <= product.maxMonthlyAmount
-      ) ?? [];
+  const onTargetPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTargetPrice(extractNumbers(e.target.value));
+  };
 
-  const recommendedSavingsProducts =
-    filteredSavingsProducts?.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2) ?? [];
-
-  const selectedSavingsProduct = filteredSavingsProducts?.find(product => product.id === selectedSavingsProductId);
+  const onMonthlyDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMonthlyDeposit(extractNumbers(e.target.value));
+  };
 
   return (
     <>
@@ -45,22 +43,16 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={targetPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-        onChange={e => {
-          const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
-          setTargetPrice(onlyNumbers);
-        }}
+        value={formatNumberWithCommas(targetPrice)}
+        onChange={onTargetPriceChange}
       />
       <Spacing size={16} />
       <TextField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        onChange={e => {
-          const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
-          setMonthlyDeposit(onlyNumbers);
-        }}
-        value={monthlyDeposit.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+        onChange={onMonthlyDepositChange}
+        value={formatNumberWithCommas(monthlyDeposit)}
       />
       <Spacing size={16} />
       <SelectBottomSheet
@@ -71,7 +63,7 @@ export function SavingsCalculatorPage() {
           setSavingDuration(duration);
         }}
       >
-        {savingsDurations.map(duration => (
+        {SAVINGS_DURATIONS.map(duration => (
           <SelectBottomSheet.Option key={duration} value={duration}>
             {`${duration}개월`}
           </SelectBottomSheet.Option>
@@ -84,7 +76,7 @@ export function SavingsCalculatorPage() {
 
       <Tab
         onChange={value => {
-          setTab(value as Tab);
+          setTab(value as SavingsTab);
         }}
       >
         <Tab.Item value="products" selected={tab === 'products'}>
