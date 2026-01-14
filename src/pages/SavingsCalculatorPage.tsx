@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Border, colors, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, colors, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { SavingsForm } from 'features/savings-calculator';
 import { useSavingsProducts } from 'shared/hooks';
 import { SavingsFormState } from 'shared/types';
@@ -14,6 +14,7 @@ export const DEFAULT_SAVINGS_FORM_STATE: SavingsFormState = {
 export function SavingsCalculatorPage() {
   const { data: products = [] } = useSavingsProducts();
   const [formState, setFormState] = useState<SavingsFormState>(DEFAULT_SAVINGS_FORM_STATE);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   const filteredProducts = useMemo(() => {
     const { monthlyAmount, term } = formState;
@@ -69,7 +70,8 @@ export function SavingsCalculatorPage() {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          onClick={() => {}}
+          onClick={() => setSelectedProductId(product.id)}
+          right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
         />
       ))}
 
