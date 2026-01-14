@@ -1,19 +1,60 @@
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { useState } from 'react';
+import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+
+/**
+ * 2. 저축 목표 입력 기능 만들기
+ * - 입력 기능 구현
+ * - 유효한 입력값이 되도록 처리 -> 시간 소요 예상
+ * - 입력한 값에 따라서 필터링 된 목록이 적금 상품에 보여지도록 처리
+ */
+
+type SavingsCalculatorFormState = {
+  targetAmount: number;
+  monthlyAmount: number;
+  term: number;
+};
+
+/** TODO:
+ * 필터링 조건
+ * - 월 납입액
+ *    - `product.minMonthlyAmount` (최소 월 납입액)보다 크고
+ *    - `product.maxMonthlyAmount` (최대 월 납입액)보다 작아야 함
+ * - 저축 기간
+ *    - `product.availableTerms` (저축 기간)와 동일해야 함
+ */
+const filterSavingsProduct = (savingsProduct: SavingsProduct, formState: SavingsCalculatorFormState) => {};
+
+const formatAmount = (amount: number) => amount.toLocaleString('ko-KR');
+
+const formatTextFieldValue = (amount: number) => {
+  return amount > 0 ? formatAmount(amount) : '';
+};
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
+  const [formState, setFormState] = useState<SavingsCalculatorFormState>({
+    targetAmount: 0,
+    monthlyAmount: 0,
+    term: 12,
+  });
+
+  const handleChangeTextField = (key: keyof SavingsCalculatorFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === '') {
+      setFormState({ ...formState, [key]: 0 });
+      return;
+    }
+
+    const digits = value.replace(/[^0-9]/g, '');
+    const parsedValue = Number(digits);
+
+    if (isNaN(parsedValue) || parsedValue <= 0) {
+      return;
+    }
+    setFormState({ ...formState, [key]: parsedValue });
+  };
 
   return (
     <>
@@ -22,11 +63,28 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
 
       {/* 계산기 form 영역 */}
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={formatTextFieldValue(formState.targetAmount)}
+        onChange={handleChangeTextField('targetAmount')}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={formatTextFieldValue(formState.monthlyAmount)}
+        onChange={handleChangeTextField('monthlyAmount')}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={formState.term}
+        onChange={value => setFormState({ ...formState, term: Number(value) })}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
