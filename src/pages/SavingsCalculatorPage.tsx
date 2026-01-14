@@ -1,6 +1,6 @@
-import { FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { SavingsCalculatorInputs } from 'components/pages/SavingCalulatorPage/SavingsCalculatorInputs';
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import { Suspense, useState } from 'react';
 import { SavingProduct } from 'queries/types';
 import { SavingProductList } from 'components/pages/SavingCalulatorPage/SavingProductList';
@@ -8,6 +8,7 @@ import { TAB_STATE, useSavingCalculatorTab } from 'hooks/useSavingCalculatorTab'
 import { Loading } from 'components/common/Loading';
 import { CalculationResultSummary } from 'components/pages/SavingCalulatorPage/CalculationResultSummary';
 import { CalculationResultProductList } from 'components/pages/SavingCalulatorPage/CalculationResultProductList';
+import { TextFieldForKRW } from 'components/common/TextFieldForKRW';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
@@ -44,7 +45,43 @@ export function SavingsCalculatorPage() {
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      <SavingsCalculatorInputs />
+      <Controller
+        name="targetAmount"
+        control={methods.control}
+        render={({ field }) => (
+          <TextFieldForKRW
+            label="목표 금액"
+            placeholder="목표 금액을 입력하세요"
+            value={field.value}
+            onChange={field.onChange}
+          />
+        )}
+      />
+      <Spacing size={16} />
+      <Controller
+        name="monthlyAmount"
+        control={methods.control}
+        render={({ field }) => (
+          <TextFieldForKRW
+            label="월 납입액"
+            placeholder="희망 월 납입액을 입력하세요"
+            value={field.value}
+            onChange={field.onChange}
+          />
+        )}
+      />
+      <Spacing size={16} />
+      <Controller
+        name="term"
+        control={methods.control}
+        render={({ field }) => (
+          <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" {...field}>
+            <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
+            <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
+            <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+          </SelectBottomSheet>
+        )}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
