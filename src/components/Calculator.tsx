@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { ProductItem } from './ProductContainer';
-import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import CalculationResult from './CalculationResult';
+import ProductList from './ProductList';
 
 type Tabs = 'products' | 'results';
-type FormData = {
+export type FormDataType = {
   targetAmount: string;
   monthlPayment: string;
   // 6, 12, 24
@@ -16,9 +18,8 @@ interface CalculatorProps {
 }
 
 export default function Calculator({ products, selectProduct }: CalculatorProps) {
-  // 폼을 다뤄야함. (사용자 입력)
   const [tab, setTab] = useState<Tabs>('products');
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<FormDataType>({
     targetAmount: '',
     monthlPayment: '',
     savingPeriod: 12,
@@ -29,25 +30,28 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
   }
 
   // 필드에 맞는 값을 업데이트
-  function handleChangeField<K extends keyof FormData>(key: K, value: FormData[K]) {
+  function handleChangeField<K extends keyof FormDataType>(key: K, value: FormDataType[K]) {
     setFormData(prev => ({ ...prev, [key]: value }));
   }
 
-  // 폼 데이터와 products를 자식한테 내려줘야함.
-
-  // 적금상품 컴포넌트에는 filter된 products만 내려줌 + select도 내려줘야함.
-  // 계산결과 컴포넌트에는 products랑 입력값을 내려줘서 계산하게 해야함.
+  // 필터로직 개선
+  function filterProdcuts(products: ProductItem[]) {
+    return products
+      .filter(product => product.minMonthlyAmount > Number(formData.monthlPayment))
+      .filter(item => item.maxMonthlyAmount < Number(formData.monthlPayment))
+      .filter(item => item.availableTerms === formData.savingPeriod);
+  }
 
   return (
     <>
-      {/* TODO : 숫자만 입력되게 나중에 개선 */}
       <TextField
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={formData.targetAmount}
+        value={Number(formData.targetAmount).toLocaleString()}
         onChange={e => {
-          handleChangeField('targetAmount', e.target.value);
+          const numericValue = e.target.value.replace(/[^0-9]/g, '');
+          handleChangeField('targetAmount', numericValue);
         }}
       />
       <Spacing size={16} />
@@ -56,9 +60,10 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={formData.monthlPayment}
+        value={Number(formData.monthlPayment).toLocaleString()}
         onChange={e => {
-          handleChangeField('monthlPayment', e.target.value);
+          const numericValue = e.target.value.replace(/[^0-9]/g, '');
+          handleChangeField('monthlPayment', numericValue);
         }}
       />
       <Spacing size={16} />
@@ -91,6 +96,13 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
           계산 결과
         </Tab.Item>
       </Tab>
+
+      {tab === 'products' ? (
+        // 입력된 값이 없으면 일반 products를 노출 | 필터된 프로덕트 노출
+        <ProductList products={filterProdcuts(products)} handleClickProduct={selectProduct} />
+      ) : (
+        <CalculationResult products={products} data={formData} handleClickProduct={selectProduct} />
+      )}
     </>
   );
 }
