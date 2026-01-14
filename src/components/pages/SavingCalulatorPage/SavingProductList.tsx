@@ -1,7 +1,6 @@
 import { SavingProduct } from 'queries/types';
 import { useSavingProductsQuery } from 'queries/useSavingProductsQuery';
 import { useWatch } from 'react-hook-form';
-import { Assets, colors, ListRow } from 'tosslib';
 import { isAffordableProducts } from 'utils/savingProductFilter';
 import { ProductItem } from './ProductItem';
 

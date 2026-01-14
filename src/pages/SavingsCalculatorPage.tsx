@@ -1,5 +1,4 @@
 import { FormProvider, useForm } from 'react-hook-form';
-import { useSavingProductsQuery } from 'queries/useSavingProductsQuery';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import { CalculatorFormInputs } from 'components/pages/SavingCalulatorPage/CalculatorFormInputs';
 import { useState } from 'react';
