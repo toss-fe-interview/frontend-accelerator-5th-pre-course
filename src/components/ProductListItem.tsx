@@ -5,7 +5,7 @@ import type { SavingsProduct } from 'apis/type';
 type ProductListItemProps = {
   savingsProduct: SavingsProduct;
   selected?: boolean;
-  onClick?: (id: string) => void;
+  onClick?: (savingsProduct: SavingsProduct) => void;
 };
 
 export const ProductListItem = ({ savingsProduct, selected, onClick }: ProductListItemProps) => {
@@ -26,7 +26,7 @@ export const ProductListItem = ({ savingsProduct, selected, onClick }: ProductLi
         />
       }
       right={selected && <Assets.Icon name="icon-check-circle-green" />}
-      onClick={() => onClick?.(id)}
+      onClick={() => onClick?.(savingsProduct)}
     />
   );
 };
