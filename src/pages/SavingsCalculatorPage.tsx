@@ -1,26 +1,22 @@
-import { Border, NavigationBar, Spacing, Tab, http, isHttpError } from 'tosslib';
+import { Border, ListRow, NavigationBar, Spacing, Tab, http, isHttpError } from 'tosslib';
 import { useEffect, useMemo, useState } from 'react';
 import { SavingsInputForm } from 'components/SavingsInputForm';
-import { SavingsProductItem } from 'components/SavingsProductItem';
 import { CalculationResult } from 'components/CalculationResult';
 import { SavingsProduct, SavingsInput } from 'type';
+import { ProductList } from 'components/ProductList';
 
 export function SavingsCalculatorPage() {
-  // 처음 api 에서 저축 상품 목록 가져오기
   const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
-
-  // 적금 계산기 입력 값
-  // 처음 적금 계산기 입력 값은 null 이므로 초기값을 null 로 설정
-  const [savingsInput, setSavingsInput] = useState<SavingsInput | null>(null);
-
-  // 선택한 적금 상품
+  const [savingsInput, setSavingsInput] = useState<SavingsInput>({
+    goalAmount: '',
+    monthlyAmount: '',
+    term: 0,
+  });
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
 
   const [selectTab, setSelectTab] = useState<'products' | 'results'>('products');
 
-  // 필터링 조건에 맞게 상품 목록 필터링
   const filteredSavingsProducts = useMemo(() => {
-    // 월 납입액 필터링
     const filteredByMonthlyAmount = savingsProducts.filter(product => {
       return (
         product.minMonthlyAmount <= Number(savingsInput?.monthlyAmount) &&
@@ -28,7 +24,6 @@ export function SavingsCalculatorPage() {
       );
     });
 
-    // 저축 기간 필터링
     const filteredByTerm = filteredByMonthlyAmount.filter(product => {
       return product.availableTerms === savingsInput?.term;
     });
@@ -52,16 +47,15 @@ export function SavingsCalculatorPage() {
     fetchSavingsProducts();
   }, []);
 
+  const hasValidInput = savingsInput?.term && savingsInput?.monthlyAmount;
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <SavingsInputForm
-        savingsInput={savingsInput ?? { goalAmount: '', monthlyAmount: '', term: 0 }}
-        setSavingsInput={setSavingsInput}
-      />
+      <SavingsInputForm savingsInput={savingsInput} setSavingsInput={setSavingsInput} />
 
       <Spacing size={24} />
       <Border height={16} />
@@ -77,26 +71,26 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       <Spacing size={8} />
-      {selectTab === 'products' && (
+      {hasValidInput ? (
         <>
-          {filteredSavingsProducts.map(product => (
-            <SavingsProductItem
-              key={product.id}
-              product={product}
-              selected={selectedSavingsProduct?.id === product.id}
-              onClick={() => setSelectedSavingsProduct(product)}
+          {selectTab === 'products' && (
+            <ProductList
+              filteredSavingsProducts={filteredSavingsProducts}
+              selectedSavingsProduct={selectedSavingsProduct}
+              setSelectedSavingsProduct={setSelectedSavingsProduct}
             />
-          ))}
+          )}
+          {selectTab === 'results' && (
+            <CalculationResult
+              selectedSavingsProduct={selectedSavingsProduct}
+              savingsInput={savingsInput}
+              filteredSavingsProducts={filteredSavingsProducts}
+            />
+          )}
         </>
+      ) : (
+        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="먼저 저축 기간과 월 납입 금액을 입력해주세요." />} />
       )}
-      {selectTab === 'results' && (
-        <CalculationResult
-          selectedSavingsProduct={selectedSavingsProduct}
-          savingsInput={savingsInput ?? { goalAmount: '', monthlyAmount: '', term: 0 }}
-          filteredSavingsProducts={filteredSavingsProducts}
-        />
-      )}
-
       <Spacing size={40} />
     </>
   );
