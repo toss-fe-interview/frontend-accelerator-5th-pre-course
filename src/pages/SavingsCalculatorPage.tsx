@@ -10,9 +10,6 @@ import { SavingsProduct } from 'types/SavingsProduct.type';
 import { filterSavingsProduct } from 'utils/filterSavingsProduct';
 import { formatTextFieldValue } from 'utils/formatTextFieldValue';
 
-/**
- * 남은 버그 - 기간 변경 했는데, 선택은 남아있어서 계산 결과가 나온다
- */
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
   const [formState, setFormState] = useState<SavingsCalculatorFormState>({
@@ -20,7 +17,7 @@ export function SavingsCalculatorPage() {
     monthlyAmount: 0,
     term: 12,
   });
-  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
+  const [selectedSavingsProductId, setSelectedSavingsProductId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
   const handleChangeTextField = (key: keyof SavingsCalculatorFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +44,14 @@ export function SavingsCalculatorPage() {
   const recommendedSavingsProducts = [...filteredSavingsProducts]
     .sort((a, b) => b.annualRate - a.annualRate)
     .slice(0, 2);
+
+  const handleSelectProduct = (savingsProduct: SavingsProduct | null) => {
+    setSelectedSavingsProductId(savingsProduct?.id || null);
+  };
+
+  const selectedSavingsProduct = filteredSavingsProducts.find(
+    savingsProduct => savingsProduct.id === selectedSavingsProductId
+  );
 
   return (
     <>
@@ -101,13 +106,13 @@ export function SavingsCalculatorPage() {
         <>
           {filteredSavingsProducts.length > 0 ? (
             filteredSavingsProducts.map(savingsProduct => {
-              const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
+              const isSelected = selectedSavingsProductId === savingsProduct.id;
               return (
                 <SavingsProductListItem
                   key={savingsProduct.id}
                   savingsProduct={savingsProduct}
                   isSelected={isSelected}
-                  setSelectedSavingsProduct={setSelectedSavingsProduct}
+                  handleSelectedSavingsProduct={handleSelectProduct}
                 />
               );
             })
@@ -139,13 +144,13 @@ export function SavingsCalculatorPage() {
 
           {recommendedSavingsProducts.length > 0 ? (
             recommendedSavingsProducts.map(savingsProduct => {
-              const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
+              const isSelected = selectedSavingsProductId === savingsProduct.id;
               return (
                 <SavingsProductListItem
                   key={savingsProduct.id}
                   savingsProduct={savingsProduct}
                   isSelected={isSelected}
-                  setSelectedSavingsProduct={setSelectedSavingsProduct}
+                  handleSelectedSavingsProduct={handleSelectProduct}
                 />
               );
             })
