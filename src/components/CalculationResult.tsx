@@ -1,6 +1,7 @@
 import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { SavingsProduct } from 'types/savings';
 import { ProductList } from './ProductList';
+import { formatNumberWithComma } from 'utils/formatNumberWithComma';
 
 interface CalculationResultProps {
   expectedAmount: number;
@@ -10,10 +11,6 @@ interface CalculationResultProps {
   selectedProductId: string | null;
   onSelectProduct: (productId: string) => void;
 }
-
-const formatNumber = (num: number) => {
-  return num.toLocaleString('ko-KR');
-};
 
 export function CalculationResult({
   expectedAmount,
@@ -33,7 +30,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatNumber(expectedAmount)}원`}
+            bottom={`${formatNumberWithComma(expectedAmount)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -44,7 +41,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="목표 금액과의 차이"
             topProps={{ color: colors.grey600 }}
-            bottom={`${differenceFromTarget >= 0 ? '' : '-'}${formatNumber(Math.abs(differenceFromTarget))}원`}
+            bottom={`${differenceFromTarget >= 0 ? '' : '-'}${formatNumberWithComma(Math.abs(differenceFromTarget))}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -55,7 +52,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="추천 월 납입 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatNumber(recommendedMonthlyAmount)}원`}
+            bottom={`${formatNumberWithComma(recommendedMonthlyAmount)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }

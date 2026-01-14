@@ -1,5 +1,6 @@
 import { Assets, colors, ListRow } from 'tosslib';
 import { SavingsProduct } from '../types/savings';
+import { formatNumberWithComma } from 'utils/formatNumberWithComma';
 
 interface ProductListProps {
   products: SavingsProduct[];
@@ -23,7 +24,7 @@ export function ProductList({ products, selectedProductId, onSelectProduct }: Pr
                 topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                 middle={`연 이자율: ${product.annualRate}%`}
                 middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                bottom={`${formatNumberWithComma(product.minMonthlyAmount)}원 ~ ${formatNumberWithComma(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
@@ -35,7 +36,3 @@ export function ProductList({ products, selectedProductId, onSelectProduct }: Pr
     </>
   );
 }
-
-const formatNumber = (num: number) => {
-  return num.toLocaleString('ko-KR');
-};
