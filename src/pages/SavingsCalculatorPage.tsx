@@ -1,6 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
 import { SAVINGS_PRODUCT_TABS } from 'features/saving-products/constants';
-import { savingsProductQuery } from 'features/saving-products/apis/queries';
 import { useTab } from 'shared/hooks/useTab';
 import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
 import { SavingsProductItem } from 'features/saving-products/components/Item';
@@ -8,9 +6,9 @@ import { useState } from 'react';
 import { NumberInput } from 'shared/components/NumberInput';
 import { SavingsProductTab } from 'features/saving-products/components/Tab';
 import { SavingsCalculateItem } from 'features/saving-products-calculate/components/Item';
-import { SavingsProduct } from 'features/saving-products/types';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/saving-products-calculate/utils';
 import { toNumber } from 'shared/utils/format';
+import { useSavingsProducts } from 'features/saving-products/hooks/useSavingsProducts';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -18,22 +16,8 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<string>('');
   const [monthlyPayment, setMonthlyPayment] = useState<string>('');
   const [terms, setTerms] = useState<string>('');
-  const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
 
-  const filteredSavingsProducts = savingsProducts?.filter(product => {
-    const monthly = parseInt(monthlyPayment) || 0;
-
-    if (monthly === 0) {
-      return true;
-    }
-
-    return monthly >= product.minMonthlyAmount && monthly <= product.maxMonthlyAmount;
-  });
-
-  const recommendedProducts = (filteredProducts: SavingsProduct[] = [], allProducts: SavingsProduct[] = []) => {
-    const products = filteredProducts.length > 0 ? filteredProducts : allProducts;
-    return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-  };
+  const { filteredSavingsProducts, recommendedProducts, savingsProducts } = useSavingsProducts(monthlyPayment);
 
   const selectedSavingsProduct = savingsProducts?.find(product => product.id === selectedProductId);
 
