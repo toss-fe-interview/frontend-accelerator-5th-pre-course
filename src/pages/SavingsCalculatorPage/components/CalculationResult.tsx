@@ -1,7 +1,7 @@
 import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { SavingsProduct } from '../models/savings-products.dto';
 import { formatCurrency } from 'utils/format';
-import { SavingsFilterForm } from '../types/saving-filter-form';
+import { SavingsCalculatorTerm, SavingsFilterForm } from '../types/saving-filter-form';
 
 interface Props extends SavingsFilterForm {
   selectedProduct: SavingsProduct | null;
@@ -25,18 +25,10 @@ export function CalculationResult({
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="모든 필수 값을 입력해주세요." />} />;
   }
 
-  const annualRate = selectedProduct.annualRate;
-  const rateMultiplier = 1 + (annualRate / 100) * 0.5;
-
-  // 예상 수익 금액
-  const expectedAmount = monthlyPayment * term * rateMultiplier;
-
+  const expectedAmount = calculateExpectedAmount(monthlyPayment, term, selectedProduct.annualRate);
   const difference = targetAmount - expectedAmount;
-
-  // 추천 월 납입 금액 (1,000원 단위 반올림)
-  const recommendedMonthlyPayment = Math.round(targetAmount / (term * rateMultiplier) / 1000) * 1000;
-
-  const recommendedProducts = products.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  const recommendedMonthlyPayment = calculateRecommendedMonthly(targetAmount, term, selectedProduct.annualRate);
+  const recommendedProducts = getRecommendedProducts(products);
 
   return (
     <>
@@ -58,7 +50,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="목표 금액과의 차이"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatCurrency(Math.round(difference))}원`}
+            bottom={`${formatDifference(difference)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -101,4 +93,30 @@ export function CalculationResult({
       ))}
     </>
   );
+}
+
+function calculateExpectedAmount(monthlyPayment: number, term: SavingsCalculatorTerm, annualRate: number): number {
+  const 연이율 = annualRate / 100;
+  const 적금평균이자기간비율 = 0.5;
+  const 최종금액비율 = 1 + 연이율 * 적금평균이자기간비율;
+
+  return monthlyPayment * term * 최종금액비율;
+}
+
+function calculateRecommendedMonthly(targetAmount: number, term: SavingsCalculatorTerm, annualRate: number): number {
+  const 연이율 = annualRate / 100;
+  const 적금평균이자기간비율 = 0.5;
+  const 최종금액비율 = 1 + 연이율 * 적금평균이자기간비율;
+  const 월납입금액반올림단위 = 1000;
+
+  return Math.round(targetAmount / (term * 최종금액비율) / 월납입금액반올림단위) * 월납입금액반올림단위;
+}
+
+function getRecommendedProducts(products: SavingsProduct[], count = 2): SavingsProduct[] {
+  return products.sort((a, b) => b.annualRate - a.annualRate).slice(0, count);
+}
+
+function formatDifference(difference: number): string {
+  const sign = difference > 0 ? '-' : '+';
+  return `${sign}${formatCurrency(Math.abs(difference))}`;
 }
