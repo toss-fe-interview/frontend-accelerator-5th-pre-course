@@ -1,15 +1,14 @@
 import { useWatch } from 'react-hook-form';
 import { colors, ListRow } from 'tosslib';
 import { SavingProduct } from 'queries/types';
+import { calculateExpectedIncome, calculateTargetDiff, calculateRecommendedMonthlyPayment } from 'utils/savingCalculator';
 
 export const CalculationResultSummary = ({ selectedProduct }: { selectedProduct: SavingProduct }) => {
   const { monthlyAmount, term, targetAmount } = useWatch();
 
-  // TODO : 테스트 코드 추가
-  const expectedIncome = monthlyAmount * term * (1 + selectedProduct.annualRate * 0.01 * 0.5);
-  const targetDiff = targetAmount - expectedIncome;
-  const recommendedMonthlyPayment =
-    Math.round(targetAmount / (term * (1 + selectedProduct.annualRate * 0.01 * 0.5)) / 1000) * 1000;
+  const expectedIncome = calculateExpectedIncome(monthlyAmount, term, selectedProduct.annualRate);
+  const targetDiff = calculateTargetDiff(targetAmount, expectedIncome);
+  const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment(targetAmount, term, selectedProduct.annualRate);
 
   return (
     <>
