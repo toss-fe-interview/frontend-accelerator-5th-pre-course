@@ -1,5 +1,6 @@
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { CalculInputs } from '../SavingsCalculatorPage';
+import { formatToKRW } from '../util';
 
 interface SavingCalculatorInputProps {
   calculInputs: CalculInputs;
@@ -35,7 +36,7 @@ export default function SavingCalculatorInput({ calculInputs, onChange }: Saving
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={calculInputs.targetAmount.toLocaleString('ko-KR')}
+        value={formatToKRW(calculInputs.targetAmount)}
         onChange={handleTargetAmountChange}
       />
       <Spacing size={16} />
@@ -43,7 +44,7 @@ export default function SavingCalculatorInput({ calculInputs, onChange }: Saving
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={calculInputs.monthlyAmount.toLocaleString('ko-KR')}
+        value={formatToKRW(calculInputs.monthlyAmount)}
         onChange={handleMonthlyAmountChange}
       />
       <Spacing size={16} />

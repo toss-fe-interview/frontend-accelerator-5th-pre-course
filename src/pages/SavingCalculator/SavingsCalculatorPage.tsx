@@ -67,7 +67,6 @@ function SavingsCalculator() {
         />
       )}
       {selectedTab === 'results' && <SavingResult />}
-      <SavingResult />
     </>
   );
 }
