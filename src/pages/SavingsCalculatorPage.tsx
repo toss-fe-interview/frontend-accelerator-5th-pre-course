@@ -28,9 +28,6 @@ export function SavingsCalculatorPage() {
 
       <Savings.Divider />
       <Savings.TabNavigation tabs={tabs} />
-
-      
-
       <Savings.TabContent
         renderProps={(tab) => (
           <>
