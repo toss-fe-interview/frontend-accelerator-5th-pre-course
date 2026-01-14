@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { SavingProduct } from 'queries/types';
 import { SavingProductList } from 'components/pages/SavingCalulatorPage/SavingProductList';
 import { CalulationResult } from 'components/pages/SavingCalulatorPage/CalulationResult';
+import { isTabType, TAB_STATE, useSavingCalulatorTab } from 'hooks/useSavingCalulatorTab';
 
 type CaluculatorForm = {
   monthlyAmount: number | null;
@@ -13,17 +14,10 @@ type CaluculatorForm = {
   term: number;
 };
 
-const TAB_STATE = {
-  PRODUCTS: 'products',
-  RESULTS: 'results',
-} as const;
-
-type TabType = (typeof TAB_STATE)[keyof typeof TAB_STATE];
-
 export function SavingsCalculatorPage() {
   const { data: savingProducts } = useSavingProductsQuery();
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
-  const [tabState, setTabState] = useState<TabType>(TAB_STATE.PRODUCTS);
+  const [tabState, setTabState] = useSavingCalulatorTab();
   const methods = useForm<CaluculatorForm>({
     defaultValues: {
       monthlyAmount: null,
@@ -31,10 +25,6 @@ export function SavingsCalculatorPage() {
       term: 12,
     },
   });
-
-  const isTabType = (value: string): value is TabType => {
-    return Object.values(TAB_STATE).includes(value as TabType);
-  };
 
   return (
     <>
