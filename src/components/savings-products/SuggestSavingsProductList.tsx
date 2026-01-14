@@ -19,7 +19,9 @@ export default function SuggestSavingProductList({
       <>
         <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
         <Spacing size={12} />
-        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다." />} />
+        <ListRow
+          contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다. 입력값을 모두 입력해주세요." />}
+        />
       </>
     );
   }

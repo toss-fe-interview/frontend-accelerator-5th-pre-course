@@ -1,7 +1,7 @@
 import { SavingsProduct } from 'api/savings-products/types';
 import { useSavingsProducts } from 'api/savings-products/useSavingsProducts';
 import CalculationResult from 'components/savings-products/CalculationResult';
-import SavingsProductsList from 'components/savings-products/SavingsProductslist';
+import SavingsProductsList from 'components/savings-products/SavingsProductsList';
 import { useMemo, useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { formatNumberToKo } from 'utils/formatting';
