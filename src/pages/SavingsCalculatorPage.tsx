@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Assets,
   Border,
@@ -66,6 +66,13 @@ export function SavingsCalculatorPage() {
   const recommendedProducts = useMemo(() => {
     return getTopProducts(filteredProducts, 2);
   }, [filteredProducts]);
+
+  // 필터링된 상품 목록이 변경되면 선택된 상품이 목록에 있는지 확인하고 없으면 선택 해제
+  useEffect(() => {
+    if (selectedProductId && !filteredProducts.find(p => p.id === selectedProductId)) {
+      setSelectedProductId(null);
+    }
+  }, [filteredProducts, selectedProductId]);
 
   // 목표 금액 입력 핸들러
   const handleTargetAmountChange = (value: string) => {
