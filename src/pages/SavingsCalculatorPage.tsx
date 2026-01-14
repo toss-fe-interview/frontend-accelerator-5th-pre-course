@@ -10,6 +10,7 @@ import { SavingsProductTab } from 'features/saving-products/components/Tab';
 import { formatPrice } from 'shared/utils/price';
 import { SavingsCalculateItem } from 'features/saving-products-calculate/components/Item';
 import { SavingsProduct } from 'features/saving-products/types';
+import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/saving-products-calculate/utils';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -33,6 +34,8 @@ export function SavingsCalculatorPage() {
     const products = filteredProducts.length > 0 ? filteredProducts : allProducts;
     return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
   };
+
+  const selectedSavingsProduct = savingsProducts?.find(product => product.id === selectedProductId);
 
   return (
     <>
@@ -92,9 +95,37 @@ export function SavingsCalculatorPage() {
         <>
           {selectedProductId ? (
             <>
-              <SavingsCalculateItem label="예상 수익 금액" value={formatPrice(1000000)} />
-              <SavingsCalculateItem label="목표 금액과의 차이" value={formatPrice(-500000)} />
-              <SavingsCalculateItem label="추천 월 납입 금액" value={formatPrice(100000)} />
+              <SavingsCalculateItem
+                label="예상 수익 금액"
+                value={formatPrice(
+                  calculateExpectedAmount({
+                    annualRate: selectedSavingsProduct?.annualRate || 0,
+                    monthlyPayment: parseInt(monthlyPayment),
+                    terms: parseInt(terms),
+                  })
+                )}
+              />
+              <SavingsCalculateItem
+                label="목표 금액과의 차이"
+                value={formatPrice(
+                  parseInt(targetAmount) -
+                    calculateExpectedAmount({
+                      annualRate: selectedSavingsProduct?.annualRate || 0,
+                      monthlyPayment: parseInt(monthlyPayment),
+                      terms: parseInt(terms),
+                    })
+                )}
+              />
+              <SavingsCalculateItem
+                label="추천 월 납입 금액"
+                value={formatPrice(
+                  calculateRecommendedMonthlyPayment({
+                    targetAmount: parseInt(targetAmount),
+                    annualRate: selectedSavingsProduct?.annualRate || 0,
+                    terms: parseInt(terms),
+                  })
+                )}
+              />
             </>
           ) : (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />

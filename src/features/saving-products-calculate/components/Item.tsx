@@ -13,7 +13,7 @@ export const SavingsCalculateItem = ({ label, value }: SavingsCalculateItemProps
           type="2RowTypeA"
           top={label}
           topProps={{ color: colors.grey600 }}
-          bottom={value}
+          bottom={`${value}원`}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }
