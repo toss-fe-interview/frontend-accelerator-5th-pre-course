@@ -4,9 +4,11 @@ import { savingsProductQuery } from 'features/saving-products/apis/queries';
 import { useTab } from 'shared/hooks/useTab';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { SavingsProductItem } from 'features/saving-products/components/Item';
+import { useState } from 'react';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
   return (
     <>
@@ -38,7 +40,12 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {savingsProducts?.map(product => (
-        <SavingsProductItem key={product.id} product={product} selected={true} onSelect={() => {}} />
+        <SavingsProductItem
+          key={product.id}
+          product={product}
+          selected={selectedProductId === product.id}
+          onSelect={() => setSelectedProductId(product.id)}
+        />
       ))}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
