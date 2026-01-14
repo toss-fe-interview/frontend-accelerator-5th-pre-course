@@ -45,6 +45,13 @@ export function SavingsCalculatorPage() {
     }));
   };
 
+  const handleChangeSavingsPeriod = (newValue: number) => {
+    setSavingsValues(prev => ({
+      ...prev,
+      savingsPeriod: newValue,
+    }));
+  };
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -54,6 +61,7 @@ export function SavingsCalculatorPage() {
         savingsValues={savingsValues}
         onChangeTargetAmount={handleChagneTargetAmount}
         onChangeMonthlyPaymentAmount={handleChagneMonthlyPaymentAmount}
+        onChangeSavingsPeriod={handleChangeSavingsPeriod}
       />
 
       <Spacing size={24} />
@@ -73,7 +81,7 @@ export function SavingsCalculatorPage() {
         <Suspense fallback={<SuspenseFallback />}>
           <div>
             {savingsProducts.map(product => (
-              <div key={product.id}>{product.id}</div>
+              <div key={product.id}>{product.availableTerms}</div>
             ))}
           </div>
         </Suspense>

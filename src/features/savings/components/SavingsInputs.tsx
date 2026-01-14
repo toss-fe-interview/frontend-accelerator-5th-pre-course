@@ -7,14 +7,18 @@ interface SavingsInputsProps {
   savingsValues: SavingsValues;
   onChangeTargetAmount: (e: ChangeEvent<HTMLInputElement>) => void;
   onChangeMonthlyPaymentAmount: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChangeSavingsPeriod: (newValue: number) => void;
 }
+
+const SAVINGS_PERIOD_OPTIONS = [6, 12, 18, 24] as const;
 
 export default function SavingsInputs({
   savingsValues,
   onChangeTargetAmount,
   onChangeMonthlyPaymentAmount,
+  onChangeSavingsPeriod,
 }: SavingsInputsProps) {
-  const { targetAmount, monthlyPaymentAmount } = savingsValues;
+  const { targetAmount, monthlyPaymentAmount, savingsPeriod } = savingsValues;
   return (
     <>
       <TextField
@@ -33,10 +37,17 @@ export default function SavingsInputs({
         onChange={onChangeMonthlyPaymentAmount}
       />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={savingsPeriod}
+        onChange={onChangeSavingsPeriod}
+      >
+        {SAVINGS_PERIOD_OPTIONS.map(period => (
+          <SelectBottomSheet.Option key={period} value={period}>
+            {period}개월
+          </SelectBottomSheet.Option>
+        ))}
       </SelectBottomSheet>
     </>
   );
