@@ -22,16 +22,17 @@ interface FormData {
   savingPeriod: number;
 }
 
+type TabType = 'products' | 'results';
+
 export function SavingsCalculatorPage() {
   const { data: products, status } = useSavingsProducts();
-
   const [formData, setFormData] = useState<FormData>({
     targetAmount: '',
     monthlyAmount: '',
     savingPeriod: 12,
   });
-
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<TabType>('products');
 
   // 필터링된 상품 목록
   const filteredProducts = useMemo(() => {
@@ -53,6 +54,11 @@ export function SavingsCalculatorPage() {
     setSelectedProductId(prev => (prev === productId ? null : productId));
   };
 
+  const handleChangeTab = (tab: string) => {
+    if (tab === 'products' || tab === 'results') {
+      setSelectedTab(tab);
+    }
+  };
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -65,24 +71,34 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={handleChangeTab}>
+        <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={selectedTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
-      {status === 'pending' && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />} />}
-      {status === 'error' && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러올 수 없습니다." />} />}
-      {status === 'success' && (
-        <ProductList
-          products={filteredProducts}
-          selectedProductId={selectedProductId}
-          onSelectProduct={handleSelectProduct}
-        />
+      {selectedTab === 'products' && (
+        <>
+          {status === 'pending' && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />} />}
+          {status === 'error' && (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러올 수 없습니다." />} />
+          )}
+          {status === 'success' && (
+            <ProductList
+              products={filteredProducts}
+              selectedProductId={selectedProductId}
+              onSelectProduct={handleSelectProduct}
+            />
+          )}
+        </>
       )}
 
+      {/* 계산 결과 탭 */}
+      {selectedTab === 'results' && (
+        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="계산 결과 탭 (구현 예정)" />} />
+      )}
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
 
