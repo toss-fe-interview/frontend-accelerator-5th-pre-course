@@ -74,6 +74,7 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
             monthlyPayment={monthlyPayment}
             term={term}
             selectedProduct={selectedProduct}
+            products={filteredSavingsProducts}
           />
         ))
         .exhaustive()}
@@ -86,9 +87,10 @@ interface CalculationResultProps {
   monthlyPayment: number | null;
   term: 6 | 12 | 24;
   selectedProduct: SavingsProduct | null;
+  products: SavingsProduct[];
 }
 
-function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct }: CalculationResultProps) {
+function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct, products }: CalculationResultProps) {
   if (!selectedProduct) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
@@ -107,6 +109,9 @@ function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct
 
   // 추천 월 납입 금액 (1,000원 단위 반올림)
   const recommendedMonthlyPayment = Math.round(targetAmount / (term * rateMultiplier) / 1000) * 1000;
+
+  console.log('products', products);
+  const recommendedProducts = products.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
     <>
@@ -148,23 +153,27 @@ function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct
       <Border height={16} />
       <Spacing size={8} />
 
-      {/* <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
+      {recommendedProducts.map(product => (
+        <ListRow
+          key={product.id}
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={product.name}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${product.annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          onClick={() => {}}
+        />
+      ))}
+
+      {/* <ListRow
         contents={
           <ListRow.Texts
             type="3RowTypeA"
