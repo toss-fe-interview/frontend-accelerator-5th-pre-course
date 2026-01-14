@@ -23,7 +23,7 @@ interface SavingItemProps {
   selectedProduct: SavingsProduct | null;
   onSelect: (product: SavingsProduct) => void;
 }
-function SavingItem({ product, selectedProduct, onSelect }: SavingItemProps) {
+export function SavingItem({ product, selectedProduct, onSelect }: SavingItemProps) {
   const isSelected = selectedProduct?.id === product.id;
   return (
     <ListRow

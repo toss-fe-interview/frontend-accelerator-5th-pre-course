@@ -42,6 +42,10 @@ function SavingsCalculator() {
     });
   }, [deferredInputs, savingsProducts]);
 
+  const recommendedProducts = useMemo(() => {
+    return filteredProducts.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  }, [filteredProducts]);
+
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   return (
@@ -66,7 +70,13 @@ function SavingsCalculator() {
           onProductSelect={setSelectedProduct}
         />
       )}
-      {selectedTab === 'results' && <SavingResult selectedProduct={selectedProduct} calculInputs={calculInputs} />}
+      {selectedTab === 'results' && (
+        <SavingResult
+          selectedProduct={selectedProduct}
+          calculInputs={calculInputs}
+          recommendedProducts={recommendedProducts}
+        />
+      )}
     </>
   );
 }
