@@ -12,4 +12,9 @@ export default defineConfig({
       exclude: [/^(?!\/api).*/],
     }),
   ],
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
+  },
 });
