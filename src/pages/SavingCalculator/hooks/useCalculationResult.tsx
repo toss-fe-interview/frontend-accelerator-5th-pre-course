@@ -13,7 +13,7 @@ export function useCalculationResult({ selectedProduct, calculInputs }: Calculat
 
   const expectedProfit = monthlyAmount * term * factor;
   const difference = targetAmount - expectedProfit;
-  const recommendedMonthly = term === 0 ? 0 : targetAmount / (term * factor);
+  const recommendedMonthly = term === 0 ? 0 : Math.round((targetAmount + term * factor) / 1000) * 1000;
 
   return {
     expectedProfit,
