@@ -1,4 +1,5 @@
 import { SavingProduct } from 'queries/types';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { Assets, colors, ListRow } from 'tosslib';
 
 export const SavingProductList = ({
@@ -10,10 +11,21 @@ export const SavingProductList = ({
   selectedProduct: SavingProduct | null;
   setSelectedProduct: (product: SavingProduct) => void;
 }) => {
+  const { monthlyAmount, term } = useWatch();
+
+  // TODO : 리팩토링 및 테스트 코드 추가 고려
+  const filteredProducts = savingProducts?.filter(savingProduct => {
+    const isTermMatched = term === savingProduct.availableTerms;
+    const isMonthlyAmountMatched = monthlyAmount
+      ? savingProduct.minMonthlyAmount <= monthlyAmount && monthlyAmount <= savingProduct.maxMonthlyAmount
+      : true;
+    return isTermMatched && isMonthlyAmountMatched;
+  });
+
   return (
     <>
       {/* TODO: suspense 처리 */}
-      {savingProducts?.map(savingProduct => (
+      {filteredProducts?.map(savingProduct => (
         <ListRow
           key={savingProduct.id}
           contents={
