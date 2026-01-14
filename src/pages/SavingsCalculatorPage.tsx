@@ -23,6 +23,9 @@ export function SavingsCalculatorPage() {
   const [monthlyAmount, setMonthlyAmount] = useState<number | undefined>(0);
   const [term, setTerm] = useState<number>(12);
 
+  // 선택한 적금 상품
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | undefined>(undefined);
+
   useEffect(() => {
     getSavingsProducts()
       .then(response => {
@@ -122,8 +125,10 @@ export function SavingsCalculatorPage() {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          // right={<Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {}}
+          right={selectedSavingsProduct?.id === product.id && <Assets.Icon name="icon-check-circle-green" />}
+          onClick={() => {
+            setSelectedSavingsProduct(product);
+          }}
         />
       ))}
 
