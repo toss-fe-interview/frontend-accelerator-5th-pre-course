@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import {
   Assets,
   Border,
@@ -10,8 +11,12 @@ import {
   Tab,
   TextField,
 } from 'tosslib';
+import { formatNumber } from 'utils/format';
+import { savingsProductsQueries } from './api/queries';
 
 export default function SavingsCalculatorPage() {
+  const { data: savingsProducts } = useQuery(savingsProductsQueries.listQuery());
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -41,7 +46,25 @@ export default function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ListRow
+      {savingsProducts?.map(product => (
+        <ListRow
+          key={product.id}
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={product.name}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${product.annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          right={<Assets.Icon name="icon-check-circle-green" />}
+          onClick={() => {}}
+        />
+      ))}
+      {/* <ListRow
         contents={
           <ListRow.Texts
             type="3RowTypeA"
@@ -69,7 +92,7 @@ export default function SavingsCalculatorPage() {
           />
         }
         onClick={() => {}}
-      />
+      /> */}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
