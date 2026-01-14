@@ -1,8 +1,12 @@
 import { Border, colors, ListRow, Spacing } from 'tosslib';
-import { calculateDifference, calculateExpectedAmount, calculateRecommendedMonthlyAmount } from '../utils/savings';
-import { formatCurrency } from 'utils/format';
-import { SavingsCalculatorFormData } from 'hooks/useSavingsCalculatorForm';
-import type { SavingsProduct } from 'api/savings';
+import {
+  calculateDifference,
+  calculateExpectedAmount,
+  calculateRecommendedMonthlyAmount,
+} from '../../../shared/utils/savings';
+import { formatCurrency } from 'shared/utils/format';
+import { SavingsCalculatorFormData } from 'features/savings-calculator/model/useSavingsCalculatorForm';
+import type { SavingsProduct } from 'features/savings-calculator/api/savings';
 import { RecommendedProductList } from './RecommendedProductList';
 
 type SavingsCalculatorResultsProps = SavingsCalculatorFormData & {
@@ -30,7 +34,6 @@ export function SavingsCalculatorResults({
   return (
     <>
       <Spacing size={8} />
-
       <ListRow
         contents={
           <ListRow.Texts

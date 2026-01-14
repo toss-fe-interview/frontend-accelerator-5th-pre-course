@@ -1,8 +1,8 @@
 import { Assets, colors, ListHeader, ListRow, Spacing } from 'tosslib';
-import { formatCurrency } from 'utils/format';
-import { SavingsCalculatorFormData } from 'hooks/useSavingsCalculatorForm';
-import type { SavingsProduct } from 'api/savings';
-import { useSavingsProducts } from 'hooks/useSavingsProducts';
+import { formatCurrency } from 'shared/utils/format';
+import { SavingsCalculatorFormData } from 'features/savings-calculator/model/useSavingsCalculatorForm';
+import type { SavingsProduct } from 'features/savings-calculator/api/savings';
+import { useSavingsProducts } from 'features/savings-calculator/model/useSavingsProducts';
 
 type RecommendedProductListProps = Omit<SavingsCalculatorFormData, 'targetAmount'> & {
   selectedProductId?: string;

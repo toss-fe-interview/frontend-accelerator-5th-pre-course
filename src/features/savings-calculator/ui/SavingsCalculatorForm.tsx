@@ -1,4 +1,4 @@
-import { SavingsCalculatorFormData } from 'hooks/useSavingsCalculatorForm';
+import { SavingsCalculatorFormData } from 'features/savings-calculator/model/useSavingsCalculatorForm';
 import { Control, Controller } from 'react-hook-form';
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 

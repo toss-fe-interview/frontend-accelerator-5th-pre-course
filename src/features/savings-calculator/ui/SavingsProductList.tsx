@@ -1,8 +1,8 @@
-import { SavingsCalculatorFormData } from 'hooks/useSavingsCalculatorForm';
-import { useSavingsProducts } from 'hooks/useSavingsProducts';
+import { SavingsCalculatorFormData } from 'features/savings-calculator/model/useSavingsCalculatorForm';
+import { useSavingsProducts } from 'features/savings-calculator/model/useSavingsProducts';
 import { Assets, colors, ListRow } from 'tosslib';
-import type { SavingsProduct } from 'api/savings';
-import { formatCurrency } from 'utils/format';
+import type { SavingsProduct } from 'features/savings-calculator/api/savings';
+import { formatCurrency } from 'shared/utils/format';
 
 type SavingsProductListProps = Omit<SavingsCalculatorFormData, 'targetAmount'> & {
   selectedProductId?: string;

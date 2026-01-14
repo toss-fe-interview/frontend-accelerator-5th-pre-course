@@ -1,11 +1,9 @@
 import { Suspense, useState } from 'react';
 import { Border, NavigationBar, Spacing } from 'tosslib';
-import { useSavingsCalculatorForm } from 'hooks/useSavingsCalculatorForm';
-import type { SavingsProduct } from 'api/savings';
-import { SavingsProductList } from 'components/SavingsProductList';
-import { SavingsCalculatorForm } from 'components/SavingsCalculatorForm';
-import { SavingsCalculatorResults } from 'components/SavingsCalculatorResults';
-import { SavingsCalculatorTabs } from 'components/SavingsCalculatorTabs';
+import { useSavingsCalculatorForm } from 'features/savings-calculator/model/useSavingsCalculatorForm';
+import type { SavingsProduct } from 'features/savings-calculator/api/savings';
+import { Tabs } from 'shared/ui/Tabs';
+import { SavingsCalculatorForm, SavingsCalculatorResults, SavingsProductList } from 'features/savings-calculator';
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | undefined>(undefined);
@@ -16,35 +14,39 @@ export function SavingsCalculatorPage() {
     <>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
-
       <SavingsCalculatorForm control={form.control} />
-
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
-      <SavingsCalculatorTabs
-        renderContent={tab =>
-          tab === 'products' ? (
-            <Suspense>
-              <SavingsProductList
-                monthlyAmount={monthlyAmount}
-                availableTerms={availableTerms}
-                selectedProductId={selectedProduct?.id}
-                onSelectedProduct={setSelectedProduct}
-              />
-            </Suspense>
-          ) : (
-            <Suspense>
-              <SavingsCalculatorResults
-                targetAmount={targetAmount}
-                monthlyAmount={monthlyAmount}
-                availableTerms={availableTerms}
-                selectedProduct={selectedProduct}
-              />
-            </Suspense>
-          )
-        }
-      />
+      <Tabs
+        defaultValue="products"
+        items={[
+          { value: 'products', label: '적금 상품' },
+          { value: 'results', label: '계산 결과' },
+        ]}
+      >
+        <Tabs.List />
+        <Tabs.Content value="products">
+          <Suspense>
+            <SavingsProductList
+              monthlyAmount={monthlyAmount}
+              availableTerms={availableTerms}
+              selectedProductId={selectedProduct?.id}
+              onSelectedProduct={setSelectedProduct}
+            />
+          </Suspense>
+        </Tabs.Content>
+        <Tabs.Content value="results">
+          <Suspense>
+            <SavingsCalculatorResults
+              targetAmount={targetAmount}
+              monthlyAmount={monthlyAmount}
+              availableTerms={availableTerms}
+              selectedProduct={selectedProduct}
+            />
+          </Suspense>
+        </Tabs.Content>
+      </Tabs>
     </>
   );
 }
