@@ -13,10 +13,6 @@ export default function SavingsProductsList({
   selectedProduct,
   setSelectedProduct,
 }: SavingsProductsListProps) {
-  const handleSavingsProductItemClick = (clickedProduct: SavingsProduct) => {
-    setSelectedProduct(clickedProduct);
-  };
-
   return (
     <>
       {products.map(product => (
@@ -24,7 +20,7 @@ export default function SavingsProductsList({
           key={product.id}
           product={product}
           selectedProductId={selectedProduct && selectedProduct.id}
-          onClick={() => handleSavingsProductItemClick(product)}
+          onClick={() => setSelectedProduct(product)}
         />
       ))}
     </>
