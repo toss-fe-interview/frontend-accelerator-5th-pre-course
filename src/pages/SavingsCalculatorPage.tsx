@@ -1,4 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
+import SavingProducts from 'product/components/SavingProducts';
+import SavingResults from 'product/components/SavingResults';
 import { TERMS_OPTIONS } from 'product/constants';
 import { savingsProductsQueryOptions } from 'product/queries';
 import { SavingProduct } from 'product/type/internal';
@@ -25,6 +27,7 @@ const formatValue = (value: string) => {
 };
 
 export function SavingsCalculatorPage() {
+  const [tab, setTab] = useState<'products' | 'results'>('products');
   const [price, setPrice] = useState('');
   const [monthlyPayment, setMonthlyPayment] = useState('');
   const [term, setTerm] = useState(0);
@@ -113,36 +116,20 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={value => setTab(value as 'products' | 'results')}>
+        <Tab.Item value="products" selected={tab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={tab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
 
-      {savingsProductsData.length === 0 ? (
-        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-      ) : (
-        savingsProductsData.map(product => (
-          <ListRow
-            key={product.id}
-            contents={
-              <ListRow.Texts
-                type="3RowTypeA"
-                top={product.name}
-                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                middle={`연 이자율: ${product.annualRate}%`}
-                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`}
-                bottomProps={{ fontSize: 13, color: colors.grey600 }}
-              />
-            }
-            right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-            onClick={() => selectProduct(product)}
-          />
-        ))
+      {tab === 'products' && (
+        <SavingProducts data={savingsProductsData} selectedProduct={selectedProduct} selectProduct={selectProduct} />
+      )}
+      {tab === 'results' && (
+        <SavingResults selectedProduct={selectedProduct} price={price} monthlyPayment={monthlyPayment} term={term} />
       )}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
