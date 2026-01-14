@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 import { CalculationResult } from 'components/CalculationResult';
+import { EmptyListItem } from 'components/common/EmptyListItem';
 import { SavingsProductListItem } from 'components/SavingsProductListItem';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
@@ -111,7 +112,7 @@ export function SavingsCalculatorPage() {
               );
             })
           ) : (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="적합한 적금 상품이 없습니다." />} />
+            <EmptyListItem message="적합한 적금 상품이 없습니다." />
           )}
         </>
       )}
@@ -125,7 +126,7 @@ export function SavingsCalculatorPage() {
             {selectedSavingsProduct ? (
               <CalculationResult formState={formState} selectedSavingsProduct={selectedSavingsProduct} />
             ) : (
-              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+              <EmptyListItem message="상품을 선택해주세요." />
             )}
           </>
 
@@ -149,7 +150,7 @@ export function SavingsCalculatorPage() {
               );
             })
           ) : (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="적합한 추천 상품이 없습니다." />} />
+            <EmptyListItem message="적합한 추천 상품이 없습니다." />
           )}
 
           <Spacing size={40} />
