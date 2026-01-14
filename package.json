@@ -13,8 +13,10 @@
     "@tanstack/react-query": "^5.90.17",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.71.1",
     "react-router-dom": "^7.1.1",
-    "tosslib": "file:./tosslib.tgz"
+    "tosslib": "file:./tosslib.tgz",
+    "ts-pattern": "^5.9.0"
   },
   "devDependencies": {
     "@hono/vite-dev-server": "^0.18.0",
