@@ -1,6 +1,6 @@
 import { http } from 'tosslib';
 
-type SavingsProduct = {
+export type SavingsProduct = {
   id: string;
   name: string;
   annualRate: number;
