@@ -3,6 +3,12 @@ import { ProductItem } from './ProductContainer';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 type Tabs = 'products' | 'results';
+type FormData = {
+  targetAmount: string;
+  monthlPayment: string;
+  // 6, 12, 24
+  savingPeriod: number;
+};
 
 interface CalculatorProps {
   products: ProductItem[];
@@ -11,12 +17,20 @@ interface CalculatorProps {
 
 export default function Calculator({ products, selectProduct }: CalculatorProps) {
   // 폼을 다뤄야함. (사용자 입력)
-  // 탭을 뭐 눌렀는지 관리.
-
   const [tab, setTab] = useState<Tabs>('products');
+  const [formData, setFormData] = useState<FormData>({
+    targetAmount: '',
+    monthlPayment: '',
+    savingPeriod: 12,
+  });
 
   function onChangeTab(tab: Tabs) {
     setTab(tab);
+  }
+
+  // 필드에 맞는 값을 업데이트
+  function handleChangeField<K extends keyof FormData>(key: K, value: FormData[K]) {
+    setFormData(prev => ({ ...prev, [key]: value }));
   }
 
   // 폼 데이터와 products를 자식한테 내려줘야함.
@@ -26,11 +40,36 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
 
   return (
     <>
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      {/* TODO : 숫자만 입력되게 나중에 개선 */}
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={formData.targetAmount}
+        onChange={e => {
+          handleChangeField('targetAmount', e.target.value);
+        }}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={formData.monthlPayment}
+        onChange={e => {
+          handleChangeField('monthlPayment', e.target.value);
+        }}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={formData.savingPeriod}
+        onChange={period => {
+          handleChangeField('savingPeriod', period);
+        }}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
@@ -41,8 +80,8 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
       <Spacing size={8} />
 
       <Tab
-        onChange={e => {
-          onChangeTab(e as Tabs);
+        onChange={tab => {
+          onChangeTab(tab as Tabs);
         }}
       >
         <Tab.Item value="products" selected={tab === 'products'}>
