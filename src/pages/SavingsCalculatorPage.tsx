@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SavingsQueryOption } from 'domain/savings/api/SavingsQueryOption';
 import { SavingsResponse } from 'domain/savings/api/type';
 import { SavingCalculateResults } from 'domain/savings/components/SavingCalculateResults';
+import { SavingItem } from 'domain/savings/components/SavingItem';
 import { SavingsFilter } from 'domain/savings/components/SavingsFilter';
 import { SavingsList } from 'domain/savings/components/SavingsList';
 import { useCalculateExpectedProfit } from 'domain/savings/hooks/useCalculateExpectedProfit';
@@ -9,7 +10,7 @@ import { useFilterSavings } from 'domain/savings/hooks/useFilterSavings';
 import { useRecommendSavings } from 'domain/savings/hooks/useRecommendSavings';
 import { useSavingForm } from 'domain/savings/hooks/useSavingForm';
 import { useState } from 'react';
-import { Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
 type Tab = 'products' | 'results';
 
@@ -59,11 +60,16 @@ export function SavingsCalculatorPage() {
       )}
 
       {tab === 'results' && (
-        <SavingCalculateResults
-          expectedProfit={getExpectedProfit()}
-          diffBetweenGoalAndExpectedProfit={getDiffBetweenGoalAndExpectedProfit()}
-          recommendedMonthlyAmount={getRecommendedMonthlyAmount()}
-        />
+        <>
+          {!selectedSaving && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />}
+          {selectedSaving && (
+            <SavingCalculateResults
+              expectedProfit={getExpectedProfit()}
+              diffBetweenGoalAndExpectedProfit={getDiffBetweenGoalAndExpectedProfit()}
+              recommendedMonthlyAmount={getRecommendedMonthlyAmount()}
+            />
+          )}
+        </>
       )}
 
       <Spacing size={8} />
@@ -74,20 +80,11 @@ export function SavingsCalculatorPage() {
       <Spacing size={12} />
 
       {getRecommendSavings(filteredSavings).map(saving => (
-        <ListRow
+        <SavingItem
           key={saving.id}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={saving.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: ${saving.annualRate}%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${saving.minMonthlyAmount.toLocaleString()}원 ~ ${saving.maxMonthlyAmount.toLocaleString()}원 | ${saving.availableTerms}개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          onClick={() => setSelectedSaving(saving)}
+          saving={saving}
+          isSelected={selectedSaving?.id === saving.id}
+          onSelect={setSelectedSaving}
         />
       ))}
 
