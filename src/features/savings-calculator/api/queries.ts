@@ -9,5 +9,7 @@ export const savingsProductsQueries = {
     queryOptions({
       queryKey: savingsProductsQueries.list(),
       queryFn: fetchSavingsProducts,
+      staleTime: 1_000 * 60 * 5,
+      gcTime: 1_000 * 60 * 10,
     }),
 };

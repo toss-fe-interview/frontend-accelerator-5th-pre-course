@@ -1,11 +1,14 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { ListRow } from 'tosslib';
-import type { SavingsProduct } from '../api/api';
+import { savingsProductsQueries } from '../api/queries';
 import { useCalculatorParams } from '../hooks/useCalculatorParams';
 import { useSelectProductParams } from '../hooks/useSelectProductParams';
 import { matchesPaymentRange, matchesPeriod } from '../utils/productFIlters';
 import ProductList from './ProductList';
 
-export default function ProductListTab({ products }: { products?: SavingsProduct[] }) {
+export default function ProductListTab() {
+  const { data: products } = useSuspenseQuery(savingsProductsQueries.listQuery());
+
   const { monthlyAmount, savingTerms } = useCalculatorParams();
   const { selectedProductId, setSelectedProductId } = useSelectProductParams();
 
