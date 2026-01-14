@@ -31,6 +31,8 @@ export function SavingsCalculatorPage() {
     savingPeriod: 12,
   });
 
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
   // 필터링된 상품 목록
   const filteredProducts = useMemo(() => {
     if (!products) {
@@ -45,6 +47,10 @@ export function SavingsCalculatorPage() {
 
   const handleChangeInput = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSelectProduct = (productId: string) => {
+    setSelectedProductId(prev => (prev === productId ? null : productId));
   };
 
   return (
@@ -69,7 +75,13 @@ export function SavingsCalculatorPage() {
       </Tab>
       {status === 'pending' && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />} />}
       {status === 'error' && <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러올 수 없습니다." />} />}
-      {status === 'success' && <ProductList products={filteredProducts} />}
+      {status === 'success' && (
+        <ProductList
+          products={filteredProducts}
+          selectedProductId={selectedProductId}
+          onSelectProduct={handleSelectProduct}
+        />
+      )}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
