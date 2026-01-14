@@ -1,38 +1,24 @@
-import { Border, ListHeader, Spacing } from 'tosslib';
+import { Border, ListHeader, ListRow, Spacing } from 'tosslib';
 import { SavingsProduct } from '../api';
-import { CalculInputs } from './SavingCalculatorInput';
 import { SavingItem } from './SavingItemList';
 import { CalculationResult } from './CalculationResult';
-import { calculateDifferenceFromTarget, calculateExpectedProfit, calculateRecommendedMonthlyAmount } from '../util';
+
+export interface CalculationResult {
+  expectedProfit: number;
+  difference: number;
+  recommendedMonthly: number;
+}
 
 interface SavingResultProps {
-  selectedProduct: SavingsProduct | null;
-  calculInputs: CalculInputs;
+  calculationResult: CalculationResult | null;
   recommendedProducts: SavingsProduct[];
 }
 
-export default function SavingResult({ selectedProduct, calculInputs, recommendedProducts }: SavingResultProps) {
-  const expectedProfit = calculateExpectedProfit(
-    calculInputs.monthlyAmount,
-    calculInputs.term,
-    selectedProduct?.annualRate ?? 0
-  );
-  const difference = calculateDifferenceFromTarget(calculInputs.targetAmount, expectedProfit);
-  const recommendedMonthly = calculateRecommendedMonthlyAmount(
-    calculInputs.targetAmount,
-    calculInputs.term,
-    selectedProduct?.annualRate ?? 0
-  );
-
-  const isProductSelected = selectedProduct !== null;
+export default function SavingResult({ calculationResult, recommendedProducts }: SavingResultProps) {
+  const hasResult = calculationResult !== null;
   return (
     <>
-      <CalculationResult
-        expectedProfit={expectedProfit}
-        difference={difference}
-        recommendedMonthly={recommendedMonthly}
-        isProductSelected={isProductSelected}
-      />
+      {hasResult ? <CalculationResult {...calculationResult} /> : <NoProductSelected />}
       <Border height={16} />
       <Spacing size={8} />
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
@@ -41,6 +27,16 @@ export default function SavingResult({ selectedProduct, calculInputs, recommende
         <SavingItem key={product.id} product={product} selectedProduct={null} onSelect={() => {}} />
       ))}
       <Spacing size={40} />
+    </>
+  );
+}
+
+function NoProductSelected() {
+  return (
+    <>
+      <Spacing size={8} />
+      <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+      <Spacing size={8} />
     </>
   );
 }

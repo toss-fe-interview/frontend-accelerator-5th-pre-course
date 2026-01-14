@@ -6,15 +6,17 @@ import { Suspense, useState } from 'react';
 import { SavingsProduct } from './api';
 import { useCalculatorInputs } from './hooks/useCalculatorInputs';
 import { useSavingsProducts } from './hooks/useSavingsProducts';
+import { calculateSavingResult } from './util';
 
 type SelectedTab = 'products' | 'results';
 
 function SavingsCalculator() {
   const [selectedTab, setSelectedTab] = useState<SelectedTab>('products');
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+
   const { calculInputs, setCalculInputs, deferredInputs } = useCalculatorInputs();
   const { filteredProducts, recommendedProducts } = useSavingsProducts(deferredInputs);
-
-  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+  const calculationResult = calculateSavingResult(selectedProduct, calculInputs);
 
   return (
     <>
@@ -39,11 +41,7 @@ function SavingsCalculator() {
         />
       )}
       {selectedTab === 'results' && (
-        <SavingResult
-          selectedProduct={selectedProduct}
-          calculInputs={calculInputs}
-          recommendedProducts={recommendedProducts}
-        />
+        <SavingResult calculationResult={calculationResult} recommendedProducts={recommendedProducts} />
       )}
     </>
   );
