@@ -1,14 +1,15 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/saving-products/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { SavingsProductItem } from 'features/saving-products/components/Item';
 import { useState } from 'react';
-import { NumberInput } from 'shared/components/NumberInput';
 import { SavingsProductTab } from 'features/saving-products/components/Tab';
 import { SavingsCalculateItem } from 'features/saving-products-calculate/components/Item';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/saving-products-calculate/utils';
 import { toNumber } from 'shared/utils/format';
 import { useSavingsProducts } from 'features/saving-products/hooks/useSavingsProducts';
+import { AmountInputSection } from 'features/saving-products/components/AmountInputSection';
+import { SavingBottomSheet } from 'features/saving-products/components/SavingBottomSheet';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -27,34 +28,15 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <NumberInput
-        label="목표 금액"
-        placeholder="목표 금액을 입력하세요"
-        suffix="원"
-        value={targetAmount}
-        onChange={setTargetAmount}
+      <AmountInputSection
+        targetAmount={targetAmount}
+        monthlyPayment={monthlyPayment}
+        setTargetAmount={setTargetAmount}
+        setMonthlyPayment={setMonthlyPayment}
       />
       <Spacing size={16} />
-      <NumberInput
-        label="월 납입액"
-        placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
-        value={monthlyPayment}
-        onChange={setMonthlyPayment}
-      />
 
-      <Spacing size={16} />
-
-      <SelectBottomSheet
-        label="저축 기간"
-        title="저축 기간을 선택해주세요"
-        value={terms}
-        onChange={value => setTerms(value)}
-      >
-        <SelectBottomSheet.Option value="6">6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value="12">12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value="24">24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <SavingBottomSheet terms={terms} onTermsChange={setTerms} />
 
       <Spacing size={24} />
       <Border height={16} />
