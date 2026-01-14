@@ -23,8 +23,6 @@ export default function RecommendedProductList({ selectedSavingsProduct, filters
     return isMonthlyPayment && isTerm;
   });
 
-  console.log(filteredProducts);
-
   const recommendedProducts = filteredProducts?.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
