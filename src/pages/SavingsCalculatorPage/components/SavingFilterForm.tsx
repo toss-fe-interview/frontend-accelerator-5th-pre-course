@@ -10,7 +10,6 @@ interface Props {
 export function SavingFilterForm({ control }: Props) {
   return (
     <>
-      {/*  입력값  */}
       <Controller
         name="targetAmount"
         control={control}
