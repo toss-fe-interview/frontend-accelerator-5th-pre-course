@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import {
   Assets,
   Border,
   colors,
+  isHttpError,
   ListHeader,
   ListRow,
   NavigationBar,
@@ -10,8 +12,24 @@ import {
   Tab,
   TextField,
 } from 'tosslib';
+import { type SavingsProduct, getSavingsProducts } from 'api/savings-products';
+import { addComma } from 'utils/add-comma';
 
 export function SavingsCalculatorPage() {
+  const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
+
+  useEffect(() => {
+    getSavingsProducts()
+      .then(response => {
+        setSavingsProducts(response);
+      })
+      .catch(e => {
+        if (isHttpError(e)) {
+          console.log(e.message);
+        }
+      });
+  }, []);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -41,7 +59,26 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ListRow
+      {savingsProducts.map(product => (
+        <ListRow
+          key={product.id}
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={'기본 정기적금'}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${product.annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${addComma(product.minMonthlyAmount)}원 ~ ${addComma(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          // right={<Assets.Icon name="icon-check-circle-green" />}
+          onClick={() => {}}
+        />
+      ))}
+
+      {/* <ListRow
         contents={
           <ListRow.Texts
             type="3RowTypeA"
@@ -69,7 +106,7 @@ export function SavingsCalculatorPage() {
           />
         }
         onClick={() => {}}
-      />
+      /> */}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
