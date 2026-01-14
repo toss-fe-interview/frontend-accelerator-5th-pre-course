@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { SAVINGS_PRODUCT_TABS } from 'features/saving-products/constants';
 import { savingsProductQuery } from 'features/saving-products/apis/queries';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import { SavingsProductItem } from 'features/saving-products/components/Item';
 import { useState } from 'react';
+import { NumberInput } from 'shared/components/NumberInput';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -30,21 +31,22 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField
+      <NumberInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={targetAmount}
-        onChange={e => setTargetAmount(e.target.value)}
+        onChange={setTargetAmount}
       />
       <Spacing size={16} />
-      <TextField
+      <NumberInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={monthlyPayment}
-        onChange={e => setMonthlyPayment(e.target.value)}
+        onChange={setMonthlyPayment}
       />
+
       <Spacing size={16} />
       <SelectBottomSheet
         label="저축 기간"
