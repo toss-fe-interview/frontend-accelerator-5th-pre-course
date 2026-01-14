@@ -1,4 +1,5 @@
-import { http } from 'tosslib';
+import { useEffect, useState } from 'react';
+import { http, isHttpError } from 'tosslib';
 
 export type SavingsProduct = {
   id: string;
@@ -14,4 +15,34 @@ export const getSavingsProducts = async () => {
   return response;
 };
 
-// export const useSavingsProducts = () => {}
+export const useSavingsProducts = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    getSavingsProducts()
+      .then(response => {
+        setSavingsProducts(response);
+        setError(null);
+      })
+      .catch(e => {
+        if (isHttpError(e)) {
+          console.log(e.message);
+          // setError(e);
+        }
+        setError(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  return {
+    savingsProducts,
+    isLoading,
+    error,
+    isError: Boolean(error),
+  };
+};
