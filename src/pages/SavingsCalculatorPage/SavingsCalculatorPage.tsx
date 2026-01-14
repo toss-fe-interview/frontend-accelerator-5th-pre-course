@@ -35,6 +35,8 @@ export function SavingsCalculatorPage() {
     },
   });
 
+  const [targetAmount, monthlyPayment, term] = form.watch(['targetAmount', 'monthlyPayment', 'term']);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -96,7 +98,7 @@ export function SavingsCalculatorPage() {
       <Spacing size={24} />
 
       {/* 탭 - 컨텐츠 */}
-      <SavingsCalculatorContent />
+      <SavingsCalculatorContent targetAmount={targetAmount} monthlyPayment={monthlyPayment} term={term} />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />

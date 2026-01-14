@@ -3,18 +3,26 @@ import { Assets, ListRow, Tab, colors } from 'tosslib';
 import { savingsProductsQuery } from '../qeuries/savings-products.query';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { formatCurrency } from 'utils/format';
+import { SavingsProduct } from '../models/savings-products.dto';
 
 type Tab = 'products' | 'results';
 function isTab(value: string): value is Tab {
   return value === 'products' || value === 'results';
 }
 
-export function SavingsCalculatorContent() {
+interface Props {
+  targetAmount: number | null;
+  monthlyPayment: number | null;
+  term: 6 | 12 | 24;
+}
+
+export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }: Props) {
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery);
 
   const [activeTab, setActiveTab] = useState<Tab>('products');
 
-  console.log(savingsProducts);
+  console.log('savingsProducts', savingsProducts);
+  const filteredSavingsProducts = filterSavingsProducts(savingsProducts, monthlyPayment, term);
   return (
     <>
       <Tab
@@ -32,7 +40,7 @@ export function SavingsCalculatorContent() {
         </Tab.Item>
       </Tab>
 
-      {savingsProducts.map(product => (
+      {filteredSavingsProducts.map(product => (
         <ListRow
           key={product.id}
           contents={
@@ -52,4 +60,20 @@ export function SavingsCalculatorContent() {
       ))}
     </>
   );
+}
+
+function filterSavingsProducts(savingsProducts: SavingsProduct[], monthlyPayment: number | null, term: number) {
+  return savingsProducts.filter(product => {
+    if (monthlyPayment) {
+      if (monthlyPayment < product.minMonthlyAmount || product.maxMonthlyAmount < monthlyPayment) {
+        return false;
+      }
+    }
+
+    if (product.availableTerms !== term) {
+      return false;
+    }
+
+    return true;
+  });
 }
