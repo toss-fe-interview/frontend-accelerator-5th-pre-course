@@ -1,0 +1,57 @@
+import { Border, Spacing } from 'tosslib';
+import CalculationSummary from '../components/CalculationSummary';
+import RecommendSavingsList from './RecommendSavingsList';
+import { SavingsProductType } from 'shared/types/api/savings';
+import {
+  calculateDiffFromTargetAmount,
+  calculateExpcedProfit,
+  calculateRecommendedMonthlyPayment,
+  round1000,
+} from '../utils/calculate';
+
+interface CalculationResultProps {
+  userInputs: {
+    targetAmount: string;
+    monthlyPayment: string;
+    term: number;
+  };
+  selectedProduct: SavingsProductType | null;
+}
+
+export default function CalculationResult({ userInputs, selectedProduct }: CalculationResultProps) {
+  const { targetAmount, monthlyPayment, term } = userInputs;
+  const { annualRate = 0 } = selectedProduct ?? {};
+
+  const expectedProfit = calculateExpcedProfit({ monthlyPayment: Number(monthlyPayment), term, annualRate });
+  const diffFromTargetAmount = calculateDiffFromTargetAmount({ targetAmount: Number(targetAmount), expectedProfit });
+  const recommendedMonthlyPayment = round1000(
+    calculateRecommendedMonthlyPayment({
+      targetAmount: Number(targetAmount),
+      term,
+      annualRate,
+    })
+  );
+
+  return (
+    <>
+      <Spacing size={8} />
+
+      <CalculationSummary
+        expectedProfit={expectedProfit}
+        differenceFromTargetAmount={diffFromTargetAmount}
+        recommendedMonthlyPayment={recommendedMonthlyPayment}
+      />
+
+      <Spacing size={8} />
+      <Border height={16} />
+      <Spacing size={8} />
+
+      <RecommendSavingsList
+        userInputs={{
+          term,
+          monthlyPayment: Number(monthlyPayment),
+        }}
+      />
+    </>
+  );
+}
