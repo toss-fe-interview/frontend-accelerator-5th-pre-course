@@ -5,6 +5,7 @@ import { isAffordableProducts } from 'utils/savingProductFilter';
 import { ProductItem } from './ProductItem';
 import { SavingProduct } from 'queries/types';
 import { CalculationResultSummary } from './CalculationResultSummary';
+import { RecommendProductList } from './RecommendProductList';
 
 const ResultGuard = ({
   selectedProduct,
@@ -27,7 +28,6 @@ export const CalulationResult = ({
   setSelectedProduct: (product: SavingProduct) => void;
 }) => {
   const { data: savingProducts } = useSavingProductsQuery();
-  const { monthlyAmount, term } = useWatch();
 
   return (
     <>
@@ -44,19 +44,11 @@ export const CalulationResult = ({
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
-      {/* TODO: 로직 분리 */}
-      {savingProducts
-        ?.filter(product => isAffordableProducts(product, monthlyAmount, term))
-        .sort((a, b) => b.annualRate - a.annualRate)
-        .slice(0, 2)
-        .map(product => (
-          <ProductItem
-            savingProduct={product}
-            selectedProduct={selectedProduct}
-            setSelectedProduct={setSelectedProduct}
-          />
-        ))}
-
+      <RecommendProductList
+        savingProducts={savingProducts}
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+      />
       <Spacing size={40} />
     </>
   );
