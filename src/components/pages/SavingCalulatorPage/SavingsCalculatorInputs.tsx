@@ -2,7 +2,7 @@ import { SelectBottomSheet, Spacing } from 'tosslib';
 import { Controller, useFormContext } from 'react-hook-form';
 import { TextFieldForKRW } from 'components/common/TextFieldForKRW';
 
-export const CalculatorFormInputs = () => {
+export const SavingsCalculatorInputs = () => {
   const { control } = useFormContext();
 
   return (

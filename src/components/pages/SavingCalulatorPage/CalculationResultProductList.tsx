@@ -4,7 +4,7 @@ import { ProductItem } from './ProductItem';
 import { isAffordableProducts } from 'utils/savingProductFilter';
 import { useSavingProductsQuery } from 'queries/useSavingProductsQuery';
 
-export const RecommendProductList = ({
+export const CalculationResultProductList = ({
   selectedProduct,
   setSelectedProduct,
 }: {
