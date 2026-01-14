@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { onlyNumbers } from 'utils/input';
 import { SavingsCalculatorContent } from './components/SavingsCalculatorContent';
+import { formatCurrency } from 'utils/format';
 
 interface SavingsFilterForm {
   targetAmount: number | null;
@@ -48,7 +49,7 @@ export function SavingsCalculatorPage() {
             label="목표 금액"
             placeholder="목표 금액을 입력하세요"
             suffix="원"
-            value={field.value ? field.value.toLocaleString() : ''}
+            value={field.value ? formatCurrency(field.value) : ''}
             onChange={event => {
               const numbersOnly = onlyNumbers(event.target.value);
               field.onChange(Number(numbersOnly));
@@ -66,7 +67,7 @@ export function SavingsCalculatorPage() {
             label="월 납입액"
             placeholder="희망 월 납입액을 입력하세요"
             suffix="원"
-            value={field.value ? field.value.toLocaleString() : ''}
+            value={field.value ? formatCurrency(field.value) : ''}
             onChange={event => {
               const numbersOnly = onlyNumbers(event.target.value);
               field.onChange(Number(numbersOnly));
@@ -96,36 +97,6 @@ export function SavingsCalculatorPage() {
 
       {/* 탭 - 컨텐츠 */}
       <SavingsCalculatorContent />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 3.2%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'100,000원 ~ 500,000원 | 12개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        right={<Assets.Icon name="icon-check-circle-green" />}
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 2.8%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'50,000원 ~ 1,000,000원 | 24개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
