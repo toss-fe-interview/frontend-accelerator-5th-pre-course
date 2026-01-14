@@ -1,5 +1,6 @@
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { SAVING_PERIODS, SavingsFormData } from 'types/savings';
+import { formatNumberWithComma } from 'utils/formatNumberWithComma';
 
 interface SavingsFormProps {
   formData: SavingsFormData;
@@ -12,7 +13,7 @@ export function SavingsForm({ formData, onChangeInput }: SavingsFormProps) {
     // 숫자만 추출
     const numbers = value.replace(/[^\d]/g, '');
     // 콤마 포맷팅
-    const formatted = numbers ? Number(numbers).toLocaleString('ko-KR') : '';
+    const formatted = numbers ? formatNumberWithComma(Number(numbers)) : '';
     onChangeInput(field, formatted);
   };
 
