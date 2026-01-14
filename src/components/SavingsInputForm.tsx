@@ -1,0 +1,44 @@
+import { SavingsInput } from 'pages/SavingsCalculatorPage';
+import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
+import { formatMoney, parseMoney } from 'utils/money';
+
+interface SavingsInputFormProps {
+  savingsInput: SavingsInput;
+  setSavingsInput: (savingsInput: SavingsInput) => void;
+}
+
+const SavingsInputForm = (props: SavingsInputFormProps) => {
+  const { savingsInput, setSavingsInput } = props;
+  return (
+    <>
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={formatMoney(Number(savingsInput.goalAmount))}
+        onChange={value => setSavingsInput({ ...savingsInput, goalAmount: parseMoney(value.target.value) })}
+      />
+      <Spacing size={16} />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={formatMoney(Number(savingsInput.monthlyAmount))}
+        onChange={value => setSavingsInput({ ...savingsInput, monthlyAmount: parseMoney(value.target.value) })}
+      />
+      <Spacing size={16} />
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={savingsInput.term}
+        onChange={value => setSavingsInput({ ...savingsInput, term: value })}
+      >
+        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
+        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
+        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+      </SelectBottomSheet>
+    </>
+  );
+};
+
+export default SavingsInputForm;
