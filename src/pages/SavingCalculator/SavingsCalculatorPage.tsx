@@ -66,7 +66,7 @@ function SavingsCalculator() {
           onProductSelect={setSelectedProduct}
         />
       )}
-      {selectedTab === 'results' && <SavingResult />}
+      {selectedTab === 'results' && <SavingResult selectedProduct={selectedProduct} calculInputs={calculInputs} />}
     </>
   );
 }
