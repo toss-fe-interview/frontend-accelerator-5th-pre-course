@@ -1,3 +1,7 @@
+const roundThousand = (number: number) => {
+  return Math.round(number / 1000) * 1000;
+};
+
 export const calculateEstimatedEaringsAmount = (
   monthlyPaymentAmount: number,
   savingsPeriod: number,
@@ -5,17 +9,17 @@ export const calculateEstimatedEaringsAmount = (
 ) => {
   const result = monthlyPaymentAmount * savingsPeriod * (1 + annualRate * 0.5);
 
-  return Math.round(result / 1000) * 1000;
+  return roundThousand(result);
 };
 
 export const calculateDifferenceWithTargetAmount = (targetAmount: number, estimatedEarginsAmount: number) => {
   const result = targetAmount - estimatedEarginsAmount;
 
-  return Math.round(result / 1000) * 1000;
+  return roundThousand(result);
 };
 
 export const calculateRecommendedMonthlyPayment = (targetAmount: number, savingsPeriod: number, annualRate: number) => {
   const result = targetAmount / (savingsPeriod * (1 + annualRate * 0.5));
 
-  return Math.round(result / 1000) * 1000;
+  return roundThousand(result);
 };
