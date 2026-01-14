@@ -1,47 +1,38 @@
+import { useQuery } from '@tanstack/react-query';
+import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { savingsProductsQueries } from '../api/queries';
+import { useSelectProductParams } from '../hooks/useSelectProductParams';
+import CalculationSummary from './CalculationSummary';
+
 export default function CalculationResult() {
+  const { data: products } = useQuery(savingsProductsQueries.listQuery());
+  const { selectedProductId } = useSelectProductParams();
+
+  const selectedProduct = products?.find(product => product.id === selectedProductId);
+
   return (
     <div>
-      계산결과 탭
-      {/* <Spacing size={8} />
+      <Spacing size={8} />
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="예상 수익 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`1,000,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="목표 금액과의 차이"
-            topProps={{ color: colors.grey600 }}
-            bottom={`-500,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="추천 월 납입 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`100,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
+      {selectedProduct ? (
+        <CalculationSummary product={selectedProduct} />
+      ) : (
+        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+      )}
 
       <Spacing size={8} />
       <Border height={16} />
       <Spacing size={8} />
 
+      <RecommendedProductList />
+      <Spacing size={40} />
+    </div>
+  );
+}
+
+function RecommendedProductList() {
+  return (
+    <>
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
@@ -73,10 +64,6 @@ export default function CalculationResult() {
         }
         onClick={() => {}}
       />
-
-      <Spacing size={40} /> */}
-      {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
-    </div>
+    </>
   );
 }
