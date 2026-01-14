@@ -6,9 +6,10 @@ import { SavingsFilter } from 'domain/savings/components/SavingsFilter';
 import { SavingsList } from 'domain/savings/components/SavingsList';
 import { useCalculateExpectedProfit } from 'domain/savings/hooks/useCalculateExpectedProfit';
 import { useFilterSavings } from 'domain/savings/hooks/useFilterSavings';
+import { useRecommendSavings } from 'domain/savings/hooks/useRecommendSavings';
 import { useSavingForm } from 'domain/savings/hooks/useSavingForm';
 import { useState } from 'react';
-import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
 type Tab = 'products' | 'results';
 
@@ -30,6 +31,7 @@ export function SavingsCalculatorPage() {
       goalAmount: filterForm.watch('goalAmount'),
       monthlyAmount: filterForm.watch('monthlyAmount'),
     });
+  const { getRecommendSavings } = useRecommendSavings();
 
   return (
     <>
@@ -71,34 +73,23 @@ export function SavingsCalculatorPage() {
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+      {getRecommendSavings(filteredSavings).map(saving => (
+        <ListRow
+          key={saving.id}
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={saving.name}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${saving.annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${saving.minMonthlyAmount.toLocaleString()}원 ~ ${saving.maxMonthlyAmount.toLocaleString()}원 | ${saving.availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          onClick={() => setSelectedSaving(saving)}
+        />
+      ))}
 
       <Spacing size={40} />
 
