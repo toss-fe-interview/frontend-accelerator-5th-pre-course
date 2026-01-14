@@ -4,9 +4,9 @@ import { CalculatorFormInputs } from 'components/pages/SavingCalulatorPage/Calcu
 import { Suspense, useState } from 'react';
 import { SavingProduct } from 'queries/types';
 import { SavingProductList } from 'components/pages/SavingCalulatorPage/SavingProductList';
-import { CalulationResult } from 'components/pages/SavingCalulatorPage/CalulationResult';
 import { isTabType, TAB_STATE, useSavingCalulatorTab } from 'hooks/useSavingCalulatorTab';
 import { Loading } from 'components/common/Loading';
+import { CalculationResult } from 'components/pages/SavingCalulatorPage/CalculationResult';
 
 type CaluculatorForm = {
   monthlyAmount: number | null;
@@ -59,7 +59,7 @@ export function SavingsCalculatorPage() {
           )}
 
           {tabState === TAB_STATE.RESULTS && (
-            <CalulationResult selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+            <CalculationResult selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
           )}
         </Suspense>
       </FormProvider>
