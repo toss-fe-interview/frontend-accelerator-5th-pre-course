@@ -1,11 +1,14 @@
 import { colors, ListRow } from 'tosslib';
-import { SavingsProduct, useGetSavingsProducts } from '../api';
+import { SavingsProduct } from '../api';
 
-export default function SavingItemList() {
-  const { data: savingsProducts } = useGetSavingsProducts();
+interface SavingItemListProps {
+  products: SavingsProduct[];
+}
+
+export default function SavingItemList({ products }: SavingItemListProps) {
   return (
     <>
-      {savingsProducts.map(product => (
+      {products.map(product => (
         <SavingItem key={product.id} {...product} />
       ))}
       {/* 선택된 적금 상품인 경우

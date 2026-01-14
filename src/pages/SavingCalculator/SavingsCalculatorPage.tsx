@@ -2,7 +2,8 @@ import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import SavingCalculatorInput from './components/SavingCalculatorInput';
 import SavingItemList from './components/SavingItemList';
 import SavingResult from './components/SavingResult';
-import { Suspense, useState } from 'react';
+import { Suspense, useDeferredValue, useMemo, useState } from 'react';
+import { useGetSavingsProducts } from './api';
 
 type SelectedTab = 'products' | 'results';
 
@@ -20,6 +21,27 @@ function SavingsCalculator() {
     term: 0,
   });
 
+  const { data: savingsProducts } = useGetSavingsProducts();
+  const deferredInputs = useDeferredValue(calculInputs);
+
+  const filteredProducts = useMemo(() => {
+    // 입력값이 설정되지 않은 경우 전체 상품 표시
+    if (deferredInputs.monthlyAmount === 0 && deferredInputs.term === 0) {
+      return savingsProducts;
+    }
+
+    return savingsProducts.filter(product => {
+      const monthlyAmountMatch =
+        deferredInputs.monthlyAmount === 0 ||
+        (deferredInputs.monthlyAmount > product.minMonthlyAmount &&
+          deferredInputs.monthlyAmount < product.maxMonthlyAmount);
+
+      const termMatch = deferredInputs.term === 0 || product.availableTerms === deferredInputs.term;
+
+      return monthlyAmountMatch && termMatch;
+    });
+  }, [deferredInputs, savingsProducts]);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -35,7 +57,7 @@ function SavingsCalculator() {
           계산 결과
         </Tab.Item>
       </Tab>
-      {selectedTab === 'products' && <SavingItemList />}
+      {selectedTab === 'products' && <SavingItemList products={filteredProducts} />}
       {selectedTab === 'results' && <SavingResult />}
       <SavingResult />
     </>
