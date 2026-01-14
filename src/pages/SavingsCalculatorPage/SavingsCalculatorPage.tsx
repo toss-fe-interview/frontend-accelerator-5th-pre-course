@@ -7,14 +7,13 @@ import {
   NavigationBar,
   SelectBottomSheet,
   Spacing,
-  Tab,
   TextField,
 } from 'tosslib';
 import { savingsProductsQuery } from './qeuries/savings-products.query';
 import { useQuery } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { onlyNumbers } from 'utils/input';
-import { useState } from 'react';
+import { SavingsCalculatorContent } from './components/SavingsCalculatorContent';
 
 interface SavingsFilterForm {
   targetAmount: number | null;
@@ -22,15 +21,10 @@ interface SavingsFilterForm {
   term: 6 | 12 | 24;
 }
 
-type Tab = 'products' | 'results';
-function isTab(value: string): value is Tab {
-  return value === 'products' || value === 'results';
-}
-
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useQuery(savingsProductsQuery);
 
-  const [activeTab, setActiveTab] = useState<Tab>('products');
+  // const [activeTab, setActiveTab] = useState<Tab>('products');
 
   const form = useForm<SavingsFilterForm>({
     defaultValues: {
@@ -101,20 +95,7 @@ export function SavingsCalculatorPage() {
       <Spacing size={24} />
 
       {/* 탭 - 컨텐츠 */}
-      <Tab
-        onChange={value => {
-          if (isTab(value)) {
-            setActiveTab(value);
-          }
-        }}
-      >
-        <Tab.Item value="products" selected={activeTab === 'products'}>
-          적금 상품
-        </Tab.Item>
-        <Tab.Item value="results" selected={activeTab === 'results'}>
-          계산 결과
-        </Tab.Item>
-      </Tab>
+      <SavingsCalculatorContent />
 
       <ListRow
         contents={
