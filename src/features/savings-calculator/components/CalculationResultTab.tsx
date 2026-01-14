@@ -17,7 +17,7 @@ export default function CalculationResultTab() {
   const recommendedProducts = products
     ?.filter(matchesPaymentRange(monthlyAmount))
     .filter(matchesPeriod(savingTerms))
-    .sort((a, b) => a.annualRate - b.annualRate)
+    .sort((a, b) => b.annualRate - a.annualRate)
     .slice(0, 2);
 
   return (
