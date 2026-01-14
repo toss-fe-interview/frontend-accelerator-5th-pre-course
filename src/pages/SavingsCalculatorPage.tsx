@@ -1,3 +1,5 @@
+import { SAVINGS_PRODUCT_TABS } from 'features/saving-products/constants';
+import { useTab } from 'shared/hooks/useTab';
 import {
   Assets,
   Border,
@@ -12,6 +14,7 @@ import {
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
+  const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -32,11 +35,11 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={handleTabChange}>
+        <Tab.Item value="products" selected={tab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={tab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
