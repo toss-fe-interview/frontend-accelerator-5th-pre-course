@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { ListRow } from 'tosslib';
 
 interface ApiStateHandlerProps {
   isLoading: boolean;
@@ -20,13 +21,12 @@ export function ApiStateHandler({
   children,
   loadingMessage = '데이터를 불러오는 중...',
 }: ApiStateHandlerProps) {
-  // TODO: UI 보고 수정 예정
   if (isLoading) {
-    return <>{loadingMessage}</>;
+    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top={loadingMessage} />}></ListRow>;
   }
 
   if (error) {
-    return <>{error}</>;
+    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top={error} />}></ListRow>;
   }
 
   return <>{children}</>;
