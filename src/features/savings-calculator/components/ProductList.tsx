@@ -7,13 +7,13 @@ export default function ProductList({
   selectedProductId,
   onProductSelect,
 }: {
-  products?: SavingsProduct[];
+  products: SavingsProduct[];
   selectedProductId?: string;
   onProductSelect: (id: string) => void;
 }) {
   return (
     <div>
-      {products?.map(product => (
+      {products.map(product => (
         <ProductItem
           key={product.id}
           product={product}
