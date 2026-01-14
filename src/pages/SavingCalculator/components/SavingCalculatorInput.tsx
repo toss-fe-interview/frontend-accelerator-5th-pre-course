@@ -1,6 +1,11 @@
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
-import { CalculInputs } from '../SavingsCalculatorPage';
 import { formatToKRW } from '../util';
+
+export interface CalculInputs {
+  targetAmount: number;
+  monthlyAmount: number;
+  term: number;
+}
 
 interface SavingCalculatorInputProps {
   calculInputs: CalculInputs;

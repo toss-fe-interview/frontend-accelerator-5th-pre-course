@@ -1,5 +1,5 @@
 import { SavingsProduct } from '../api';
-import { CalculInputs } from '../SavingsCalculatorPage';
+import { CalculInputs } from '../components/SavingCalculatorInput';
 
 interface CalculationResult {
   selectedProduct: SavingsProduct | null;

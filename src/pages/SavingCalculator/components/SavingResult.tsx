@@ -1,6 +1,6 @@
 import { Border, ListHeader, Spacing } from 'tosslib';
 import { SavingsProduct } from '../api';
-import { CalculInputs } from '../SavingsCalculatorPage';
+import { CalculInputs } from './SavingCalculatorInput';
 import { SavingItem } from './SavingItemList';
 import { CalculationResult } from './CalculationResult';
 import { useCalculationResult } from '../hooks/useCalculationResult';

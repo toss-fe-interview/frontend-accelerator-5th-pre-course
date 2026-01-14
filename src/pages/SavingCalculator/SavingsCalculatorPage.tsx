@@ -2,49 +2,17 @@ import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import SavingCalculatorInput from './components/SavingCalculatorInput';
 import SavingProductList from './components/SavingItemList';
 import SavingResult from './components/SavingResult';
-import { Suspense, useDeferredValue, useMemo, useState } from 'react';
-import { SavingsProduct, useGetSavingsProducts } from './api';
+import { Suspense, useState } from 'react';
+import { SavingsProduct } from './api';
+import { useCalculatorInputs } from './hooks/useCalculatorInputs';
+import { useSavingsProducts } from './hooks/useSavingsProducts';
 
 type SelectedTab = 'products' | 'results';
 
-export interface CalculInputs {
-  targetAmount: number;
-  monthlyAmount: number;
-  term: number;
-}
-
 function SavingsCalculator() {
   const [selectedTab, setSelectedTab] = useState<SelectedTab>('products');
-  const [calculInputs, setCalculInputs] = useState<CalculInputs>({
-    targetAmount: 0,
-    monthlyAmount: 0,
-    term: 0,
-  });
-
-  const { data: savingsProducts } = useGetSavingsProducts();
-  const deferredInputs = useDeferredValue(calculInputs);
-
-  const filteredProducts = useMemo(() => {
-    // 입력값이 설정되지 않은 경우 전체 상품 표시
-    if (deferredInputs.monthlyAmount === 0 && deferredInputs.term === 0) {
-      return savingsProducts;
-    }
-
-    return savingsProducts.filter(product => {
-      const monthlyAmountMatch =
-        deferredInputs.monthlyAmount === 0 ||
-        (deferredInputs.monthlyAmount > product.minMonthlyAmount &&
-          deferredInputs.monthlyAmount < product.maxMonthlyAmount);
-
-      const termMatch = deferredInputs.term === 0 || product.availableTerms === deferredInputs.term;
-
-      return monthlyAmountMatch && termMatch;
-    });
-  }, [deferredInputs, savingsProducts]);
-
-  const recommendedProducts = useMemo(() => {
-    return filteredProducts.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-  }, [filteredProducts]);
+  const { calculInputs, setCalculInputs, deferredInputs } = useCalculatorInputs();
+  const { filteredProducts, recommendedProducts } = useSavingsProducts(deferredInputs);
 
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
