@@ -1,16 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
+import ProductContainer from 'components/ProductContainer';
+import { Suspense } from 'react';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { getProducts } from 'utils/api';
 
 export function SavingsCalculatorPage() {
-  const { data } = useQuery({ queryKey: ['products'], queryFn: getProducts });
-  console.log(data);
+  // 데이터 fetching해서 클라이언트 데이터로 동기화 시켜서 + isSelected => 컴포넌트
 
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
+      {/* TODO. 에러 바운더리 추가해야함. */}
+      <Suspense fallback={<></>}>
+        <ProductContainer />
+      </Suspense>
 
       <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
       <Spacing size={16} />

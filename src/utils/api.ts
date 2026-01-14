@@ -1,6 +1,6 @@
 import { http, isHttpError } from 'tosslib';
 
-type ProductResponseDto = {
+export type ProductResponseDto = {
   id: string;
   name: string;
   annualRate: number;
