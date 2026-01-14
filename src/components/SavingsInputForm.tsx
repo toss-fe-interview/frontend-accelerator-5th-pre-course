@@ -1,4 +1,4 @@
-import { SavingsInput } from 'pages/SavingsCalculatorPage';
+import { SavingsInput } from 'type';
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { formatMoney, parseMoney } from 'utils/money';
 
@@ -7,7 +7,7 @@ interface SavingsInputFormProps {
   setSavingsInput: (savingsInput: SavingsInput) => void;
 }
 
-const SavingsInputForm = (props: SavingsInputFormProps) => {
+export function SavingsInputForm(props: SavingsInputFormProps) {
   const { savingsInput, setSavingsInput } = props;
   return (
     <>
@@ -39,6 +39,4 @@ const SavingsInputForm = (props: SavingsInputFormProps) => {
       </SelectBottomSheet>
     </>
   );
-};
-
-export default SavingsInputForm;
+}

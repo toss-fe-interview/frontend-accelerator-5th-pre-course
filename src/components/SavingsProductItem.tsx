@@ -1,14 +1,16 @@
 import { Assets, colors, ListRow } from 'tosslib';
-import { SavingsProduct } from 'pages/SavingsCalculatorPage';
+import { SavingsProduct } from 'type';
 import { formatMoney } from 'utils/money';
 
-type SavingsProductItemProps = {
+interface SavingsProductItemProps {
   product: SavingsProduct;
   selected?: boolean;
   onClick?: () => void;
-};
+}
 
-export default function SavingsProductItem({ product, selected = false, onClick }: SavingsProductItemProps) {
+export function SavingsProductItem(props: SavingsProductItemProps) {
+  const { product, selected = false, onClick } = props;
+
   return (
     <ListRow
       contents={

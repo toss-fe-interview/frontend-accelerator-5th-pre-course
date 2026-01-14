@@ -1,7 +1,7 @@
-import { SavingsInput, SavingsProduct } from 'pages/SavingsCalculatorPage';
+import { SavingsInput, SavingsProduct } from 'type';
+import { SavingsProductItem } from 'components/SavingsProductItem';
 import { Border, colors, ListRow, Spacing, ListHeader } from 'tosslib';
 import { formatMoney } from 'utils/money';
-import SavingsProductItem from 'components/SavingsProductItem';
 
 interface CalculationResultProps {
   selectedSavingsProduct: SavingsProduct | null;
@@ -9,7 +9,7 @@ interface CalculationResultProps {
   filteredSavingsProducts: SavingsProduct[];
 }
 
-const CalculationResult = (props: CalculationResultProps) => {
+export function CalculationResult(props: CalculationResultProps) {
   const { selectedSavingsProduct, savingsInput, filteredSavingsProducts } = props;
 
   const topRecommendedProducts = [...filteredSavingsProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
@@ -90,6 +90,4 @@ const CalculationResult = (props: CalculationResultProps) => {
       ))}
     </div>
   );
-};
-
-export default CalculationResult;
+}

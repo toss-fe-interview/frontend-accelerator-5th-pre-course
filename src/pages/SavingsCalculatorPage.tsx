@@ -1,35 +1,17 @@
 import { Border, NavigationBar, Spacing, Tab, http, isHttpError } from 'tosslib';
 import { useEffect, useMemo, useState } from 'react';
-import SavingsInputForm from 'components/SavingsInputForm';
-import SavingsProductItem from 'components/SavingsProductItem';
-import CalculationResult from 'components/CalculationResult';
-
-export type SavingsProduct = {
-  id: string;
-  name: string;
-  annualRate: number;
-  // 최소 월 납입액
-  minMonthlyAmount: number;
-  // 최대 월 납입액
-  maxMonthlyAmount: number;
-  // 저축 기간
-  availableTerms: number;
-};
-
-export type SavingsInput = {
-  goalAmount: string;
-  monthlyAmount: string;
-  term: number;
-};
+import { SavingsInputForm } from 'components/SavingsInputForm';
+import { SavingsProductItem } from 'components/SavingsProductItem';
+import { CalculationResult } from 'components/CalculationResult';
+import { SavingsProduct, SavingsInput } from 'type';
 
 export function SavingsCalculatorPage() {
+  // 처음 api 에서 저축 상품 목록 가져오기
   const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
 
-  const [savingsInput, setSavingsInput] = useState<SavingsInput>({
-    goalAmount: '',
-    monthlyAmount: '',
-    term: 0,
-  });
+  // 적금 계산기 입력 값
+  // 처음 적금 계산기 입력 값은 null 이므로 초기값을 null 로 설정
+  const [savingsInput, setSavingsInput] = useState<SavingsInput | null>(null);
 
   // 선택한 적금 상품
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
@@ -41,14 +23,14 @@ export function SavingsCalculatorPage() {
     // 월 납입액 필터링
     const filteredByMonthlyAmount = savingsProducts.filter(product => {
       return (
-        product.minMonthlyAmount <= Number(savingsInput.monthlyAmount) &&
-        product.maxMonthlyAmount >= Number(savingsInput.monthlyAmount)
+        product.minMonthlyAmount <= Number(savingsInput?.monthlyAmount) &&
+        product.maxMonthlyAmount >= Number(savingsInput?.monthlyAmount)
       );
     });
 
     // 저축 기간 필터링
     const filteredByTerm = filteredByMonthlyAmount.filter(product => {
-      return product.availableTerms === savingsInput.term;
+      return product.availableTerms === savingsInput?.term;
     });
 
     return filteredByTerm;
@@ -76,7 +58,10 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <SavingsInputForm savingsInput={savingsInput} setSavingsInput={setSavingsInput} />
+      <SavingsInputForm
+        savingsInput={savingsInput ?? { goalAmount: '', monthlyAmount: '', term: 0 }}
+        setSavingsInput={setSavingsInput}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
@@ -107,7 +92,7 @@ export function SavingsCalculatorPage() {
       {selectTab === 'results' && (
         <CalculationResult
           selectedSavingsProduct={selectedSavingsProduct}
-          savingsInput={savingsInput}
+          savingsInput={savingsInput ?? { goalAmount: '', monthlyAmount: '', term: 0 }}
           filteredSavingsProducts={filteredSavingsProducts}
         />
       )}
