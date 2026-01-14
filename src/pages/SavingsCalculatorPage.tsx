@@ -15,7 +15,6 @@ type CaluculatorForm = {
 };
 
 export function SavingsCalculatorPage() {
-  const { data: savingProducts } = useSavingProductsQuery();
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
   const [tabState, setTabState] = useSavingCalulatorTab();
   const methods = useForm<CaluculatorForm>({
@@ -55,14 +54,12 @@ export function SavingsCalculatorPage() {
         </Tab>
 
         {tabState === TAB_STATE.PRODUCTS && (
-          <SavingProductList
-            savingProducts={savingProducts}
-            selectedProduct={selectedProduct}
-            setSelectedProduct={setSelectedProduct}
-          />
+          <SavingProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
         )}
 
-        {tabState === TAB_STATE.RESULTS && <CalulationResult />}
+        {tabState === TAB_STATE.RESULTS && (
+          <CalulationResult selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+        )}
       </FormProvider>
     </>
   );
