@@ -8,7 +8,7 @@ import { isTabType, TAB_STATE, useSavingCalculatorTab } from 'hooks/useSavingCal
 import { Loading } from 'components/common/Loading';
 import { CalculationResult } from 'components/pages/SavingCalulatorPage/CalculationResult';
 
-type CaluculatorForm = {
+type CalculatorForm = {
   monthlyAmount: number | null;
   targetAmount: number | null;
   term: number;
@@ -17,7 +17,7 @@ type CaluculatorForm = {
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
   const [tabState, setTabState] = useSavingCalculatorTab();
-  const methods = useForm<CaluculatorForm>({
+  const methods = useForm<CalculatorForm>({
     defaultValues: {
       monthlyAmount: null,
       targetAmount: null,
