@@ -13,3 +13,9 @@ export const calculateDifferenceWithTargetAmount = (targetAmount: number, estima
 
   return Math.round(result);
 };
+
+export const calculateRecommendedMonthlyPayment = (targetAmount: number, savingsPeriod: number, annualRate: number) => {
+  const result = targetAmount / (savingsPeriod * (1 + annualRate * 0.5));
+
+  return Math.round(result);
+};

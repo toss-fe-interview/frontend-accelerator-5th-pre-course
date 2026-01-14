@@ -1,5 +1,9 @@
 import { ListRow, colors } from 'tosslib';
-import { calculateDifferenceWithTargetAmount, calculateEstimatedEaringsAmount } from '../utils/calculation/savings';
+import {
+  calculateDifferenceWithTargetAmount,
+  calculateEstimatedEaringsAmount,
+  calculateRecommendedMonthlyPayment,
+} from '../utils/calculation/savings';
 import { SavingsValues } from '../types/savingsValues';
 import { SavingsProduct } from '../schemas/savingsProduct';
 import { formatNumberWithComma } from '../utils/format/number';
@@ -22,6 +26,7 @@ export default function SavingsResult({ savingsValues, savingsProducts, selected
 
   const estimatedEaringsAmount = calculateEstimatedEaringsAmount(monthlyPaymentAmount, savingsPeriod, annualRate);
   const differnceWithTargetAmount = calculateDifferenceWithTargetAmount(targetAmount, estimatedEaringsAmount);
+  const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment(targetAmount, savingsPeriod, annualRate);
 
   const resultItems = [
     {
@@ -34,7 +39,7 @@ export default function SavingsResult({ savingsValues, savingsProducts, selected
     },
     {
       label: '추천 월 납입 금액',
-      value: calculateEstimatedEaringsAmount(monthlyPaymentAmount, savingsPeriod, annualRate),
+      value: recommendedMonthlyPayment,
     },
   ];
 
