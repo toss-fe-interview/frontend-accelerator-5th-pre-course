@@ -2,6 +2,7 @@ import { SavingsInput, SavingsProduct } from 'type';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { Border, colors, ListRow, Spacing, ListHeader } from 'tosslib';
 import { formatMoney } from 'utils/money';
+import { useMemo } from 'react';
 
 interface CalculationResultProps {
   selectedSavingsProduct: SavingsProduct | null;
@@ -14,7 +15,7 @@ export function CalculationResult(props: CalculationResultProps) {
 
   const topRecommendedProducts = [...filteredSavingsProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
-  const calculateResults = () => {
+  const calculateSavingsResult = useMemo(() => {
     if (!selectedSavingsProduct) {
       return null;
     }
@@ -23,22 +24,17 @@ export function CalculationResult(props: CalculationResultProps) {
     const term = savingsInput.term;
     const goalAmount = Number(savingsInput.goalAmount);
     const annualRate = selectedSavingsProduct.annualRate / 100;
+
     const expectedAmount = monthlyAmount * term * (1 + annualRate * 0.5);
     const difference = goalAmount - expectedAmount;
     const recommendedMonthlyAmount = Math.round(goalAmount / (term * (1 + annualRate * 0.5)) / 1000) * 1000;
 
-    return {
-      expectedAmount,
-      difference,
-      recommendedMonthlyAmount,
-    };
-  };
-
-  const results = calculateResults();
+    return { expectedAmount, difference, recommendedMonthlyAmount };
+  }, [selectedSavingsProduct, savingsInput]);
 
   return (
     <div>
-      {selectedSavingsProduct && results ? (
+      {calculateSavingsResult ? (
         <>
           <ListRow
             contents={
@@ -46,7 +42,7 @@ export function CalculationResult(props: CalculationResultProps) {
                 type="2RowTypeA"
                 top="예상 수익 금액"
                 topProps={{ color: colors.grey600 }}
-                bottom={`${formatMoney(Math.round(results.expectedAmount))}원`}
+                bottom={`${formatMoney(Math.round(calculateSavingsResult.expectedAmount))}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -57,7 +53,7 @@ export function CalculationResult(props: CalculationResultProps) {
                 type="2RowTypeA"
                 top="목표 금액과의 차이"
                 topProps={{ color: colors.grey600 }}
-                bottom={`${results.difference >= 0 ? '+' : ''}${formatMoney(Math.round(results.difference))}원`}
+                bottom={`${calculateSavingsResult.difference >= 0 ? '+' : ''}${formatMoney(Math.round(calculateSavingsResult.difference))}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -68,7 +64,7 @@ export function CalculationResult(props: CalculationResultProps) {
                 type="2RowTypeA"
                 top="추천 월 납입 금액"
                 topProps={{ color: colors.grey600 }}
-                bottom={`${formatMoney(results.recommendedMonthlyAmount)}원`}
+                bottom={`${formatMoney(calculateSavingsResult.recommendedMonthlyAmount)}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
