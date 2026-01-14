@@ -1,5 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { TERMS_OPTIONS } from 'product/constants';
 import { savingsProductsQueryOptions } from 'product/queries';
+import { useState } from 'react';
 import {
   Assets,
   Border,
@@ -13,10 +15,60 @@ import {
   TextField,
 } from 'tosslib';
 
+const validateInputNumber = (value: string) => {
+  return /^[\d,]*$/.test(value);
+};
+
+const formatValue = (value: string) => {
+  return value.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 export function SavingsCalculatorPage() {
-  const { data: savingsProductsData } = useSuspenseQuery(savingsProductsQueryOptions);
+  const [price, setPrice] = useState('');
+  const [monthlyPayment, setMonthlyPayment] = useState('');
+  const [term, setTerm] = useState(0);
+
+  const { data: savingsProductsData } = useSuspenseQuery({
+    ...savingsProductsQueryOptions,
+    select: data => {
+      return data.filter(product => {
+        if (
+          product.minMonthlyAmount > Number(monthlyPayment.replace(/,/g, '')) ||
+          product.maxMonthlyAmount < Number(monthlyPayment.replace(/,/g, ''))
+        ) {
+          return;
+        }
+
+        return product.availableTerms === term;
+      });
+    },
+  });
 
   console.log(savingsProductsData);
+
+  const handlePriceChange = (value: string) => {
+    if (!validateInputNumber(value)) {
+      return;
+    }
+
+    const formattedValue = formatValue(value);
+
+    setPrice(formattedValue);
+  };
+
+  const handleMonthlyPaymentChange = (value: string) => {
+    if (!validateInputNumber(value)) {
+      return;
+    }
+
+    const formattedValue = formatValue(value);
+
+    setMonthlyPayment(formattedValue);
+  };
+
+  const handleTermChange = (value: number) => {
+    setTerm(value);
+  };
 
   return (
     <>
@@ -24,14 +76,33 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={price}
+        onChange={e => handlePriceChange(e.target.value)}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={monthlyPayment}
+        onChange={e => handleMonthlyPaymentChange(e.target.value)}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={term}
+        onChange={value => handleTermChange(value)}
+      >
+        {TERMS_OPTIONS.map(option => (
+          <SelectBottomSheet.Option key={option.value} value={option.value}>
+            {option.label}
+          </SelectBottomSheet.Option>
+        ))}
       </SelectBottomSheet>
 
       <Spacing size={24} />
