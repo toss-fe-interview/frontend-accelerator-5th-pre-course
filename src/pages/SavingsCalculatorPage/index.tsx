@@ -1,4 +1,5 @@
 import { Suspense, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import {
   Assets,
   Border,
@@ -12,6 +13,8 @@ import {
   TextField,
 } from 'tosslib';
 import { useSavingsProduct } from './useSavingsProduct';
+import { parseNumericInput } from './utils';
+import { SavingsCalculatorError } from './error';
 
 function SavingsCalculatorContent() {
   const {
@@ -44,9 +47,12 @@ function SavingsCalculatorContent() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={targetAmount?.toLocaleString() ?? ''}
-        onChange={(e) => {
-          const value = e.target.value.replace(/,/g, '');
-          setTargetAmount(value ? Number(value) : null);
+        onChange={e => {
+          const parsed = parseNumericInput(e.target.value);
+          // undefined가 아닌 경우에만 상태 업데이트 (유효한 입력)
+          if (parsed !== undefined) {
+            setTargetAmount(parsed);
+          }
         }}
       />
       <Spacing size={16} />
@@ -55,9 +61,12 @@ function SavingsCalculatorContent() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={monthlyAmount?.toLocaleString() ?? ''}
-        onChange={(e) => {
-          const value = e.target.value.replace(/,/g, '');
-          setMonthlyAmount(value ? Number(value) : null);
+        onChange={e => {
+          const parsed = parseNumericInput(e.target.value);
+          // undefined가 아닌 경우에만 상태 업데이트 (유효한 입력)
+          if (parsed !== undefined) {
+            setMonthlyAmount(parsed);
+          }
         }}
       />
       <Spacing size={16} />
@@ -65,7 +74,7 @@ function SavingsCalculatorContent() {
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={savingsTerm}
-        onChange={(value) => setSavingsTerm(value as number)}
+        onChange={value => setSavingsTerm(value as number)}
       >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
@@ -76,7 +85,7 @@ function SavingsCalculatorContent() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={(value) => setSelectedTab(value as 'products' | 'results')}>
+      <Tab onChange={value => setSelectedTab(value as 'products' | 'results')}>
         <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
         </Tab.Item>
@@ -101,7 +110,7 @@ function SavingsCalculatorContent() {
               }
             />
           ) : (
-            filteredProducts.map((product) => (
+            filteredProducts.map(product => (
               <ListRow
                 key={product.id}
                 contents={
@@ -115,11 +124,7 @@ function SavingsCalculatorContent() {
                     bottomProps={{ fontSize: 13, color: colors.grey600 }}
                   />
                 }
-                right={
-                  selectedProduct?.id === product.id ? (
-                    <Assets.Icon name="icon-check-circle-green" />
-                  ) : undefined
-                }
+                right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                 onClick={() => setSelectedProduct(product)}
               />
             ))
@@ -136,11 +141,7 @@ function SavingsCalculatorContent() {
             // 상품은 선택했지만 목표 금액이 없는 경우
             <ListRow
               contents={
-                <ListRow.Texts
-                  type="1RowTypeA"
-                  top="목표 금액을 입력해 주세요."
-                  topProps={{ color: colors.red600 }}
-                />
+                <ListRow.Texts type="1RowTypeA" top="목표 금액을 입력해 주세요." topProps={{ color: colors.red600 }} />
               }
             />
           ) : (
@@ -188,15 +189,13 @@ function SavingsCalculatorContent() {
           <Border height={16} />
           <Spacing size={8} />
 
-          <ListHeader
-            title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-          />
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
           {recommendedProducts.length === 0 ? (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="추천 상품이 없습니다." />} />
           ) : (
-            recommendedProducts.map((product) => (
+            recommendedProducts.map(product => (
               <ListRow
                 key={product.id}
                 contents={
@@ -210,13 +209,8 @@ function SavingsCalculatorContent() {
                     bottomProps={{ fontSize: 13, color: colors.grey600 }}
                   />
                 }
-                right={
-                  selectedProduct?.id === product.id ? (
-                    <Assets.Icon name="icon-check-circle-green" />
-                  ) : undefined
-                }
+                right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                 onClick={() => setSelectedProduct(product)}
-                style={{ cursor: 'pointer' }}
               />
             ))
           )}
@@ -230,8 +224,10 @@ function SavingsCalculatorContent() {
 
 export function SavingsCalculatorPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SavingsCalculatorContent />
-    </Suspense>
+    <ErrorBoundary fallback={<SavingsCalculatorError />}>
+      <Suspense fallback={<div>Loading...</div>}>
+        <SavingsCalculatorContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
