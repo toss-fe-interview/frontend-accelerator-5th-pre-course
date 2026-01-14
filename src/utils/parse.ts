@@ -3,5 +3,11 @@ export const parseFormattedNumber = (str: string | undefined | null): number | u
     return undefined;
   }
 
-  return Number(str.replace(/,/g, ''));
+  const num = Number(str.replace(/,/g, ''));
+
+  if (isNaN(num)) {
+    return undefined;
+  }
+
+  return num;
 };
