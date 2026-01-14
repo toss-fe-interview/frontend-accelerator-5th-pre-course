@@ -116,7 +116,7 @@ export function SavingsCalculatorPage() {
                 topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                 middle={`연 이자율: ${savingsProduct.annualRate}%`}
                 middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${savingsProduct.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${savingsProduct.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${savingsProduct.availableTerms}개월`}
+                bottom={`${formatAmount(savingsProduct.minMonthlyAmount)}원 ~ ${formatAmount(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
