@@ -7,7 +7,7 @@
  * @param annualRate - 연 이자율 (퍼센트 단위, 예: 3.5)
  * @returns 예상 수익 금액
  */
-export const calculateExpectedIncome = (monthlyAmount: number, term: number, annualRate: number): number => {
+export const calculateExpectedIncome = (monthlyAmount: number, term: number, annualRate = 0): number => {
   return monthlyAmount * term * (1 + annualRate * 0.01 * 0.5);
 };
 
@@ -31,7 +31,7 @@ export const calculateTargetDiff = (targetAmount: number, expectedIncome: number
  * @param annualRate - 연 이자율 (퍼센트 단위, 예: 3.5)
  * @returns 추천 월 납입 금액 (1000원 단위)
  */
-export const calculateRecommendedMonthlyPayment = (targetAmount: number, term: number, annualRate: number): number => {
+export const calculateRecommendedMonthlyPayment = (targetAmount: number, term: number, annualRate = 0): number => {
   const rawAmount = targetAmount / (term * (1 + annualRate * 0.01 * 0.5));
   return Math.round(rawAmount / 1000) * 1000;
 };
