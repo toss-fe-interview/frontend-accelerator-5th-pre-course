@@ -23,7 +23,7 @@ src/
 │       │   ├── GoalDifference.tsx
 │       │   └── RecommendedDeposit.tsx
 │       ├── ProductList/         # 상품 목록 컴포넌트
-│       ├── ui/                  # 공통 UI 컴포넌트
+│       ├── ui/                  # 적금 도메인 UI 컴포넌트
 │       └── index.tsx            # Compound Component 조합
 ├── pages/
 │   └── SavingsCalculatorPage.tsx
