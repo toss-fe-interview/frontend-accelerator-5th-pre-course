@@ -1,4 +1,3 @@
-// src/components/CalculationResult.tsx
 import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { SavingsProduct } from 'types/savings';
 import { ProductList } from './ProductList';

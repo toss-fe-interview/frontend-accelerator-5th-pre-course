@@ -1,4 +1,3 @@
-// src/components/SavingsForm.tsx
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 
 interface FormData {

@@ -42,6 +42,10 @@ export function SavingsCalculatorPage() {
       return [];
     }
 
+    if (formData.monthlyAmount === '') {
+      return products;
+    }
+
     return filterProducts(products, {
       monthlyAmount: Number(formData.monthlyAmount.replace(/,/g, '')),
       savingPeriod: formData.savingPeriod,
