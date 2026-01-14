@@ -2,16 +2,17 @@ import { SavingProduct } from 'queries/types';
 import { useWatch } from 'react-hook-form';
 import { ProductItem } from './ProductItem';
 import { isAffordableProducts } from 'utils/savingProductFilter';
+import { useSavingProductsQuery } from 'queries/useSavingProductsQuery';
 
 export const RecommendProductList = ({
-  savingProducts,
   selectedProduct,
   setSelectedProduct,
 }: {
-  savingProducts: SavingProduct[];
   selectedProduct: SavingProduct | null;
   setSelectedProduct: (product: SavingProduct) => void;
 }) => {
+  const { data: savingProducts } = useSavingProductsQuery();
+
   const { monthlyAmount, term } = useWatch();
   const recommendProductList = savingProducts
     ?.filter(product => isAffordableProducts(product, monthlyAmount, term))

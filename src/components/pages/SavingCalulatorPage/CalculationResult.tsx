@@ -24,8 +24,6 @@ export const CalculationResult = ({
   selectedProduct: SavingProduct | null;
   setSelectedProduct: (product: SavingProduct) => void;
 }) => {
-  const { data: savingProducts } = useSavingProductsQuery();
-
   return (
     <>
       <Spacing size={8} />
@@ -41,11 +39,7 @@ export const CalculationResult = ({
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
-      <RecommendProductList
-        savingProducts={savingProducts}
-        selectedProduct={selectedProduct}
-        setSelectedProduct={setSelectedProduct}
-      />
+      <RecommendProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
       <Spacing size={40} />
     </>
   );
