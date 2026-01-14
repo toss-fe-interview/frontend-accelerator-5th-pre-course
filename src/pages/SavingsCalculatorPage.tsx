@@ -1,9 +1,9 @@
-import { Border, colors, ListRow, NavigationBar, Spacing, Tab, http, isHttpError } from 'tosslib';
+import { Border, colors, ListRow, NavigationBar, Spacing, Tab, http, isHttpError, Assets } from 'tosslib';
 import { useEffect, useMemo, useState } from 'react';
 import SavingsInputForm from 'components/SavingsInputForm';
 import { formatMoney } from 'utils/money';
 
-type SavingsProduct = {
+export type SavingsProduct = {
   id: string;
   name: string;
   annualRate: number;
@@ -29,6 +29,11 @@ export function SavingsCalculatorPage() {
     monthlyAmount: '',
     term: 0,
   });
+
+  // 선택한 적금 상품
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
+
+  const [selectTab, setSelectTab] = useState<'products' | 'results'>('products');
 
   // 필터링 조건에 맞게 상품 목록 필터링
   const filteredSavingsProducts = useMemo(() => {
@@ -76,11 +81,11 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={value => setSelectTab(value as 'products' | 'results')}>
+        <Tab.Item value="products" selected={selectTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={selectTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
@@ -99,8 +104,10 @@ export function SavingsCalculatorPage() {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          // right={<Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {}}
+          right={selectedSavingsProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+          onClick={() => {
+            setSelectedSavingsProduct(product);
+          }}
         />
       ))}
 
