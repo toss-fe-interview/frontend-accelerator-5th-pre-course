@@ -6,33 +6,34 @@
 
 ### 1. 페이지 스코프 상태 관리
 
-- **문제**: Jotai의 atom을 전역으로 선언하면 의도치 않게 전역 상태가 되어 페이지를 벗어나도 상태가 유지됨
-- **해결**: `SavingsCalculatorPage`를 Jotai의 `Provider`로 감싸서 페이지 스코프로 격리
-- **결과**: 페이지 내에서는 하위 컴포넌트들이 자유롭게 상태를 공유하되, 페이지 언마운트 시 자동으로 초기화
+- **원칙**: 페이지 컴포넌트에서 훅을 한 번만 호출하여 상태 관리
+- **구현**: `useState`를 사용한 로컬 상태 관리
+- **결과**: 페이지 언마운트 시 자동으로 상태 초기화, 추가 라이브러리 불필요
 
 ### 2. Co-location (응집도)
 
 - **원칙**: 페이지와 관련된 모든 로직을 함께 배치
 - **구조**:
-  ```
+
+  ```text
   SavingsCalculatorPage/
   ├── index.tsx                    # 페이지 컴포넌트
   └── useSavingsProduct/           # 페이지 전용 훅
       ├── README.md               # 이 문서
-      ├── index.ts                # 메인 훅
+      ├── index.ts                # 메인 훅 (useState + useMemo)
       ├── api.ts                  # React Query API 호출
-      ├── atoms.ts                # Jotai atoms (상태 + 파생상태)
       └── types.ts                # 타입 정의
   ```
+
 - **장점**: 페이지 이해가 쉽고, 삭제/이동 시 관련 코드를 한꺼번에 처리 가능
 
-### 3. 선언적 파생 상태 관리
+### 3. 파생 상태 관리
 
-- **도구**: Jotai의 atom을 활용하여 파생 상태를 선언적으로 정의
+- **도구**: React의 `useMemo`를 활용하여 파생 상태를 계산
 - **이점**:
   - 컴포넌트에서 복잡한 계산 로직을 분리
-  - 상태 변경 시 자동으로 파생 상태 재계산
-  - `useMemo` 대비 더 명확한 의존성 관리
+  - 의존성 배열로 명확한 재계산 조건 명시
+  - 표준 React 패턴 사용으로 학습 곡선 감소
 
 ## API
 
@@ -109,29 +110,31 @@
 
 ## 설계 결정 (Design Decisions)
 
-### Q: 왜 useState + useMemo가 아닌 Jotai를 사용했나요?
+### Q: 왜 Jotai나 Context를 사용하지 않았나요?
 
 **A**:
 
-- 파생 상태가 5개로 많고, 의존성 관계가 복잡함
-- Jotai의 atom은 선언적으로 파생 상태를 정의할 수 있어 가독성과 유지보수성이 높음
-- 컴포넌트가 필요한 상태만 구독하여 불필요한 리렌더링 방지
+- 이 훅은 페이지 최상위에서 한 번만 호출되고 props로 전달
+- 여러 컴포넌트에서 독립적으로 호출할 필요가 없음
+- `useState` + `useMemo`가 가장 간단하고 명확한 솔루션
+- 추가 라이브러리나 보일러플레이트 불필요
 
-### Q: 왜 전역 hooks 폴더가 아닌 페이지 폴더에 위치하나요?
-
-**A**:
-
-- 이 훅은 `SavingsCalculatorPage`에만 종속적임
-- Co-location 원칙: 관련된 코드를 가까이 배치
-- 페이지를 삭제하거나 이동할 때 관련 로직을 함께 처리 가능
-
-### Q: 왜 Suspense를 사용하나요?
+### Q: 여러 컴포넌트에서 이 훅을 호출하면 어떻게 되나요?
 
 **A**:
 
-- React Query의 `useSuspenseQuery`와 함께 사용하여 로딩 상태를 선언적으로 처리
-- 컴포넌트에서 로딩 상태 처리 로직을 제거하여 코드 간소화
-- 에러 처리는 ErrorBoundary와 함께 사용 가능 (향후 추가 예정)
+- 각 컴포넌트가 독립적인 상태를 가짐 (상태 공유 안 됨)
+- React Query는 캐싱되므로 API 중복 호출은 발생하지 않음
+- 파생 상태 계산은 각 컴포넌트마다 실행 (~0.1ms, 무시할 수 있는 수준)
+- **권장 패턴**: 페이지 최상위에서 한 번만 호출 + props 전달
+
+### Q: Props drilling이 깊어지면 어떻게 하나요?
+
+**A**:
+
+- 3 depth 이상 깊어지면 Context 도입 고려
+- 또는 컴포넌트 구조를 재설계하여 depth 줄이기
+- 성능 최적화가 필요하면 Jotai 같은 상태 관리 라이브러리 재도입
 
 ### Q: 월 납입액이 null일 때 왜 빈 배열을 반환하나요?
 
@@ -142,15 +145,20 @@
 
 ## 요구사항 매핑
 
-| 요구사항            | 구현 위치                                   |
-| ------------------- | ------------------------------------------- |
-| 적금 상품 목록 연동 | `api.ts` - `useSavingsProductsQuery`        |
-| 목표 금액 입력      | `atoms.ts` - `targetAmountAtom`             |
-| 월 납입액 입력      | `atoms.ts` - `monthlyAmountAtom`            |
-| 저축 기간 선택      | `atoms.ts` - `savingsTermAtom` (기본값: 12) |
-| 조건별 필터링       | `atoms.ts` - `filteredProductsAtom`         |
-| 상품 선택           | `atoms.ts` - `selectedProductAtom`          |
-| 예상 수익 금액 계산 | `atoms.ts` - `expectedRevenueAtom`          |
-| 목표 금액과의 차이  | `atoms.ts` - `targetDifferenceAtom`         |
-| 추천 월 납입 금액   | `atoms.ts` - `recommendedMonthlyAmountAtom` |
-| 추천 상품 목록      | `atoms.ts` - `recommendedProductsAtom`      |
+| 요구사항            | 구현 위치                                          |
+| ------------------- | -------------------------------------------------- |
+| 적금 상품 목록 연동 | `api.ts` - `useSavingsProductsQuery`               |
+| 목표 금액 입력      | `index.ts` - `useState` (targetAmount)             |
+| 월 납입액 입력      | `index.ts` - `useState` (monthlyAmount)            |
+| 저축 기간 선택      | `index.ts` - `useState` (savingsTerm, 기본값: 12)  |
+| 조건별 필터링       | `index.ts` - `useMemo` (filteredProducts)          |
+| 상품 선택           | `index.ts` - `useState` (selectedProduct)          |
+| 예상 수익 금액 계산 | `index.ts` - `useMemo` (expectedRevenue)           |
+| 목표 금액과의 차이  | `index.ts` - `useMemo` (targetDifference)          |
+| 추천 월 납입 금액   | `index.ts` - `useMemo` (recommendedMonthlyAmount)  |
+| 추천 상품 목록      | `index.ts` - `useMemo` (recommendedProducts)       |
+
+## 참고 문서
+
+- [프로젝트 요구사항](.docs/accelerator-plan.md)
+- [TanStack Query 공식 문서](https://tanstack.com/query/latest)
