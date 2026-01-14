@@ -104,7 +104,13 @@ export function SavingsCalculatorPage() {
           ))}
         </>
       )}
-      {selectTab === 'results' && <CalculationResult selectedSavingsProduct={selectedSavingsProduct} />}
+      {selectTab === 'results' && (
+        <CalculationResult
+          selectedSavingsProduct={selectedSavingsProduct}
+          savingsInput={savingsInput}
+          filteredSavingsProducts={filteredSavingsProducts}
+        />
+      )}
 
       <Spacing size={40} />
     </>

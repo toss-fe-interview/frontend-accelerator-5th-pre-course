@@ -1,15 +1,44 @@
-import { SavingsProduct } from 'pages/SavingsCalculatorPage';
+import { SavingsInput, SavingsProduct } from 'pages/SavingsCalculatorPage';
 import { Border, colors, ListRow, Spacing, ListHeader } from 'tosslib';
+import { formatMoney } from 'utils/money';
+import SavingsProductItem from 'components/SavingsProductItem';
 
 interface CalculationResultProps {
   selectedSavingsProduct: SavingsProduct | null;
+  savingsInput: SavingsInput;
+  filteredSavingsProducts: SavingsProduct[];
 }
 
 const CalculationResult = (props: CalculationResultProps) => {
-  const { selectedSavingsProduct } = props;
+  const { selectedSavingsProduct, savingsInput, filteredSavingsProducts } = props;
+
+  const topRecommendedProducts = [...filteredSavingsProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+
+  const calculateResults = () => {
+    if (!selectedSavingsProduct) {
+      return null;
+    }
+
+    const monthlyAmount = Number(savingsInput.monthlyAmount);
+    const term = savingsInput.term;
+    const goalAmount = Number(savingsInput.goalAmount);
+    const annualRate = selectedSavingsProduct.annualRate / 100;
+    const expectedAmount = monthlyAmount * term * (1 + annualRate * 0.5);
+    const difference = goalAmount - expectedAmount;
+    const recommendedMonthlyAmount = Math.round(goalAmount / (term * (1 + annualRate * 0.5)) / 1000) * 1000;
+
+    return {
+      expectedAmount,
+      difference,
+      recommendedMonthlyAmount,
+    };
+  };
+
+  const results = calculateResults();
+
   return (
     <div>
-      {selectedSavingsProduct ? (
+      {selectedSavingsProduct && results ? (
         <>
           <ListRow
             contents={
@@ -17,7 +46,7 @@ const CalculationResult = (props: CalculationResultProps) => {
                 type="2RowTypeA"
                 top="예상 수익 금액"
                 topProps={{ color: colors.grey600 }}
-                bottom={`1,000,000원`}
+                bottom={`${formatMoney(Math.round(results.expectedAmount))}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -28,7 +57,7 @@ const CalculationResult = (props: CalculationResultProps) => {
                 type="2RowTypeA"
                 top="목표 금액과의 차이"
                 topProps={{ color: colors.grey600 }}
-                bottom={`-500,000원`}
+                bottom={`${results.difference >= 0 ? '+' : ''}${formatMoney(Math.round(results.difference))}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -39,7 +68,7 @@ const CalculationResult = (props: CalculationResultProps) => {
                 type="2RowTypeA"
                 top="추천 월 납입 금액"
                 topProps={{ color: colors.grey600 }}
-                bottom={`100,000원`}
+                bottom={`${formatMoney(results.recommendedMonthlyAmount)}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -56,34 +85,9 @@ const CalculationResult = (props: CalculationResultProps) => {
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+      {topRecommendedProducts.map(product => (
+        <SavingsProductItem key={product.id} product={product} />
+      ))}
     </div>
   );
 };
