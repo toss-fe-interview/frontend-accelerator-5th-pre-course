@@ -31,6 +31,7 @@ export function SavingsCalculatorPage() {
     monthlyAmount: 0,
     term: 12,
   });
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
 
   const handleChangeTextField = (key: keyof SavingsCalculatorFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -102,25 +103,33 @@ export function SavingsCalculatorPage() {
       <>
         {savingsProducts
           .filter(savingsProduct => filterSavingsProduct(savingsProduct, formState))
-          .map(savingsProduct => (
-            <ListRow
-              key={savingsProduct.id}
-              contents={
-                <ListRow.Texts
-                  type="3RowTypeA"
-                  top={savingsProduct.name}
-                  topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                  middle={`연 이자율: ${savingsProduct.annualRate}%`}
-                  middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                  bottom={`${formatAmount(savingsProduct.minMonthlyAmount)}원 ~ ${formatAmount(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
-                  bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                />
-              }
-              // TODO: select 여부에 따른 check icon
-              right={<Assets.Icon name="icon-check-circle-green" />}
-              onClick={() => {}}
-            />
-          ))}
+          .map(savingsProduct => {
+            const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
+            return (
+              <ListRow
+                key={savingsProduct.id}
+                contents={
+                  <ListRow.Texts
+                    type="3RowTypeA"
+                    top={savingsProduct.name}
+                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                    middle={`연 이자율: ${savingsProduct.annualRate}%`}
+                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                    bottom={`${formatAmount(savingsProduct.minMonthlyAmount)}원 ~ ${formatAmount(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
+                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                  />
+                }
+                right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
+                onClick={() => {
+                  if (isSelected) {
+                    setSelectedSavingsProduct(null);
+                    return;
+                  }
+                  setSelectedSavingsProduct(savingsProduct);
+                }}
+              />
+            );
+          })}
       </>
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
