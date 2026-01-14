@@ -1,13 +1,8 @@
-import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { useState } from 'react';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
-/**
- * 2. 저축 목표 입력 기능 만들기
- * - 입력 기능 구현
- * - 유효한 입력값이 되도록 처리 -> 시간 소요 예상
- * - 입력한 값에 따라서 필터링 된 목록이 적금 상품에 보여지도록 처리
- */
+import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
+import { SavingsProduct } from 'types/SavingsProduct.type';
 
 type SavingsCalculatorFormState = {
   targetAmount: number;
@@ -15,15 +10,13 @@ type SavingsCalculatorFormState = {
   term: number;
 };
 
-/** TODO:
- * 필터링 조건
- * - 월 납입액
- *    - `product.minMonthlyAmount` (최소 월 납입액)보다 크고
- *    - `product.maxMonthlyAmount` (최대 월 납입액)보다 작아야 함
- * - 저축 기간
- *    - `product.availableTerms` (저축 기간)와 동일해야 함
- */
-const filterSavingsProduct = (savingsProduct: SavingsProduct, formState: SavingsCalculatorFormState) => {};
+const filterSavingsProduct = (savingsProduct: SavingsProduct, formState: SavingsCalculatorFormState) => {
+  return (
+    savingsProduct.minMonthlyAmount <= formState.monthlyAmount &&
+    savingsProduct.maxMonthlyAmount >= formState.monthlyAmount &&
+    savingsProduct.availableTerms === formState.term
+  );
+};
 
 const formatAmount = (amount: number) => amount.toLocaleString('ko-KR');
 
@@ -105,26 +98,29 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {/* 적금 상품 리스트 영역 */}
+      {/* TODO: 적금 상품 리스트 Empty 컴포넌트 */}
       <>
-        {savingsProducts.map(savingsProduct => (
-          <ListRow
-            key={savingsProduct.id}
-            contents={
-              <ListRow.Texts
-                type="3RowTypeA"
-                top={savingsProduct.name}
-                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                middle={`연 이자율: ${savingsProduct.annualRate}%`}
-                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${formatAmount(savingsProduct.minMonthlyAmount)}원 ~ ${formatAmount(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
-                bottomProps={{ fontSize: 13, color: colors.grey600 }}
-              />
-            }
-            // TODO: select 여부에 따른 check icon
-            right={<Assets.Icon name="icon-check-circle-green" />}
-            onClick={() => {}}
-          />
-        ))}
+        {savingsProducts
+          .filter(savingsProduct => filterSavingsProduct(savingsProduct, formState))
+          .map(savingsProduct => (
+            <ListRow
+              key={savingsProduct.id}
+              contents={
+                <ListRow.Texts
+                  type="3RowTypeA"
+                  top={savingsProduct.name}
+                  topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                  middle={`연 이자율: ${savingsProduct.annualRate}%`}
+                  middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                  bottom={`${formatAmount(savingsProduct.minMonthlyAmount)}원 ~ ${formatAmount(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
+                  bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                />
+              }
+              // TODO: select 여부에 따른 check icon
+              right={<Assets.Icon name="icon-check-circle-green" />}
+              onClick={() => {}}
+            />
+          ))}
       </>
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
