@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import {
   Assets,
   Border,
@@ -13,9 +14,40 @@ import {
 import { useSavingsProducts } from '../hooks/useSavingsProducts';
 import { formatNumber } from '../utils/format';
 import { ApiStateHandler } from '../components/ApiStateHandler';
+import { filterProducts } from '../utils/productFilter';
 
 export function SavingsCalculatorPage() {
   const { products, isLoading, error } = useSavingsProducts();
+
+  // 사용자 입력 상태 관리
+  const [targetAmount, setTargetAmount] = useState<number>(0);
+  const [monthlyAmount, setMonthlyAmount] = useState<number>(0);
+  const [savingTerm, setSavingTerm] = useState<number>(12);
+
+  // 입력값에 따라 필터링된 상품 목록 계산
+  const filteredProducts = useMemo(() => {
+    return filterProducts(products, {
+      monthlyAmount,
+      savingTerm,
+    });
+  }, [products, monthlyAmount, savingTerm]);
+
+  // 목표 금액 입력 핸들러
+  const handleTargetAmountChange = (value: string) => {
+    const numericValue = parseInt(value.replace(/,/g, ''), 10);
+    setTargetAmount(isNaN(numericValue) ? 0 : numericValue);
+  };
+
+  // 월 납입액 입력 핸들러
+  const handleMonthlyAmountChange = (value: string) => {
+    const numericValue = parseInt(value.replace(/,/g, ''), 10);
+    setMonthlyAmount(isNaN(numericValue) ? 0 : numericValue);
+  };
+
+  // 저축 기간 선택 핸들러
+  const handleSavingTermChange = (value: number) => {
+    setSavingTerm(value);
+  };
 
   return (
     <>
@@ -23,11 +55,28 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={targetAmount > 0 ? formatNumber(targetAmount) : ''}
+        onChange={(e) => handleTargetAmountChange(e.target.value)}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={monthlyAmount > 0 ? formatNumber(monthlyAmount) : ''}
+        onChange={(e) => handleMonthlyAmountChange(e.target.value)}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={savingTerm}
+        onChange={handleSavingTermChange}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
@@ -47,7 +96,7 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       <ApiStateHandler isLoading={isLoading} error={error} loadingMessage="적금 상품을 불러오는 중...">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <ListRow
             key={product.id}
             contents={
