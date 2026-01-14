@@ -14,12 +14,13 @@ export const SavingProductList = ({
   const { data: savingProducts } = useSavingProductsQuery();
   const { monthlyAmount, term } = useWatch();
 
-  const filteredProducts = savingProducts?.filter(product => isAffordableProducts(product, monthlyAmount, term));
+  const filteredProducts = savingProducts.filter(product => isAffordableProducts(product, monthlyAmount, term));
 
   return (
     <>
-      {filteredProducts?.map(savingProduct => (
+      {filteredProducts.map(savingProduct => (
         <ProductItem
+          key={savingProduct.id}
           savingProduct={savingProduct}
           selectedProduct={selectedProduct}
           setSelectedProduct={setSelectedProduct}
