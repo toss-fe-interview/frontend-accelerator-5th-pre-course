@@ -1,27 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tab } from 'tosslib';
 import { savingsProductsQuery } from '../qeuries/savings-products.query';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import type { SavingsProduct } from '../models/savings-products.dto';
 import { match } from 'ts-pattern';
 import { CalculationResult } from './CalculationResult';
-import { SavingsFilterForm } from '../types/saving-filter-form';
-import { SavingsProductItem } from './SavingsProductItem';
+import { SavingsCalculatorTab, SavingsFilterForm } from '../types/saving-filter-form';
+import { SavingsProducts } from './SavingsProducts';
 
-type Tab = 'products' | 'results';
-function isTab(value: string): value is Tab {
-  return value === 'products' || value === 'results';
-}
-
-export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }: SavingsFilterForm) {
+export function SavingsCalculatorContents({ targetAmount, monthlyPayment, term }: SavingsFilterForm) {
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery);
 
-  const [activeTab, setActiveTab] = useState<Tab>('products');
+  const [activeTab, setActiveTab] = useState<SavingsCalculatorTab>('products');
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   const handleSelectProduct = (product: SavingsProduct) => {
     setSelectedProduct(prev => (prev?.id === product.id ? null : product));
   };
+
+  useEffect(
+    function resetSelectedProductOnSavingFilterFormChange() {
+      setSelectedProduct(null);
+    },
+    [monthlyPayment, term]
+  );
 
   const filteredSavingsProducts = filterSavingsProducts(savingsProducts, monthlyPayment, term);
 
@@ -45,14 +47,11 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
       {match(activeTab)
         .with('products', () => (
           <>
-            {filteredSavingsProducts.map(product => (
-              <SavingsProductItem
-                key={product.id}
-                product={product}
-                selectedProduct={selectedProduct}
-                onSelectProduct={handleSelectProduct}
-              />
-            ))}
+            <SavingsProducts
+              products={filteredSavingsProducts}
+              selectedProduct={selectedProduct}
+              onSelectProduct={handleSelectProduct}
+            />
           </>
         ))
         .with('results', () => (
@@ -84,4 +83,8 @@ function filterSavingsProducts(savingsProducts: SavingsProduct[], monthlyPayment
 
     return true;
   });
+}
+
+function isTab(value: string): value is SavingsCalculatorTab {
+  return value === 'products' || value === 'results';
 }

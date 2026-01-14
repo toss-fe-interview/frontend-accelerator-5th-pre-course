@@ -1,3 +1,4 @@
+export type SavingsCalculatorTab = 'products' | 'results';
 export interface SavingsFilterForm {
   targetAmount: number | null;
   monthlyPayment: number | null;

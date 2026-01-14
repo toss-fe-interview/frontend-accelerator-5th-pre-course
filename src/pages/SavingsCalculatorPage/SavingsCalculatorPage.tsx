@@ -1,6 +1,6 @@
 import { NavigationBar, Spacing } from 'tosslib';
 import { useForm } from 'react-hook-form';
-import { SavingsCalculatorContent } from './components/SavingsCalculatorContent';
+import { SavingsCalculatorContents } from './components/SavingsCalculatorContents';
 import { SavingsFilterForm } from './types/saving-filter-form';
 import { SavingFilterForm } from './components/SavingFilterForm';
 
@@ -23,7 +23,7 @@ export function SavingsCalculatorPage() {
       <SavingFilterForm control={form.control} />
       <Spacing size={24} />
 
-      <SavingsCalculatorContent targetAmount={targetAmount} monthlyPayment={monthlyPayment} term={term} />
+      <SavingsCalculatorContents targetAmount={targetAmount} monthlyPayment={monthlyPayment} term={term} />
       <Spacing size={40} />
     </>
   );
