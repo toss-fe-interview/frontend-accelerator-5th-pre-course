@@ -10,7 +10,13 @@ export interface SavingsProduct {
 export interface SavingsFormInput {
   targetAmount: number;
   monthlyAmount: number;
-  savingPeriod: number;
+  savingPeriod: SavingPeriod;
+}
+
+export interface SavingsFormData {
+  targetAmount: string;
+  monthlyAmount: string;
+  savingPeriod: SavingPeriod;
 }
 
 export interface CalculationResult {
@@ -18,3 +24,6 @@ export interface CalculationResult {
   differenceFromTarget: number;
   recommendedMonthlyAmount: number;
 }
+
+export const SAVING_PERIODS = [6, 12, 24] as const;
+export type SavingPeriod = (typeof SAVING_PERIODS)[number];

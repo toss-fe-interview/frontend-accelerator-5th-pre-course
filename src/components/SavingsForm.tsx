@@ -1,14 +1,9 @@
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
-
-interface FormData {
-  targetAmount: string;
-  monthlyAmount: string;
-  savingPeriod: number;
-}
+import { SAVING_PERIODS, SavingsFormData } from 'types/savings';
 
 interface SavingsFormProps {
-  formData: FormData;
-  onChangeInput: <K extends keyof FormData>(field: K, value: FormData[K]) => void;
+  formData: SavingsFormData;
+  onChangeInput: <K extends keyof SavingsFormData>(field: K, value: SavingsFormData[K]) => void;
 }
 
 export function SavingsForm({ formData, onChangeInput }: SavingsFormProps) {
@@ -45,9 +40,11 @@ export function SavingsForm({ formData, onChangeInput }: SavingsFormProps) {
         value={formData.savingPeriod}
         onChange={value => onChangeInput('savingPeriod', value)}
       >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+        {SAVING_PERIODS.map(period => (
+          <SelectBottomSheet.Option key={period} value={period}>
+            {period}개월
+          </SelectBottomSheet.Option>
+        ))}
       </SelectBottomSheet>
     </>
   );

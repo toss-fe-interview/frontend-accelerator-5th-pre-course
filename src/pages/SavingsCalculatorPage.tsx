@@ -3,32 +3,16 @@ import { CalculationResult } from 'components/CalculationResult';
 import { ProductList } from 'components/ProductList';
 import { SavingsForm } from 'components/SavingsForm';
 import { useMemo, useState } from 'react';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { SavingsFormData } from 'types/savings';
 import { calculateSavingsResult } from 'utils/calculateSavings';
 import { filterProducts } from 'utils/filterProducts';
-
-interface FormData {
-  targetAmount: string;
-  monthlyAmount: string;
-  savingPeriod: number;
-}
 
 type TabType = 'products' | 'results';
 
 export function SavingsCalculatorPage() {
   const { data: products, status } = useSavingsProducts();
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SavingsFormData>({
     targetAmount: '',
     monthlyAmount: '',
     savingPeriod: 12,
@@ -86,7 +70,7 @@ export function SavingsCalculatorPage() {
     });
   }, [selectedProduct, formData]);
 
-  const handleChangeInput = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+  const handleChangeInput = <K extends keyof SavingsFormData>(field: K, value: SavingsFormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
