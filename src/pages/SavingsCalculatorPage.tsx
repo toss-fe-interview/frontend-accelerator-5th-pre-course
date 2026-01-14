@@ -19,8 +19,8 @@ export function SavingsCalculatorPage() {
   const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
 
   // 적금 계산기
-  const [targetAmount, setTargetAmount] = useState<number | undefined>(0);
-  const [monthlyAmount, setMonthlyAmount] = useState<number | undefined>(0);
+  const [targetAmount, setTargetAmount] = useState<number | undefined>(undefined);
+  const [monthlyAmount, setMonthlyAmount] = useState<number | undefined>(undefined);
   const [term, setTerm] = useState<number>(12);
 
   // 선택한 적금 상품
