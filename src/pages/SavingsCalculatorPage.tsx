@@ -96,13 +96,14 @@ export function SavingsCalculatorPage() {
               clickable
             />
           ) : (
-            <CalculationResult savingsProducts={filteredSavingsProducts} selectedProductId={selectedProductId} />
+            <CalculationResult
+              savingsValues={savingsValues}
+              savingsProducts={filteredSavingsProducts}
+              selectedProductId={selectedProductId}
+            />
           )}
         </Suspense>
       </ErrorBoundary>
-
-      {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
     </>
   );
 }

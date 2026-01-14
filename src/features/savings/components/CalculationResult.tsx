@@ -1,52 +1,31 @@
-import { Spacing, ListRow, colors, Border, ListHeader } from 'tosslib';
+import { Spacing, Border, ListHeader } from 'tosslib';
 import SavingsProductList from './SavingsProductList';
 import { SavingsProduct } from '../schemas/savingsProduct';
 import useRecommendedSavingsProducts from '../hooks/useRecommendedSavingsProducts';
+import SavingsResult from './SavingsResult';
+import { SavingsValues } from '../types/savingsValues';
 
 interface CalculationResultProps {
+  savingsValues: SavingsValues;
   savingsProducts: SavingsProduct[];
   selectedProductId: string | null;
 }
 
-export default function CalculationResult({ savingsProducts, selectedProductId }: CalculationResultProps) {
+export default function CalculationResult({
+  savingsValues,
+  savingsProducts,
+  selectedProductId,
+}: CalculationResultProps) {
   const recommendedSavingsProducts = useRecommendedSavingsProducts(savingsProducts);
 
   return (
     <>
       <Spacing size={8} />
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="예상 수익 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`1,000,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="목표 금액과의 차이"
-            topProps={{ color: colors.grey600 }}
-            bottom={`-500,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="추천 월 납입 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`100,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
+      <SavingsResult
+        savingsValues={savingsValues}
+        savingsProducts={savingsProducts}
+        selectedProductId={selectedProductId}
       />
 
       <Spacing size={8} />
