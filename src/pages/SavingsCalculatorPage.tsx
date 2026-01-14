@@ -98,7 +98,7 @@ export function SavingsCalculatorPage() {
 
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
-          {recommendedProducts(filteredSavingsProducts, savingsProducts).map(product => (
+          {recommendedProducts.map(product => (
             <SavingsProductItem
               key={product.id}
               product={product}
