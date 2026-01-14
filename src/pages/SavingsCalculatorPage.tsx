@@ -23,6 +23,7 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number>(0);
   const [monthlyAmount, setMonthlyAmount] = useState<number>(0);
   const [savingTerm, setSavingTerm] = useState<number>(12);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   // 입력값에 따라 필터링된 상품 목록 계산
   const filteredProducts = useMemo(() => {
@@ -47,6 +48,11 @@ export function SavingsCalculatorPage() {
   // 저축 기간 선택 핸들러
   const handleSavingTermChange = (value: number) => {
     setSavingTerm(value);
+  };
+
+  // 적금 상품 선택 핸들러
+  const handleProductSelect = (productId: string) => {
+    setSelectedProductId(productId);
   };
 
   return (
@@ -110,7 +116,8 @@ export function SavingsCalculatorPage() {
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
-            onClick={() => {}}
+            right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+            onClick={() => handleProductSelect(product.id)}
           />
         ))}
       </ApiStateHandler>
