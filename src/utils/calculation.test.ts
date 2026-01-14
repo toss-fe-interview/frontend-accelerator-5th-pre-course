@@ -48,7 +48,7 @@ describe('calculation utilities', () => {
     it('예상 수익 금액 계산 - 기본 케이스', () => {
       // 월 납입액 100,000원, 저축 기간 12개월, 연이자율 3.2%
       const result = calculateExpectedAmount(100000, 12, 3.2);
-      const expected = Math.floor(100000 * 12 * (1 + 3.2 / 100 * 0.5));
+      const expected = Math.floor(100000 * 12 * (1 + (3.2 / 100) * 0.5));
       expect(result).toBe(expected);
       expect(result).toBe(1219200);
     });
@@ -61,13 +61,13 @@ describe('calculation utilities', () => {
 
     it('예상 수익 금액 계산 - 24개월', () => {
       const result = calculateExpectedAmount(200000, 24, 2.8);
-      const expected = Math.floor(200000 * 24 * (1 + 2.8 / 100 * 0.5));
+      const expected = Math.floor(200000 * 24 * (1 + (2.8 / 100) * 0.5));
       expect(result).toBe(expected);
     });
 
     it('예상 수익 금액 계산 - 6개월', () => {
       const result = calculateExpectedAmount(500000, 6, 3.3);
-      const expected = Math.floor(500000 * 6 * (1 + 3.3 / 100 * 0.5));
+      const expected = Math.floor(500000 * 6 * (1 + (3.3 / 100) * 0.5));
       expect(result).toBe(expected);
     });
 
@@ -149,9 +149,9 @@ describe('calculation utilities', () => {
     });
 
     it('원본 배열을 수정하지 않음 (불변성)', () => {
-      const originalOrder = mockProducts.map((p) => p.id);
+      const originalOrder = mockProducts.map(p => p.id);
       sortByAnnualRate(mockProducts);
-      const currentOrder = mockProducts.map((p) => p.id);
+      const currentOrder = mockProducts.map(p => p.id);
 
       expect(currentOrder).toEqual(originalOrder);
     });
@@ -237,7 +237,7 @@ describe('calculation utilities', () => {
 
     it('추천 상품 목록 플로우', () => {
       // 필터링된 상품 중 상위 2개
-      const filteredProducts = mockProducts.filter((p) => p.availableTerms === 12);
+      const filteredProducts = mockProducts.filter(p => p.availableTerms === 12);
       const topProducts = getTopProducts(filteredProducts, 2);
 
       expect(topProducts).toHaveLength(2);
