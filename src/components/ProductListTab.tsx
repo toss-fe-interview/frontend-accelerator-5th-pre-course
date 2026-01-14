@@ -1,12 +1,14 @@
 import { filterSavingsProducts } from 'domain/savingsFilter';
 import { useSavingsProducts } from 'hook/useSavingsProducts';
 import { useMemo } from 'react';
+import { useSelectedProductStore } from 'store/useSelectedProduct';
 import { useUserSavingGoalStore } from 'store/useUserSavingGoalStore';
-import { colors, ListRow } from 'tosslib';
+import { Assets, colors, ListRow } from 'tosslib';
 
 const ProductListTab = () => {
   const { data, isLoading, isError } = useSavingsProducts();
   const { userSavingGoal } = useUserSavingGoalStore();
+  const { selectedProduct, setSelectedProduct } = useSelectedProductStore();
 
   const filteredProducts = useMemo(() => {
     if (!data) return [];
@@ -35,7 +37,14 @@ const ProductListTab = () => {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          onClick={() => {}}
+          right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+          onClick={() => {
+            if (selectedProduct?.id === product.id) {
+              setSelectedProduct(null);
+            } else {
+              setSelectedProduct(product);
+            }
+          }}
         />
       ))}
     </>
