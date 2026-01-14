@@ -1,6 +1,5 @@
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { useSavingForm } from '../hooks/useSavingForm';
-import { createAmountHandler } from '../utils';
 
 export const SavingGoals = ({ values, handlers }: ReturnType<typeof useSavingForm>) => {
   return (
@@ -33,4 +32,11 @@ export const SavingGoals = ({ values, handlers }: ReturnType<typeof useSavingFor
       </SelectBottomSheet>
     </>
   );
+};
+
+const createAmountHandler = (setter: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const res = e.target.value.replace(/,/g, '');
+  if (!isNaN(Number(res))) {
+    setter(res ? Number(res).toLocaleString() : '');
+  }
 };

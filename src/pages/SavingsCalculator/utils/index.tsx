@@ -24,11 +24,4 @@ export const getRecommendSavingProducts = (products: SavingsProduct[], limit = 2
     .sort((a, b) => b.annualRate - a.annualRate)
     .slice(0, limit);
 
-export const createAmountHandler = (setter: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
-  const res = e.target.value.replace(/,/g, '');
-  if (!isNaN(Number(res))) {
-    setter(res ? Number(res).toLocaleString() : '');
-  }
-};
-
 export const toNumeric = (value: string) => Number(value.replace(/,/g, ''));
