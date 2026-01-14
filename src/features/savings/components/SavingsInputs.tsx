@@ -6,10 +6,15 @@ import { formatNumberWithComma } from '../utils/format/number';
 interface SavingsInputsProps {
   savingsValues: SavingsValues;
   onChangeTargetAmount: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChangeMonthlyPaymentAmount: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function SavingsInputs({ savingsValues, onChangeTargetAmount }: SavingsInputsProps) {
-  const { targetAmount } = savingsValues;
+export default function SavingsInputs({
+  savingsValues,
+  onChangeTargetAmount,
+  onChangeMonthlyPaymentAmount,
+}: SavingsInputsProps) {
+  const { targetAmount, monthlyPaymentAmount } = savingsValues;
   return (
     <>
       <TextField
@@ -20,7 +25,13 @@ export default function SavingsInputs({ savingsValues, onChangeTargetAmount }: S
         onChange={onChangeTargetAmount}
       />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={formatNumberWithComma(monthlyPaymentAmount)}
+        onChange={onChangeMonthlyPaymentAmount}
+      />
       <Spacing size={16} />
       <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>

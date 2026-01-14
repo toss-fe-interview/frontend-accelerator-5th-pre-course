@@ -36,12 +36,25 @@ export function SavingsCalculatorPage() {
     }));
   };
 
+  const handleChagneMonthlyPaymentAmount = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseNumberInput(e.target.value);
+
+    setSavingsValues(prev => ({
+      ...prev,
+      monthlyPaymentAmount: newValue,
+    }));
+  };
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      <SavingsInputs savingsValues={savingsValues} onChangeTargetAmount={handleChagneTargetAmount} />
+      <SavingsInputs
+        savingsValues={savingsValues}
+        onChangeTargetAmount={handleChagneTargetAmount}
+        onChangeMonthlyPaymentAmount={handleChagneMonthlyPaymentAmount}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
