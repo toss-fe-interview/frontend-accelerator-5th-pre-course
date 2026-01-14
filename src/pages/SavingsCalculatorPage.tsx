@@ -3,7 +3,7 @@ import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, Tex
 
 import { CalculationResult } from 'components/CalculationResult';
 import { EmptyListItem } from 'components/common/EmptyListItem';
-import { SavingsProductListItem } from 'components/SavingsProductListItem';
+import { SavingsProductList } from 'components/SavingsProductList';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
 import { SavingsProduct } from 'types/SavingsProduct.type';
@@ -103,23 +103,12 @@ export function SavingsCalculatorPage() {
 
       {/* 적금 상품 리스트 영역 */}
       {selectedTab === 'products' && (
-        <>
-          {filteredSavingsProducts.length > 0 ? (
-            filteredSavingsProducts.map(savingsProduct => {
-              const isSelected = selectedSavingsProductId === savingsProduct.id;
-              return (
-                <SavingsProductListItem
-                  key={savingsProduct.id}
-                  savingsProduct={savingsProduct}
-                  isSelected={isSelected}
-                  handleSelectedSavingsProduct={handleSelectProduct}
-                />
-              );
-            })
-          ) : (
-            <EmptyListItem message="적합한 적금 상품이 없습니다." />
-          )}
-        </>
+        <SavingsProductList
+          savingsProducts={filteredSavingsProducts}
+          selectedSavingsProductId={selectedSavingsProductId}
+          handleSelectProduct={handleSelectProduct}
+          emptyText="적합한 적금 상품이 없습니다."
+        />
       )}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
@@ -142,21 +131,12 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {recommendedSavingsProducts.length > 0 ? (
-            recommendedSavingsProducts.map(savingsProduct => {
-              const isSelected = selectedSavingsProductId === savingsProduct.id;
-              return (
-                <SavingsProductListItem
-                  key={savingsProduct.id}
-                  savingsProduct={savingsProduct}
-                  isSelected={isSelected}
-                  handleSelectedSavingsProduct={handleSelectProduct}
-                />
-              );
-            })
-          ) : (
-            <EmptyListItem message="적합한 추천 상품이 없습니다." />
-          )}
+          <SavingsProductList
+            savingsProducts={recommendedSavingsProducts}
+            selectedSavingsProductId={selectedSavingsProductId}
+            handleSelectProduct={handleSelectProduct}
+            emptyText="적합한 추천 상품이 없습니다."
+          />
 
           <Spacing size={40} />
         </>
