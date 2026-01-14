@@ -12,7 +12,7 @@ import {
   Tab,
   TextField,
 } from 'tosslib';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { URLS } from 'consts';
 
@@ -151,104 +151,100 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <Suspense fallback={<div>Loading...</div>}>
-        {tabState === TAB_STATE.PRODUCTS &&
-          filteredProducts.map(savingProduct => (
+      {tabState === TAB_STATE.PRODUCTS &&
+        filteredProducts.map(savingProduct => (
+          <ListRow
+            key={savingProduct.id}
+            contents={
+              <ListRow.Texts
+                type="3RowTypeA"
+                top={savingProduct.name}
+                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                middle={`연 이자율: ${savingProduct.annualRate}%`}
+                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                bottom={`${savingProduct.minMonthlyAmount.toLocaleString('kr-KR')}원 ~ ${savingProduct.maxMonthlyAmount.toLocaleString('kr-KR')}원 | ${savingProduct.availableTerms}개월`}
+                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+              />
+            }
+            right={selectedProduct?.id === savingProduct.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+            onClick={() => {
+              setSelectedProduct(savingProduct);
+            }}
+          />
+        ))}
+
+      {tabState === TAB_STATE.RESULTS && (
+        <>
+          <Spacing size={8} />
+          {selectedProduct ? (
+            <>
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="예상 수익 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${expectedIncome.toLocaleString('kr-KR')}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="목표 금액과의 차이"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${targetDiff.toLocaleString('kr-KR')}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="추천 월 납입 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${recommendedMonthlyPayment.toLocaleString('kr-KR')}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+            </>
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+          )}
+
+          <Spacing size={8} />
+          <Border height={16} />
+          <Spacing size={8} />
+
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+          {recommendProductList?.map(product => (
             <ListRow
-              key={savingProduct.id}
+              key={product.id}
               contents={
                 <ListRow.Texts
                   type="3RowTypeA"
-                  top={savingProduct.name}
+                  top={product.name}
                   topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                  middle={`연 이자율: ${savingProduct.annualRate}%`}
+                  middle={`연 이자율: ${product.annualRate}%`}
                   middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                  bottom={`${savingProduct.minMonthlyAmount.toLocaleString('kr-KR')}원 ~ ${savingProduct.maxMonthlyAmount.toLocaleString('kr-KR')}원 | ${savingProduct.availableTerms}개월`}
+                  bottom={`${product.minMonthlyAmount.toLocaleString('kr-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('kr-KR')}원 | ${product.availableTerms}개월`}
                   bottomProps={{ fontSize: 13, color: colors.grey600 }}
                 />
               }
-              right={selectedProduct?.id === savingProduct.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+              right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
               onClick={() => {
-                setSelectedProduct(savingProduct);
+                setSelectedProduct(product);
               }}
             />
           ))}
-
-        {tabState === TAB_STATE.RESULTS && (
-          <>
-            <Spacing size={8} />
-            {selectedProduct ? (
-              <>
-                <ListRow
-                  contents={
-                    <ListRow.Texts
-                      type="2RowTypeA"
-                      top="예상 수익 금액"
-                      topProps={{ color: colors.grey600 }}
-                      bottom={`${expectedIncome.toLocaleString('kr-KR')}원`}
-                      bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                    />
-                  }
-                />
-                <ListRow
-                  contents={
-                    <ListRow.Texts
-                      type="2RowTypeA"
-                      top="목표 금액과의 차이"
-                      topProps={{ color: colors.grey600 }}
-                      bottom={`${targetDiff.toLocaleString('kr-KR')}원`}
-                      bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                    />
-                  }
-                />
-                <ListRow
-                  contents={
-                    <ListRow.Texts
-                      type="2RowTypeA"
-                      top="추천 월 납입 금액"
-                      topProps={{ color: colors.grey600 }}
-                      bottom={`${recommendedMonthlyPayment.toLocaleString('kr-KR')}원`}
-                      bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                    />
-                  }
-                />
-              </>
-            ) : (
-              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-            )}
-
-            <Spacing size={8} />
-            <Border height={16} />
-            <Spacing size={8} />
-
-            <ListHeader
-              title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-            />
-            <Spacing size={12} />
-            {recommendProductList?.map(product => (
-              <ListRow
-                key={product.id}
-                contents={
-                  <ListRow.Texts
-                    type="3RowTypeA"
-                    top={product.name}
-                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                    middle={`연 이자율: ${product.annualRate}%`}
-                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                    bottom={`${product.minMonthlyAmount.toLocaleString('kr-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('kr-KR')}원 | ${product.availableTerms}개월`}
-                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                  />
-                }
-                right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-                onClick={() => {
-                  setSelectedProduct(product);
-                }}
-              />
-            ))}
-            <Spacing size={40} />
-          </>
-        )}
-      </Suspense>
+          <Spacing size={40} />
+        </>
+      )}
     </>
   );
 }
