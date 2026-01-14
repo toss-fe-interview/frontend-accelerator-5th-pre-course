@@ -3,9 +3,11 @@ import { Assets, colors, ListRow } from 'tosslib';
 
 interface Props {
   savings: SavingsResponse[];
+  selectedSaving: SavingsResponse | null;
+  onSelectSaving: (saving: SavingsResponse) => void;
 }
 
-export const SavingsList = ({ savings }: Props) => {
+export const SavingsList = ({ savings, selectedSaving, onSelectSaving }: Props) => {
   return savings.map(saving => (
     <ListRow
       key={saving.id}
@@ -20,8 +22,8 @@ export const SavingsList = ({ savings }: Props) => {
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
-      right={<Assets.Icon name="icon-check-circle-green" />}
-      onClick={() => {}}
+      right={selectedSaving?.id === saving.id && <Assets.Icon name="icon-check-circle-green" />}
+      onClick={() => onSelectSaving(saving)}
     />
   ));
 };

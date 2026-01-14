@@ -1,13 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { SavingsQueryOption } from 'domain/savings/api/SavingsQueryOption';
+import { SavingsResponse } from 'domain/savings/api/type';
 import { SavingsFilter } from 'domain/savings/components/SavingsFilter';
 import { SavingsList } from 'domain/savings/components/SavingsList';
 import { useFilterSavings } from 'domain/savings/hooks/useFilterSavings';
 import { useSavingForm } from 'domain/savings/hooks/useSavingForm';
+import { useState } from 'react';
 import { Assets, Border, colors, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const { data: savings } = useQuery(SavingsQueryOption.getSavings);
+
+  const [selectedSaving, setSelectedSaving] = useState<SavingsResponse | null>(null);
+
   const filterForm = useSavingForm();
   const { filteredSavings } = useFilterSavings({
     savings: savings ?? [],
@@ -36,7 +41,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <SavingsList savings={filteredSavings} />
+      <SavingsList savings={filteredSavings} selectedSaving={selectedSaving} onSelectSaving={setSelectedSaving} />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
