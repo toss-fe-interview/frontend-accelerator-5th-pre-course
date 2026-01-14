@@ -1,5 +1,6 @@
 import { SavingProduct } from 'product/type/internal';
 import { Border, colors, ListRow, Spacing } from 'tosslib';
+import RecommendedProducts from './RecommendedProducts';
 
 interface Props {
   price: string;
@@ -54,6 +55,8 @@ const SavingResults = ({ price, monthlyPayment, term, selectedProduct }: Props) 
       <Spacing size={8} />
       <Border height={16} />
       <Spacing size={8} />
+
+      <RecommendedProducts monthlyPayment={monthlyPayment} term={term} selectedProduct={selectedProduct} />
     </>
   );
 };

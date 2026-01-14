@@ -4,19 +4,9 @@ import SavingResults from 'product/components/SavingResults';
 import { TERMS_OPTIONS } from 'product/constants';
 import { savingsProductsQueryOptions } from 'product/queries';
 import { SavingProduct } from 'product/type/internal';
+import { getFilteredProducts } from 'product/utils/getFilteredProducts';
 import { useState } from 'react';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 const validateInputNumber = (value: string) => {
   return /^[\d,]*$/.test(value);
@@ -35,18 +25,7 @@ export function SavingsCalculatorPage() {
 
   const { data: savingsProductsData } = useSuspenseQuery({
     ...savingsProductsQueryOptions,
-    select: data => {
-      return data.filter(product => {
-        if (
-          product.minMonthlyAmount > Number(monthlyPayment.replace(/,/g, '')) ||
-          product.maxMonthlyAmount < Number(monthlyPayment.replace(/,/g, ''))
-        ) {
-          return;
-        }
-
-        return product.availableTerms === term;
-      });
-    },
+    select: data => getFilteredProducts(data, monthlyPayment, term),
   });
 
   const handlePriceChange = (value: string) => {
@@ -126,7 +105,12 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {tab === 'products' && (
-        <SavingProducts data={savingsProductsData} selectedProduct={selectedProduct} selectProduct={selectProduct} />
+        <SavingProducts
+          type="select"
+          data={savingsProductsData}
+          selectedProduct={selectedProduct}
+          selectProduct={selectProduct}
+        />
       )}
       {tab === 'results' && (
         <SavingResults selectedProduct={selectedProduct} price={price} monthlyPayment={monthlyPayment} term={term} />

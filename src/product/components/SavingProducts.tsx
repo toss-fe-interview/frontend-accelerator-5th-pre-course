@@ -1,12 +1,21 @@
 import { SavingProduct } from 'product/type/internal';
 import { Assets, colors, ListRow } from 'tosslib';
 
-interface Props {
-  data: SavingProduct[];
-  selectedProduct: SavingProduct | null;
-  selectProduct: (product: SavingProduct) => void;
-}
-const SavingProducts = ({ data, selectedProduct, selectProduct }: Props) => {
+type Props =
+  | {
+      type: 'recommended';
+      data: SavingProduct[];
+      selectedProduct: SavingProduct | null;
+      selectProduct?: never;
+    }
+  | {
+      type: 'select';
+      data: SavingProduct[];
+      selectedProduct: SavingProduct | null;
+      selectProduct: (product: SavingProduct) => void;
+    };
+
+const SavingProducts = ({ type, data, selectedProduct, selectProduct }: Props) => {
   if (data.length === 0) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 없습니다." />} />;
   }
@@ -25,7 +34,13 @@ const SavingProducts = ({ data, selectedProduct, selectProduct }: Props) => {
         />
       }
       right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-      onClick={() => selectProduct(product)}
+      onClick={() => {
+        if (type === 'recommended') {
+          return;
+        }
+
+        selectProduct(product);
+      }}
     />
   ));
 };
