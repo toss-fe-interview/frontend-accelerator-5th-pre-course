@@ -15,6 +15,7 @@ export function SavingsProductTabView({
   savingsProducts: SavingsProduct[];
   selectedSavingsProduct: SavingsProduct | null;
   handleSelectSavingsProduct: (product: SavingsProduct) => void;
+  // 타입 정의했으면 좋을것같음
   savingsProductTab: 'products' | 'results';
   handleSelectSavingsProductTab: (tab: 'products' | 'results') => void;
   savingsInput: SavingsInput;

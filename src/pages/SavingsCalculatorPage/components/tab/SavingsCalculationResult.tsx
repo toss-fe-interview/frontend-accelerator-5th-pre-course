@@ -26,6 +26,7 @@ export function SavingsCalculationResult({
 
     const annualRateDecimal = selectedSavingsProduct.annualRate / 100;
 
+    // 매직 넘버 상수화
     return monthlyAmountNumber * savingsTerm * (1 + annualRateDecimal * 0.5);
   };
 
@@ -68,7 +69,6 @@ export function SavingsCalculationResult({
   return (
     <>
       <Spacing size={8} />
-
       {selectedSavingsProduct ? (
         <>
           <ListRow
@@ -108,14 +108,13 @@ export function SavingsCalculationResult({
       ) : (
         <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
       )}
-
       <Spacing size={8} />
       <Border height={16} />
       <Spacing size={8} />
-
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
+      {/* SavingProductList 랑 UI가 같은데 컴포넌트로 분리했다면? */}
       {recommendedProducts.length > 0 ? (
         recommendedProducts.map(product => (
           <ListRow
@@ -138,7 +137,6 @@ export function SavingsCalculationResult({
       ) : (
         <ListRow contents={<ListRow.Texts type="1RowTypeA" top="추천 상품이 없습니다." />} />
       )}
-
       <Spacing size={40} />
     </>
   );

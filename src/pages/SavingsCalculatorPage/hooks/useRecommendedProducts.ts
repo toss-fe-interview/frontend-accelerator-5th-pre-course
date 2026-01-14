@@ -11,7 +11,7 @@ export function useRecommendedProducts(filteredSavingsProducts: SavingsProduct[]
     const hasMonthlyAmount = savingsInput.monthlyAmount !== '' && savingsInput.monthlyAmount.trim() !== '';
 
     if (hasTargetAmount && hasMonthlyAmount && filteredSavingsProducts.length > 0) {
-      // 연 이자율이 높은 순으로 정렬하고 상위 2개 선택
+      // 연 이자율이 높은 순으로 정렬하고 상위 2개 선택의미가 들어나는 변수명이 좋을까?
       const sortedByRate = [...filteredSavingsProducts].sort((a, b) => b.annualRate - a.annualRate);
       const topProducts = sortedByRate.slice(0, RECOMMENDED_PRODUCTS_COUNT);
       setRecommendedProducts(topProducts);
