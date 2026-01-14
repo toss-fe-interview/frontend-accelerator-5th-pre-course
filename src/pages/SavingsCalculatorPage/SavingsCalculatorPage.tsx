@@ -1,9 +1,11 @@
 import { Border, NavigationBar, Spacing } from 'tosslib';
-import { SavingsInputForm } from './components/SavingsInputForm';
-import { SavingsProductTabView } from './components/SavingsProductTabView';
-import { getSavingsProducts } from './api/getSavingsProducts';
 import { SavingsProduct } from './types/types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { SavingsInputForm } from './components/form/SavingsInputForm';
+import { SavingsProductTabView } from './components/tab/SavingsProductTabView';
+import { useSavingsProducts } from './hooks/useSavingsProducts';
+import { useFilteredSavingsProducts } from './hooks/useFilteredSavingsProducts';
+import { useRecommendedProducts } from './hooks/useRecommendedProducts';
 
 export function SavingsCalculatorPage() {
   const [savingsInput, setSavingsInput] = useState({
@@ -11,12 +13,12 @@ export function SavingsCalculatorPage() {
     monthlyAmount: '',
     savingsTerm: 12,
   });
-  const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
-  const [filteredSavingsProducts, setFilteredSavingsProducts] = useState<SavingsProduct[]>([]);
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   const [savingsProductTab, setSavingsProductTab] = useState<'products' | 'results'>('products');
-  // 2개의 상품만 추천하는 의미를 넣으면 좋을듯..
-  const [recommendedProducts, setRecommendedProducts] = useState<SavingsProduct[]>([]);
+
+  const savingsProducts = useSavingsProducts();
+  const filteredSavingsProducts = useFilteredSavingsProducts(savingsProducts, savingsInput);
+  const recommendedProducts = useRecommendedProducts(filteredSavingsProducts, savingsInput);
 
   const handleSavingsInputChange = (key: keyof typeof savingsInput, value: string | number) => {
     setSavingsInput({ ...savingsInput, [key]: value });
@@ -30,52 +32,6 @@ export function SavingsCalculatorPage() {
   const handleSelectSavingsProductTab = (tab: 'products' | 'results') => {
     setSavingsProductTab(tab);
   };
-
-  useEffect(() => {
-    const fetchSavingsProducts = async () => {
-      // TODO: 에러, 로딩 처리
-      const response = await getSavingsProducts();
-      if (response) {
-        setSavingsProducts(response);
-      }
-    };
-
-    fetchSavingsProducts();
-  }, []);
-
-  useEffect(() => {
-    if (savingsProducts.length === 0) {
-      return;
-    }
-
-    const monthlyAmountNumber = Number(savingsInput.monthlyAmount);
-    const hasMonthlyAmount = savingsInput.monthlyAmount !== '' && !isNaN(monthlyAmountNumber);
-
-    if (!hasMonthlyAmount) {
-      setFilteredSavingsProducts(savingsProducts);
-      return;
-    }
-
-    const filteredProducts = savingsProducts.filter(product => {
-      const isMonthlyAmountValid =
-        monthlyAmountNumber >= product.minMonthlyAmount && monthlyAmountNumber <= product.maxMonthlyAmount;
-      const isTermMatched = product.availableTerms === savingsInput.savingsTerm;
-      return isMonthlyAmountValid && isTermMatched;
-    });
-
-    setFilteredSavingsProducts(filteredProducts);
-  }, [savingsProducts, savingsInput]);
-
-  useEffect(() => {
-    if (savingsInput.targetAmount !== '' && savingsInput.monthlyAmount !== '' && savingsInput.targetAmount) {
-      // 연 이자율이 높은 순으로 정렬하고 상위 2개 선택
-      const sortedByRate = [...filteredSavingsProducts].sort((a, b) => b.annualRate - a.annualRate);
-      const topTwoProducts = sortedByRate.slice(0, 2);
-      setRecommendedProducts(topTwoProducts);
-    } else {
-      setRecommendedProducts([]);
-    }
-  }, [filteredSavingsProducts, savingsInput]);
 
   return (
     <>

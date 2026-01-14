@@ -1,6 +1,6 @@
-import { SavingsProduct } from '../types/types';
+import { SavingsProduct } from '../../types/types';
 import { ListRow, colors, Assets } from 'tosslib';
-import { formatCurrency } from '../lib/formatCurrency';
+import { formatCurrency } from '../../lib/formatCurrency';
 
 export function SavingsProductList({
   savingsProducts,

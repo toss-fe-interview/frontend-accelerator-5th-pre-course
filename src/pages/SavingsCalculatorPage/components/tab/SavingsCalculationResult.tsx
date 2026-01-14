@@ -1,7 +1,7 @@
 import { colors, ListRow, Border, ListHeader, Spacing, Assets } from 'tosslib';
-import { SavingsInput, SavingsProduct } from '../types/types';
-import { formatCurrency } from '../lib/formatCurrency';
-import { extractNumbers } from '../lib/extractNumbers';
+import { SavingsInput, SavingsProduct } from '../../types/types';
+import { formatCurrency } from '../../lib/formatCurrency';
+import { extractNumbers } from '../../lib/extractNumbers';
 
 export function SavingsCalculationResult({
   selectedSavingsProduct,

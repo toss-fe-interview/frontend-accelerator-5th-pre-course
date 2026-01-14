@@ -1,7 +1,7 @@
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
-import { SavingsInput } from '../types/types';
-import { formatCurrency } from '../lib/formatCurrency';
-import { extractNumbers } from '../lib/extractNumbers';
+import { SavingsInput } from '../../types/types';
+import { formatCurrency } from '../../lib/formatCurrency';
+import { extractNumbers } from '../../lib/extractNumbers';
 
 export function SavingsInputForm({
   savingsInput,

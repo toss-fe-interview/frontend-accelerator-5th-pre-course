@@ -1,5 +1,5 @@
 import { Tab } from 'tosslib';
-import { SavingsInput, SavingsProduct } from '../types/types';
+import { SavingsInput, SavingsProduct } from '../../types/types';
 import { SavingsProductList } from './SavingsProductList';
 import { SavingsCalculationResult } from './SavingsCalculationResult';
 
