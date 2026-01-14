@@ -1,3 +1,4 @@
+import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import {
   Assets,
   Border,
@@ -12,12 +13,15 @@ import {
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
+  const { data: savingsProducts } = useSavingsProducts();
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
+      {/* 계산기 form 영역 */}
       <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
       <Spacing size={16} />
       <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
@@ -32,6 +36,7 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
+      {/* Tab 버튼 영역 */}
       <Tab onChange={() => {}}>
         <Tab.Item value="products" selected={true}>
           적금 상품
@@ -41,35 +46,28 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 3.2%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'100,000원 ~ 500,000원 | 12개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
+      {/* 적금 상품 리스트 영역 */}
+      <>
+        {savingsProducts.map(savingsProduct => (
+          <ListRow
+            key={savingsProduct.id}
+            contents={
+              <ListRow.Texts
+                type="3RowTypeA"
+                top={savingsProduct.name}
+                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                middle={`연 이자율: ${savingsProduct.annualRate}%`}
+                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                bottom={`${savingsProduct.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${savingsProduct.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${savingsProduct.availableTerms}개월`}
+                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+              />
+            }
+            // TODO: select 여부에 따른 check icon
+            right={<Assets.Icon name="icon-check-circle-green" />}
+            onClick={() => {}}
           />
-        }
-        right={<Assets.Icon name="icon-check-circle-green" />}
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 2.8%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'50,000원 ~ 1,000,000원 | 24개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+        ))}
+      </>
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
