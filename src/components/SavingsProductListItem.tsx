@@ -6,14 +6,21 @@ import { formatAmount } from 'utils/formatAmount';
 interface SavingsProductListItemProps {
   savingsProduct: SavingsProduct;
   isSelected: boolean;
-  setSelectedSavingsProduct: (savingsProduct: SavingsProduct | null) => void;
+  handleSelectSavingsProduct: (savingsProduct: SavingsProduct | null) => void;
 }
 
 export function SavingsProductListItem({
   savingsProduct,
   isSelected,
-  setSelectedSavingsProduct,
+  handleSelectSavingsProduct,
 }: SavingsProductListItemProps) {
+  const handleClick = () => {
+    if (isSelected) {
+      handleSelectSavingsProduct(null);
+      return;
+    }
+    handleSelectSavingsProduct(savingsProduct);
+  };
   return (
     <ListRow
       contents={
@@ -28,13 +35,7 @@ export function SavingsProductListItem({
         />
       }
       right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
-      onClick={() => {
-        if (isSelected) {
-          setSelectedSavingsProduct(null);
-          return;
-        }
-        setSelectedSavingsProduct(savingsProduct);
-      }}
+      onClick={handleClick}
     />
   );
 }
