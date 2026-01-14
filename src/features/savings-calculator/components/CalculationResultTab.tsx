@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { Assets, Border, ListHeader, ListRow, Spacing } from 'tosslib';
-import type { SavingsProduct } from '../api/api';
+import { Border, ListRow, Spacing } from 'tosslib';
 import { savingsProductsQueries } from '../api/queries';
 import { useCalculatorParams } from '../hooks/useCalculatorParams';
 import { useSelectProductParams } from '../hooks/useSelectProductParams';
 import { matchesPaymentRange, matchesPeriod } from '../utils/productFIlters';
 import CalculationSummary from './CalculationSummary';
-import ProductItem from './ProductItem';
+import RecommendedProductList from './RecommendProductList';
 
-export default function CalculationResult() {
+export default function CalculationResultTab() {
   const { data: products } = useQuery(savingsProductsQueries.listQuery());
   const { selectedProductId } = useSelectProductParams();
   const { monthlyAmount, savingTerms } = useCalculatorParams();
@@ -35,33 +34,6 @@ export default function CalculationResult() {
       <Spacing size={8} />
 
       <RecommendedProductList products={recommendedProducts} />
-      <Spacing size={40} />
     </div>
-  );
-}
-
-function RecommendedProductList({ products }: { products?: SavingsProduct[] }) {
-  const { selectedProductId, setSelectedProductId } = useSelectProductParams();
-
-  return (
-    <>
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-
-      {products?.length === 0 ? (
-        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />
-      ) : (
-        <div>
-          {products?.map(product => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-              onProductSelect={() => setSelectedProductId(product.id)}
-            />
-          ))}
-        </div>
-      )}
-    </>
   );
 }

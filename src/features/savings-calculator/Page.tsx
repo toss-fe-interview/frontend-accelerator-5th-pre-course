@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import { savingsProductsQueries } from './api/queries';
-import CalculationResult from './components/CalculationResult';
+import CalculationResultTab from './components/CalculationResultTab';
 import CalculatorInputSection from './components/CalculatorInputSection';
-import ProductList from './components/ProductList';
+import ProductListTab from './components/ProductListTab';
 
 const TABS_CONFIG = {
   products: '적금 상품',
@@ -45,8 +45,8 @@ export default function SavingsCalculatorPage() {
         ))}
       </Tab>
 
-      {currentTab === 'products' && <ProductList products={savingsProducts} />}
-      {currentTab === 'results' && <CalculationResult />}
+      {currentTab === 'products' && <ProductListTab products={savingsProducts} />}
+      {currentTab === 'results' && <CalculationResultTab />}
     </>
   );
 }
