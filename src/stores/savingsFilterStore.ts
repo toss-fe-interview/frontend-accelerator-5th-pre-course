@@ -17,8 +17,16 @@ export const useSavingsFilterStore = create<SavingsFilterState & SavingFilterAct
   goal: 0,
   monthlyPay: 0,
   terms: 12,
-  changeGoal: value => set({ goal: value }),
-  changeMonthlyPay: value => set({ monthlyPay: value }),
+  changeGoal: value => {
+    if (Number.isSafeInteger(Number(value))) {
+      set({ goal: value });
+    }
+  },
+  changeMonthlyPay: value => {
+    if (Number.isSafeInteger(Number(value))) {
+      set({ monthlyPay: value });
+    }
+  },
   changeTerms: value => {
     if (TERMS_SELECT_OPTION.find(opt => opt.value === value)) {
       set({ terms: value });
