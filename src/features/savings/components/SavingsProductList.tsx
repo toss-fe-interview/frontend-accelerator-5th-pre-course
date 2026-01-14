@@ -43,6 +43,7 @@ export default function SavingsProductList({
                 }
               : undefined
           }
+          style={{ cursor: clickable ? 'pointer' : 'defualt' }}
         >
           <ListRow
             contents={
