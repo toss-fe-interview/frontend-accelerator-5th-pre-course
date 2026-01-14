@@ -1,36 +1,82 @@
 import { SavingsProduct } from 'api/savings-products/types';
 import { useSavingsProducts } from 'api/savings-products/useSavingsProducts';
 import SavingsProductsList from 'components/savings-products/SavingsProductslist';
-import { useState } from 'react';
-import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { useMemo, useState } from 'react';
+import {
+  Border,
+  ListHeader,
+  NavigationBar,
+  SelectBottomSheet,
+  Spacing,
+  Tab,
+  TextField,
+  colors,
+  ListRow,
+} from 'tosslib';
+import { formatNumberToKo } from 'utils/formatting';
+import { parseFormattedNumber } from 'utils/parse';
 
 export function SavingsCalculatorPage() {
   const { savingsProducts } = useSavingsProducts();
 
-  console.log('데이터', savingsProducts);
-
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct>();
+
+  const [targetAmount, setTargetAmount] = useState<number>();
+  const [monthlyPayment, setMonthlyPayment] = useState<number>();
+  const [availableTerms, setAvailableTerms] = useState<number>();
+
+  const filteredProducts = useMemo(() => {
+    return savingsProducts.filter(product => {
+      const isValidMonthly =
+        monthlyPayment !== undefined &&
+        monthlyPayment > product.minMonthlyAmount &&
+        monthlyPayment < product.maxMonthlyAmount;
+
+      const isValidTerm = product.availableTerms === availableTerms;
+
+      const isValidTargetAmount =
+        monthlyPayment !== undefined &&
+        availableTerms !== undefined &&
+        targetAmount !== undefined &&
+        monthlyPayment * availableTerms > targetAmount;
+
+      return isValidMonthly && isValidTerm && isValidTargetAmount;
+    });
+  }, [savingsProducts, monthlyPayment, availableTerms, targetAmount]);
 
   return (
     <>
       <NavigationBar title="적금 계산기" />
-
       <Spacing size={16} />
-
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={formatNumberToKo(targetAmount)}
+        onChange={e => setTargetAmount(parseFormattedNumber(e.target.value))}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={formatNumberToKo(monthlyPayment)}
+        onChange={e => setMonthlyPayment(parseFormattedNumber(e.target.value))}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={availableTerms}
+        onChange={setAvailableTerms}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
       </SelectBottomSheet>
-
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
-
       <Tab onChange={() => {}}>
         <Tab.Item value="products" selected={true}>
           적금 상품
@@ -39,17 +85,14 @@ export function SavingsCalculatorPage() {
           계산 결과
         </Tab.Item>
       </Tab>
-
       <SavingsProductsList
-        products={savingsProducts}
+        products={filteredProducts.length !== 0 ? filteredProducts : savingsProducts}
         selectedProduct={selectedSavingsProduct && selectedSavingsProduct}
         setSelectedProduct={setSelectedSavingsProduct}
       />
-
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
-      {/* <Spacing size={8} />
-
-      <ListRow
+      <Spacing size={8} />
+      {/* <ListRow
         contents={
           <ListRow.Texts
             type="2RowTypeA"
@@ -120,7 +163,6 @@ export function SavingsCalculatorPage() {
       />
 
       <Spacing size={40} /> */}
-
       {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
       {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
     </>
