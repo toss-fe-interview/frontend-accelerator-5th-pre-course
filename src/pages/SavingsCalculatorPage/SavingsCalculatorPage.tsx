@@ -14,6 +14,9 @@ export function SavingsCalculatorPage() {
   const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
   const [filteredSavingsProducts, setFilteredSavingsProducts] = useState<SavingsProduct[]>([]);
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
+  const [savingsProductTab, setSavingsProductTab] = useState<'products' | 'results'>('products');
+  // 2개의 상품만 추천하는 의미를 넣으면 좋을듯..
+  const [recommendedProducts, setRecommendedProducts] = useState<SavingsProduct[]>([]);
 
   const handleSavingsInputChange = (key: keyof typeof savingsInput, value: string | number) => {
     setSavingsInput({ ...savingsInput, [key]: value });
@@ -22,6 +25,10 @@ export function SavingsCalculatorPage() {
   const handleSelectSavingsProduct = (product: SavingsProduct) => {
     //TODO : 하나임을 보장받을 수 있는 로직
     setSelectedSavingsProduct(product);
+  };
+
+  const handleSelectSavingsProductTab = (tab: 'products' | 'results') => {
+    setSavingsProductTab(tab);
   };
 
   useEffect(() => {
@@ -59,6 +66,17 @@ export function SavingsCalculatorPage() {
     setFilteredSavingsProducts(filteredProducts);
   }, [savingsProducts, savingsInput]);
 
+  useEffect(() => {
+    if (savingsInput.targetAmount !== '' && savingsInput.monthlyAmount !== '' && savingsInput.targetAmount) {
+      // 연 이자율이 높은 순으로 정렬하고 상위 2개 선택
+      const sortedByRate = [...filteredSavingsProducts].sort((a, b) => b.annualRate - a.annualRate);
+      const topTwoProducts = sortedByRate.slice(0, 2);
+      setRecommendedProducts(topTwoProducts);
+    } else {
+      setRecommendedProducts([]);
+    }
+  }, [filteredSavingsProducts, savingsInput]);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -75,85 +93,11 @@ export function SavingsCalculatorPage() {
         savingsProducts={filteredSavingsProducts}
         selectedSavingsProduct={selectedSavingsProduct}
         handleSelectSavingsProduct={handleSelectSavingsProduct}
+        savingsProductTab={savingsProductTab}
+        handleSelectSavingsProductTab={handleSelectSavingsProductTab}
+        savingsInput={savingsInput}
+        recommendedProducts={recommendedProducts}
       />
-
-      {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
-      {/* <Spacing size={8} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="예상 수익 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`1,000,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="목표 금액과의 차이"
-            topProps={{ color: colors.grey600 }}
-            bottom={`-500,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="추천 월 납입 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`100,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-
-      <Spacing size={8} />
-      <Border height={16} />
-      <Spacing size={8} />
-
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-
-      <Spacing size={40} /> */}
-
-      {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
     </>
   );
 }

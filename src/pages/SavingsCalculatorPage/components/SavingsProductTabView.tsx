@@ -1,47 +1,51 @@
-import { Assets, colors, ListRow, Tab } from 'tosslib';
-import { SavingsProduct } from '../types/types';
-import { formatCurrency } from '../lib/formatCurrency';
+import { Tab } from 'tosslib';
+import { SavingsInput, SavingsProduct } from '../types/types';
+import { SavingsProductList } from './SavingsProductList';
+import { SavingsCalculationResult } from './SavingsCalculationResult';
 
 export function SavingsProductTabView({
   savingsProducts,
   selectedSavingsProduct,
   handleSelectSavingsProduct,
+  savingsProductTab,
+  handleSelectSavingsProductTab,
+  savingsInput,
+  recommendedProducts,
 }: {
   savingsProducts: SavingsProduct[];
   selectedSavingsProduct: SavingsProduct | null;
   handleSelectSavingsProduct: (product: SavingsProduct) => void;
+  savingsProductTab: 'products' | 'results';
+  handleSelectSavingsProductTab: (tab: 'products' | 'results') => void;
+  savingsInput: SavingsInput;
+  recommendedProducts: SavingsProduct[];
 }) {
   return (
     <>
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={value => handleSelectSavingsProductTab(value as 'products' | 'results')}>
+        <Tab.Item value="products" selected={savingsProductTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={savingsProductTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
 
-      {savingsProducts.map(product => (
-        <ListRow
-          key={product.id}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={product.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: ${product.annualRate}%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${formatCurrency(product.minMonthlyAmount)} ~ ${formatCurrency(product.maxMonthlyAmount)} | ${product.availableTerms}개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          right={selectedSavingsProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-          onClick={() => {
-            handleSelectSavingsProduct(product);
-          }}
+      {savingsProductTab === 'products' && (
+        <SavingsProductList
+          savingsProducts={savingsProducts}
+          selectedSavingsProduct={selectedSavingsProduct}
+          handleSelectSavingsProduct={handleSelectSavingsProduct}
         />
-      ))}
+      )}
+
+      {savingsProductTab === 'results' && (
+        <SavingsCalculationResult
+          selectedSavingsProduct={selectedSavingsProduct}
+          savingsInput={savingsInput}
+          recommendedProducts={recommendedProducts}
+        />
+      )}
     </>
   );
 }
