@@ -1,16 +1,4 @@
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  TextField,
-} from 'tosslib';
-import { savingsProductsQuery } from './qeuries/savings-products.query';
-import { useQuery } from '@tanstack/react-query';
+import { NavigationBar, SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { Controller, useForm } from 'react-hook-form';
 import { onlyNumbers } from 'utils/input';
 import { SavingsCalculatorContent } from './components/SavingsCalculatorContent';
@@ -23,10 +11,6 @@ interface SavingsFilterForm {
 }
 
 export function SavingsCalculatorPage() {
-  const { data: savingsProducts } = useQuery(savingsProductsQuery);
-
-  // const [activeTab, setActiveTab] = useState<Tab>('products');
-
   const form = useForm<SavingsFilterForm>({
     defaultValues: {
       targetAmount: null,
