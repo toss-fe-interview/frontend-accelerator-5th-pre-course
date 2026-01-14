@@ -6,20 +6,19 @@ import { SavingsProductListItem } from './SavingsProductListItem';
 
 const SIMPLE_INTEREST_COEFFICIENT = 0.5;
 const ROUNDING_UNIT = 1000;
-const RECOMMENDED_PRODUCTS_COUNT = 2;
 
 interface CalculationResultProps {
   formState: SavingsFormState;
   selectedProduct: SavingsProduct | null;
   selectedProductId: string | null;
-  filteredProducts: SavingsProduct[];
+  recommendedProducts: SavingsProduct[];
 }
 
 export function CalculationResult({
   formState,
   selectedProduct,
   selectedProductId,
-  filteredProducts,
+  recommendedProducts,
 }: CalculationResultProps) {
   const { goalAmount, monthlyAmount, term } = formState;
 
@@ -40,10 +39,6 @@ export function CalculationResult({
     return { expectedProfit, goalDifference, recommendedMonthlyAmount };
   }, [selectedProduct, monthlyAmount, term, goalAmount]);
 
-  const recommendedProducts = useMemo(() => {
-    return [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, RECOMMENDED_PRODUCTS_COUNT);
-  }, [filteredProducts]);
-
   if (selectedProduct === null || calculationResult === null) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
@@ -60,7 +55,7 @@ export function CalculationResult({
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatNumber(expectedProfit)}원`}
+            bottom={`${formatNumber(expectedProfit ?? 0)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
