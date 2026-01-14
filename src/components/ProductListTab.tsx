@@ -1,8 +1,18 @@
+import { filterSavingsProducts } from 'domain/savingsFilter';
 import { useSavingsProducts } from 'hook/useSavingsProducts';
+import { useMemo } from 'react';
+import { useUserSavingGoalStore } from 'store/useUserSavingGoalStore';
 import { colors, ListRow } from 'tosslib';
 
 const ProductListTab = () => {
   const { data, isLoading, isError } = useSavingsProducts();
+  const { userSavingGoal } = useUserSavingGoalStore();
+
+  const filteredProducts = useMemo(() => {
+    if (!data) return [];
+    if (!userSavingGoal.monthlyAmount || !userSavingGoal.term) return data;
+    return filterSavingsProducts(data, userSavingGoal.monthlyAmount, userSavingGoal.term);
+  }, [data, userSavingGoal.monthlyAmount, userSavingGoal.term]);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error</div>;
@@ -11,7 +21,7 @@ const ProductListTab = () => {
 
   return (
     <>
-      {data.map(product => (
+      {filteredProducts.map(product => (
         <ListRow
           key={product.id}
           contents={
