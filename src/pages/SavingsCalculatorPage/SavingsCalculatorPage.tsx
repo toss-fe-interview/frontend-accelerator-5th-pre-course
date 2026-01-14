@@ -6,16 +6,22 @@ import { SavingsProduct } from './types/types';
 import { useEffect, useState } from 'react';
 
 export function SavingsCalculatorPage() {
-  const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
-  const [filteredSavingsProducts, setFilteredSavingsProducts] = useState<SavingsProduct[]>([]);
   const [savingsInput, setSavingsInput] = useState({
     targetAmount: '',
     monthlyAmount: '',
     savingsTerm: 12,
   });
+  const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
+  const [filteredSavingsProducts, setFilteredSavingsProducts] = useState<SavingsProduct[]>([]);
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
 
   const handleSavingsInputChange = (key: keyof typeof savingsInput, value: string | number) => {
     setSavingsInput({ ...savingsInput, [key]: value });
+  };
+
+  const handleSelectSavingsProduct = (product: SavingsProduct) => {
+    //TODO : 하나임을 보장받을 수 있는 로직
+    setSelectedSavingsProduct(product);
   };
 
   useEffect(() => {
@@ -65,7 +71,11 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <SavingsProductTabView savingsProducts={filteredSavingsProducts} />
+      <SavingsProductTabView
+        savingsProducts={filteredSavingsProducts}
+        selectedSavingsProduct={selectedSavingsProduct}
+        handleSelectSavingsProduct={handleSelectSavingsProduct}
+      />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />

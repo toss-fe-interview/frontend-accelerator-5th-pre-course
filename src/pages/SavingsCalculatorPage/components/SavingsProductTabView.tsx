@@ -2,7 +2,15 @@ import { Assets, colors, ListRow, Tab } from 'tosslib';
 import { SavingsProduct } from '../types/types';
 import { formatCurrency } from '../lib/formatCurrency';
 
-export function SavingsProductTabView({ savingsProducts }: { savingsProducts: SavingsProduct[] }) {
+export function SavingsProductTabView({
+  savingsProducts,
+  selectedSavingsProduct,
+  handleSelectSavingsProduct,
+}: {
+  savingsProducts: SavingsProduct[];
+  selectedSavingsProduct: SavingsProduct | null;
+  handleSelectSavingsProduct: (product: SavingsProduct) => void;
+}) {
   return (
     <>
       <Tab onChange={() => {}}>
@@ -28,8 +36,10 @@ export function SavingsProductTabView({ savingsProducts }: { savingsProducts: Sa
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          right={<Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {}}
+          right={selectedSavingsProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+          onClick={() => {
+            handleSelectSavingsProduct(product);
+          }}
         />
       ))}
     </>
