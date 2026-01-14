@@ -3,7 +3,7 @@ import { useSavingsProducts } from 'hooks/queries/savings';
 import { useDebounce } from 'hooks/useDebounce';
 import { useState } from 'react';
 import { useSavingsFilterStore } from 'stores/savingsFilterStore';
-import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import { formatMoney } from 'utils/format';
 
 export function SavingsCalculatorPage() {
@@ -66,10 +66,17 @@ const SavingsFilter = () => {
   );
 };
 
+const SAVINGS_TAB_OPTIONS = [
+  { value: 'products', title: '적금 상품' },
+  { value: 'results', title: '계산 결과' },
+] as const;
+type SavingsTabValue = (typeof SAVINGS_TAB_OPTIONS)[number]['value'];
+
 const SavingsTab = () => {
   const { data } = useSavingsProducts();
   const { monthlyPay, terms } = useSavingsFilterStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [tab, setTab] = useState<SavingsTabValue>('products');
   const allSavingsList = data ?? [];
 
   const debouncedMonthlyPay = useDebounce(monthlyPay, 300);
@@ -80,117 +87,132 @@ const SavingsTab = () => {
 
   return (
     <>
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
-          적금 상품
-        </Tab.Item>
-        <Tab.Item value="results" selected={false}>
-          계산 결과
-        </Tab.Item>
+      <Tab onChange={newTab => setTab(newTab as SavingsTabValue)}>
+        {SAVINGS_TAB_OPTIONS.map(opt => (
+          <Tab.Item key={`savings-tab-${opt.value}`} value={opt.value} selected={opt.value === tab}>
+            {opt.title}
+          </Tab.Item>
+        ))}
       </Tab>
 
-      {filterdSavingsList.map(item => (
-        <ListRow
-          key={`savings-product-${item.id}`}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={item.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: ${item.annualRate}%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${formatMoney(item.minMonthlyAmount, '원', 'ko-KR')} ~ ${formatMoney(item.maxMonthlyAmount, '원', 'ko-KR')} | ${item.availableTerms}개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          right={selectedId === item.id && <Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {
-            if (selectedId === item.id) {
-              setSelectedId(null);
-            } else {
-              setSelectedId(item.id);
+      {tab === 'products' && (
+        <>
+          {filterdSavingsList.length ? (
+            <>
+              {filterdSavingsList.map(item => (
+                <ListRow
+                  key={`savings-product-${item.id}`}
+                  contents={
+                    <ListRow.Texts
+                      type="3RowTypeA"
+                      top={item.name}
+                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                      middle={`연 이자율: ${item.annualRate}%`}
+                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                      bottom={`${formatMoney(item.minMonthlyAmount, '원', 'ko-KR')} ~ ${formatMoney(item.maxMonthlyAmount, '원', 'ko-KR')} | ${item.availableTerms}개월`}
+                      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                    />
+                  }
+                  right={selectedId === item.id && <Assets.Icon name="icon-check-circle-green" />}
+                  onClick={() => {
+                    if (selectedId === item.id) {
+                      setSelectedId(null);
+                    } else {
+                      setSelectedId(item.id);
+                    }
+                  }}
+                />
+              ))}
+            </>
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 결과가 없습니다." />} />
+          )}
+        </>
+      )}
+
+      {tab === 'results' && (
+        <>
+          {selectedId ? (
+            <>
+              <Spacing size={8} />
+
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="예상 수익 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`1,000,000원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="목표 금액과의 차이"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`-500,000원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="추천 월 납입 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`100,000원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+
+              <Spacing size={8} />
+            </>
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+          )}
+          <Border height={16} />
+          <Spacing size={8} />
+
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+
+          <ListRow
+            contents={
+              <ListRow.Texts
+                type="3RowTypeA"
+                top={'기본 정기적금'}
+                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                middle={`연 이자율: 3.2%`}
+                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                bottom={`100,000원 ~ 500,000원 | 12개월`}
+                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+              />
             }
-          }}
-        />
-      ))}
-
-      {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
-      {/* <Spacing size={8} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="예상 수익 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`1,000,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+            onClick={() => {}}
           />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="목표 금액과의 차이"
-            topProps={{ color: colors.grey600 }}
-            bottom={`-500,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+          <ListRow
+            contents={
+              <ListRow.Texts
+                type="3RowTypeA"
+                top={'고급 정기적금'}
+                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                middle={`연 이자율: 2.8%`}
+                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                bottom={`50,000원 ~ 1,000,000원 | 24개월`}
+                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+              />
+            }
+            onClick={() => {}}
           />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="추천 월 납입 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`100,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
 
-      <Spacing size={8} />
-      <Border height={16} />
-      <Spacing size={8} />
-
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-
-      <Spacing size={40} /> */}
-
-      {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
+          <Spacing size={40} />
+        </>
+      )}
     </>
   );
 };
