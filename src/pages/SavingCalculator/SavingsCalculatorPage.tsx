@@ -1,9 +1,9 @@
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import SavingCalculatorInput from './components/SavingCalculatorInput';
-import SavingItemList from './components/SavingItemList';
+import SavingProductList from './components/SavingItemList';
 import SavingResult from './components/SavingResult';
 import { Suspense, useDeferredValue, useMemo, useState } from 'react';
-import { useGetSavingsProducts } from './api';
+import { SavingsProduct, useGetSavingsProducts } from './api';
 
 type SelectedTab = 'products' | 'results';
 
@@ -42,6 +42,8 @@ function SavingsCalculator() {
     });
   }, [deferredInputs, savingsProducts]);
 
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -57,7 +59,13 @@ function SavingsCalculator() {
           계산 결과
         </Tab.Item>
       </Tab>
-      {selectedTab === 'products' && <SavingItemList products={filteredProducts} />}
+      {selectedTab === 'products' && (
+        <SavingProductList
+          products={filteredProducts}
+          selectedProduct={selectedProduct}
+          onProductSelect={setSelectedProduct}
+        />
+      )}
       {selectedTab === 'results' && <SavingResult />}
       <SavingResult />
     </>
