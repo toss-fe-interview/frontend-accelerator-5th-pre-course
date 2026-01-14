@@ -1,15 +1,6 @@
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { useSavingsProducts } from 'hooks/queries/savings';
+import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { formatMoney } from 'utils/format';
 
 export function SavingsCalculatorPage() {
   return (
@@ -18,6 +9,20 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
+      <SavingsFilter />
+
+      <Spacing size={24} />
+      <Border height={16} />
+      <Spacing size={8} />
+
+      <SavingsTab />
+    </>
+  );
+}
+
+const SavingsFilter = () => {
+  return (
+    <>
       <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
       <Spacing size={16} />
       <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
@@ -27,11 +32,16 @@ export function SavingsCalculatorPage() {
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
       </SelectBottomSheet>
+    </>
+  );
+};
 
-      <Spacing size={24} />
-      <Border height={16} />
-      <Spacing size={8} />
+const SavingsTab = () => {
+  const { data } = useSavingsProducts();
+  const allSavingsList = data ?? [];
 
+  return (
+    <>
       <Tab onChange={() => {}}>
         <Tab.Item value="products" selected={true}>
           적금 상품
@@ -41,35 +51,24 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 3.2%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'100,000원 ~ 500,000원 | 12개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        right={<Assets.Icon name="icon-check-circle-green" />}
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 2.8%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'50,000원 ~ 1,000,000원 | 24개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+      {allSavingsList.map(item => (
+        <ListRow
+          key={`savings-product-${item.id}`}
+          contents={
+            <ListRow.Texts
+              type="3RowTypeA"
+              top={item.name}
+              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+              middle={`연 이자율: ${item.annualRate}%`}
+              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+              bottom={`${formatMoney(item.minMonthlyAmount, '원', 'ko-KR')} ~ ${formatMoney(item.maxMonthlyAmount, '원', 'ko-KR')} | ${item.availableTerms}개월`}
+              bottomProps={{ fontSize: 13, color: colors.grey600 }}
+            />
+          }
+          right={<Assets.Icon name="icon-check-circle-green" />}
+          onClick={() => {}}
+        />
+      ))}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
@@ -150,4 +149,4 @@ export function SavingsCalculatorPage() {
       {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
     </>
   );
-}
+};
