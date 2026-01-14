@@ -1,4 +1,4 @@
-import { Border, Spacing } from 'tosslib';
+import { Border, ListRow, Spacing } from 'tosslib';
 import CalculationSummary from '../components/CalculationSummary';
 import RecommendSavingsList from './RecommendSavingsList';
 import { SavingsProductType } from 'shared/types/api/savings';
@@ -36,17 +36,22 @@ export default function CalculationResult({ userInputs, selectedProduct }: Calcu
     <>
       <Spacing size={8} />
 
-      <CalculationSummary
-        expectedProfit={expectedProfit}
-        differenceFromTargetAmount={diffFromTargetAmount}
-        recommendedMonthlyPayment={recommendedMonthlyPayment}
-      />
+      {selectedProduct ? (
+        <CalculationSummary
+          expectedProfit={expectedProfit}
+          differenceFromTargetAmount={diffFromTargetAmount}
+          recommendedMonthlyPayment={recommendedMonthlyPayment}
+        />
+      ) : (
+        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+      )}
 
       <Spacing size={8} />
       <Border height={16} />
       <Spacing size={8} />
 
       <RecommendSavingsList
+        selectedId={selectedProduct?.id}
         userInputs={{
           term,
           monthlyPayment: Number(monthlyPayment),

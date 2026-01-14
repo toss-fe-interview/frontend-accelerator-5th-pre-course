@@ -4,6 +4,7 @@ import SavingsQuery from 'shared/query/saving';
 import SavingsList from '../components/SavingsList';
 
 interface RecommendSavingsListProps {
+  selectedId?: string;
   userInputs: {
     monthlyPayment: number;
     term: number;
@@ -11,6 +12,7 @@ interface RecommendSavingsListProps {
 }
 
 export default function RecommendSavingsList({
+  selectedId,
   userInputs = { monthlyPayment: 0, term: 0 },
 }: RecommendSavingsListProps) {
   const { monthlyPayment, term } = userInputs;
@@ -45,6 +47,7 @@ export default function RecommendSavingsList({
               minMonthlyAmount={product.minMonthlyAmount}
               maxMonthlyAmount={product.maxMonthlyAmount}
               availableTerms={product.availableTerms}
+              selected={selectedId === product.id}
             />
           );
         }}
