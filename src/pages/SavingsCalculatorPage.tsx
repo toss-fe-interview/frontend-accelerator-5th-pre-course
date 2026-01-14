@@ -1,8 +1,9 @@
-import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
   Assets,
   Border,
   colors,
+  http,
   ListHeader,
   ListRow,
   NavigationBar,
@@ -12,15 +13,8 @@ import {
   TextField,
 } from 'tosslib';
 import { Suspense, useState } from 'react';
-import { SavingProduct } from 'queries/types';
-import { TAB_STATE, useSavingCalculatorTab } from 'hooks/useSavingCalculatorTab';
-import { useSavingProductsQuery } from 'queries/useSavingProductsQuery';
-import { isAffordableProducts } from 'utils/savingProductFilter';
-import {
-  calculateExpectedIncome,
-  calculateRecommendedMonthlyPayment,
-  calculateTargetDiff,
-} from 'utils/savingCalculator';
+import { useQuery } from '@tanstack/react-query';
+import { URLS } from 'consts';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
@@ -28,8 +22,35 @@ type CalculatorForm = {
   term: number;
 };
 
+const TAB_STATE = {
+  PRODUCTS: 'products',
+  RESULTS: 'results',
+} as const;
+
+type TabType = (typeof TAB_STATE)[keyof typeof TAB_STATE];
+
+const isTabType = (value: string): value is TabType => {
+  return Object.values(TAB_STATE).includes(value as TabType);
+};
+
+type SavingProduct = {
+  annualRate: number;
+  availableTerms: number;
+  id: string;
+  maxMonthlyAmount: number;
+  minMonthlyAmount: number;
+  name: string;
+};
+
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
+  const [tabState, setTabState] = useState<TabType>(TAB_STATE.PRODUCTS);
+
+  const { data: savingProducts } = useQuery({
+    queryKey: [URLS.SAVINGS_PRODUCTS],
+    queryFn: () => http.get<SavingProduct[]>(URLS.SAVINGS_PRODUCTS),
+  });
+
   const methods = useForm<CalculatorForm>({
     defaultValues: {
       monthlyAmount: null,
@@ -37,19 +58,27 @@ export function SavingsCalculatorPage() {
       term: 12,
     },
   });
-  const { tabState, handleTabState } = useSavingCalculatorTab();
-  const { data: savingProducts } = useSavingProductsQuery();
-  const { monthlyAmount, term, targetAmount } = useWatch();
+  const { monthlyAmount, term, targetAmount } = useWatch({
+    control: methods.control,
+  });
 
-  const filteredProducts = savingProducts.filter(product => isAffordableProducts(product, monthlyAmount, term));
+  const filteredProducts = (savingProducts ?? []).filter(product => {
+    const isTermMatched = product.availableTerms === term;
+    const isMonthlyAmountMatched = monthlyAmount
+      ? product.minMonthlyAmount <= monthlyAmount && monthlyAmount <= product.maxMonthlyAmount
+      : true;
+    return isTermMatched && isMonthlyAmountMatched;
+  });
   const recommendProductList = filteredProducts.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
-  const expectedIncome = calculateExpectedIncome(monthlyAmount, term, selectedProduct?.annualRate);
-  const targetDiff = calculateTargetDiff(targetAmount, expectedIncome);
-  const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment(targetAmount, term, selectedProduct?.annualRate);
+  const expectedIncome = (monthlyAmount ?? 0) * (term ?? 0) * (1 + (selectedProduct?.annualRate ?? 0) * 0.01 * 0.5);
+  const targetDiff = (targetAmount ?? 0) - expectedIncome;
+  const rawRecommendedMonthlyPayment =
+    ((targetAmount ?? 0) / (term ?? 0)) * (1 + (selectedProduct?.annualRate ?? 0) * 0.01 * 0.5);
+  const recommendedMonthlyPayment = Math.round(rawRecommendedMonthlyPayment / 1000) * 1000;
 
   return (
-    <FormProvider {...methods}>
+    <>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
@@ -107,7 +136,13 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={handleTabState}>
+      <Tab
+        onChange={value => {
+          if (isTabType(value)) {
+            setTabState(value);
+          }
+        }}
+      >
         <Tab.Item value={TAB_STATE.PRODUCTS} selected={tabState === TAB_STATE.PRODUCTS}>
           적금 상품
         </Tab.Item>
@@ -214,6 +249,6 @@ export function SavingsCalculatorPage() {
           </>
         )}
       </Suspense>
-    </FormProvider>
+    </>
   );
 }
