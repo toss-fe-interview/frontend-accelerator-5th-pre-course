@@ -3,7 +3,7 @@ import { SavingsProduct } from '../api';
 import { CalculInputs } from './SavingCalculatorInput';
 import { SavingItem } from './SavingItemList';
 import { CalculationResult } from './CalculationResult';
-import { useCalculationResult } from '../hooks/useCalculationResult';
+import { calculateDifferenceFromTarget, calculateExpectedProfit, calculateRecommendedMonthlyAmount } from '../util';
 
 interface SavingResultProps {
   selectedProduct: SavingsProduct | null;
@@ -11,11 +11,18 @@ interface SavingResultProps {
   recommendedProducts: SavingsProduct[];
 }
 
-/**
- * 선택된 적금 상품과, 적금 계산기 입력을 바탕으로 결과 값만 제공해주자.
- */
 export default function SavingResult({ selectedProduct, calculInputs, recommendedProducts }: SavingResultProps) {
-  const { expectedProfit, difference, recommendedMonthly } = useCalculationResult({ selectedProduct, calculInputs });
+  const expectedProfit = calculateExpectedProfit(
+    calculInputs.monthlyAmount,
+    calculInputs.term,
+    selectedProduct?.annualRate ?? 0
+  );
+  const difference = calculateDifferenceFromTarget(calculInputs.targetAmount, expectedProfit);
+  const recommendedMonthly = calculateRecommendedMonthlyAmount(
+    calculInputs.targetAmount,
+    calculInputs.term,
+    selectedProduct?.annualRate ?? 0
+  );
 
   const isProductSelected = selectedProduct !== null;
   return (
