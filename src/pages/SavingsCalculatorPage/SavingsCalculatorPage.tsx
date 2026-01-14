@@ -9,7 +9,7 @@ export function SavingsCalculatorPage() {
     defaultValues: {
       targetAmount: null,
       monthlyPayment: null,
-      term: 12, // 임의로 기본값 12개월
+      term: 12,
     },
   });
 
@@ -23,8 +23,8 @@ export function SavingsCalculatorPage() {
       <SavingFilterForm control={form.control} />
       <Spacing size={24} />
 
-      {/* 탭 - 컨텐츠 */}
       <SavingsCalculatorContent targetAmount={targetAmount} monthlyPayment={monthlyPayment} term={term} />
+      <Spacing size={40} />
     </>
   );
 }

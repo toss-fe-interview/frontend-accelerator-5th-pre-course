@@ -3,7 +3,7 @@ import { Assets, Border, ListHeader, ListRow, Spacing, Tab, colors } from 'tossl
 import { savingsProductsQuery } from '../qeuries/savings-products.query';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { formatCurrency } from 'utils/format';
-import { SavingsProduct } from '../models/savings-products.dto';
+import type { SavingsProduct } from '../models/savings-products.dto';
 import { match } from 'ts-pattern';
 
 type Tab = 'products' | 'results';
@@ -28,6 +28,7 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
   };
 
   const filteredSavingsProducts = filterSavingsProducts(savingsProducts, monthlyPayment, term);
+
   return (
     <>
       <Tab
@@ -49,27 +50,17 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
         .with('products', () => (
           <>
             {filteredSavingsProducts.map(product => (
-              <ListRow
+              <SavingsProduct
                 key={product.id}
-                contents={
-                  <ListRow.Texts
-                    type="3RowTypeA"
-                    top={product.name}
-                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                    middle={`연 이자율: ${product.annualRate}%`}
-                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                    bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                  />
-                }
-                right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-                onClick={() => handleSelectProduct(product)}
+                product={product}
+                selectedProduct={selectedProduct}
+                handleSelectProduct={handleSelectProduct}
               />
             ))}
           </>
         ))
         .with('results', () => (
-          <CalculationResult //
+          <CalculationResult
             targetAmount={targetAmount}
             monthlyPayment={monthlyPayment}
             term={term}
@@ -79,6 +70,32 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
         ))
         .exhaustive()}
     </>
+  );
+}
+
+interface SavingsProductProps {
+  product: SavingsProduct;
+  selectedProduct: SavingsProduct | null;
+  handleSelectProduct: (product: SavingsProduct) => void;
+}
+function SavingsProduct({ product, selectedProduct, handleSelectProduct }: SavingsProductProps) {
+  return (
+    <ListRow
+      key={product.id}
+      contents={
+        <ListRow.Texts
+          type="3RowTypeA"
+          top={product.name}
+          topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+          middle={`연 이자율: ${product.annualRate}%`}
+          middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+          bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+          bottomProps={{ fontSize: 13, color: colors.grey600 }}
+        />
+      }
+      right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+      onClick={() => handleSelectProduct(product)}
+    />
   );
 }
 
@@ -110,7 +127,6 @@ function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct
   // 추천 월 납입 금액 (1,000원 단위 반올림)
   const recommendedMonthlyPayment = Math.round(targetAmount / (term * rateMultiplier) / 1000) * 1000;
 
-  console.log('products', products);
   const recommendedProducts = products.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
@@ -173,8 +189,6 @@ function CalculationResult({ targetAmount, monthlyPayment, term, selectedProduct
           onClick={() => {}}
         />
       ))}
-
-      <Spacing size={40} />
     </>
   );
 }
