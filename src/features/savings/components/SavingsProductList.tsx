@@ -22,8 +22,8 @@ export default function SavingsProductList({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, productId: string) => {
-    if (clickable && (e.key === 'Enter' || e.key === ' ')) {
-      changeSelectedProduct?.(productId);
+    if (clickable && changeSelectedProduct && (e.key === 'Enter' || e.key === ' ')) {
+      changeSelectedProduct(productId);
     }
   };
 
