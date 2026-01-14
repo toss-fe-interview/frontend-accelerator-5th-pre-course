@@ -11,7 +11,7 @@ import {
   TextField,
 } from 'tosslib';
 
-export function SavingsCalculatorPage() {
+export default function SavingsCalculatorPage() {
   return (
     <>
       <NavigationBar title="적금 계산기" />
