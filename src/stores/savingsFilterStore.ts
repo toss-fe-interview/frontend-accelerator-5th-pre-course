@@ -1,4 +1,4 @@
-import { TERMS_SELECT_OPTION, TermsValue } from 'pages/SavingsCalculatorPage';
+import { TermsValue, TERMS_SELECT_OPTION } from 'components/SavingsCalculator/SavingsFilter';
 import { create } from 'zustand';
 
 interface SavingsFilterState {
@@ -15,7 +15,7 @@ interface SavingFilterAction {
 
 export const useSavingsFilterStore = create<SavingsFilterState & SavingFilterAction>(set => ({
   goal: 0,
-  monthlyPay: 0,
+  monthlyPay: 200000,
   terms: 12,
   changeGoal: value => {
     if (Number.isSafeInteger(Number(value))) {
