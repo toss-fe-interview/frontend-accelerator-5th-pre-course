@@ -2,13 +2,7 @@ import CalculationResultTab from 'components/CalculationResultTab';
 import ProductListTab from 'components/ProductListTab';
 import UserSavingGoalSection from 'components/UserSavingGoalSection';
 import { useState } from 'react';
-import {
-  Border,
-
-  NavigationBar,
-  Spacing,
-  Tab
-} from 'tosslib';
+import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
@@ -34,10 +28,6 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {selectedTab === 'productList' ? <ProductListTab /> : <CalculationResultTab />}
-
-
-      {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
     </>
   );
 }
