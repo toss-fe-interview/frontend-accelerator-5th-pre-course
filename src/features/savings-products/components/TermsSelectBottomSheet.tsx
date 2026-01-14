@@ -1,11 +1,11 @@
 import { SelectBottomSheet } from 'tosslib';
 
-type SavingBottomSheetProps = {
+type TermsSelectBottomSheetProps = {
   terms: string;
   onTermsChange: (value: string) => void;
 };
 
-export const SavingBottomSheet = ({ terms, onTermsChange }: SavingBottomSheetProps) => {
+export const TermsSelectBottomSheet = ({ terms, onTermsChange }: TermsSelectBottomSheetProps) => {
   return (
     <SelectBottomSheet
       label="저축 기간"

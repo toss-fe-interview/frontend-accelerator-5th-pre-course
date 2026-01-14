@@ -9,7 +9,7 @@ import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'fea
 import { toNumber } from 'shared/utils/format';
 import { useSavingsProducts } from 'features/savings-products/hooks/useSavingsProducts';
 import { AmountInputSection } from 'features/savings-products/components/AmountInputSection';
-import { SavingBottomSheet } from 'features/savings-products/components/SavingBottomSheet';
+import { TermsSelectBottomSheet } from 'features/savings-products/components/TermsSelectBottomSheet';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -36,7 +36,7 @@ export function SavingsCalculatorPage() {
       />
       <Spacing size={16} />
 
-      <SavingBottomSheet terms={terms} onTermsChange={setTerms} />
+      <TermsSelectBottomSheet terms={terms} onTermsChange={setTerms} />
 
       <Spacing size={24} />
       <Border height={16} />
