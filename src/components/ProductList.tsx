@@ -5,10 +5,12 @@ import { ProductListItem } from './ProductListItem';
 import { SavingsProduct } from 'apis/type';
 
 type ProductListProps = {
+  selectedProductId?: string;
+  onClick?: (id: string) => void;
   filterOptions: SavingsFilterForm;
 };
 
-export const ProductList = ({ filterOptions }: ProductListProps) => {
+export const ProductList = ({ selectedProductId, onClick, filterOptions }: ProductListProps) => {
   const { data: savingsProducts = [] } = useFetch(savingsApis.getSavingsProducts);
   const { monthlySaving, savingPeriod } = filterOptions;
 
@@ -23,5 +25,9 @@ export const ProductList = ({ filterOptions }: ProductListProps) => {
     return monthlyMatchs && termMathcs;
   };
 
-  return savingsProducts.filter(filterProduct).map(sp => <ProductListItem key={sp.id} savingsProduct={sp} />);
+  return savingsProducts
+    .filter(filterProduct)
+    .map(sp => (
+      <ProductListItem key={sp.id} savingsProduct={sp} onClick={onClick} selected={selectedProductId === sp.id} />
+    ));
 };

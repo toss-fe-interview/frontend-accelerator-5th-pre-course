@@ -1,7 +1,7 @@
-import { ProductList } from 'components/ProductList';
+import { Border, NavigationBar, Spacing } from 'tosslib';
 import { SavingsFilterForm } from 'components/SavingsFilterForm';
+import { SavingsTabs } from 'components/SavingsTabs';
 import { useSavingsFilterForm } from 'hooks/useSavingsFilterForm';
-import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const { savingsFilterForm, handleChanges } = useSavingsFilterForm();
@@ -18,15 +18,7 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
-          적금 상품
-        </Tab.Item>
-        <Tab.Item value="results" selected={false}>
-          계산 결과
-        </Tab.Item>
-      </Tab>
-      <ProductList filterOptions={savingsFilterForm} />
+      <SavingsTabs savingsFilterForm={savingsFilterForm} />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />

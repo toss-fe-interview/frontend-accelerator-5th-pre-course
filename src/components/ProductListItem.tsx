@@ -4,10 +4,11 @@ import type { SavingsProduct } from 'apis/type';
 
 type ProductListItemProps = {
   savingsProduct: SavingsProduct;
-  onClick?: () => void;
+  selected?: boolean;
+  onClick?: (id: string) => void;
 };
 
-export const ProductListItem = ({ savingsProduct, onClick }: ProductListItemProps) => {
+export const ProductListItem = ({ savingsProduct, selected, onClick }: ProductListItemProps) => {
   const { id, name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
 
   return (
@@ -24,8 +25,8 @@ export const ProductListItem = ({ savingsProduct, onClick }: ProductListItemProp
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
-      right={<Assets.Icon name="icon-check-circle-green" />}
-      onClick={onClick}
+      right={selected && <Assets.Icon name="icon-check-circle-green" />}
+      onClick={() => onClick?.(id)}
     />
   );
 };
