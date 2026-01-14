@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
-import { CalculationResult, SavingsForm, SavingsProductList } from 'features/savings-calculator';
+import { CalculationResult, SavingsForm, SavingsProductList, useSavingsCalculator } from 'features/savings-calculator';
 import { useSavingsProducts } from 'shared/hooks';
 import { SavingsFormState } from 'shared/types';
 
@@ -10,31 +10,31 @@ export const DEFAULT_SAVINGS_FORM_STATE: SavingsFormState = {
   term: 12,
 };
 
-type TabValue = 'savingsProducts' | 'calculatedResult';
+const TAB_VALUES = {
+  SAVINGS_PRODUCTS: 'savingsProducts',
+  CALCULATED_RESULT: 'calculatedResult',
+} as const;
+
+type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
 export function SavingsCalculatorPage() {
   const { data: products = [] } = useSavingsProducts();
   const [formState, setFormState] = useState<SavingsFormState>(DEFAULT_SAVINGS_FORM_STATE);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [selectedTab, setSelectedTab] = useState<TabValue>('savingsProducts');
+  const [selectedTab, setSelectedTab] = useState<TabValue>(TAB_VALUES.SAVINGS_PRODUCTS);
 
-  const filteredProducts = useMemo(() => {
-    const { monthlyAmount, term } = formState;
-
-    if (monthlyAmount === null) {
-      return products;
-    }
-
-    return products.filter(
-      product =>
-        product.minMonthlyAmount < monthlyAmount &&
-        monthlyAmount < product.maxMonthlyAmount &&
-        product.availableTerms === term
-    );
-  }, [products, formState]);
+  const { filteredProducts, selectedProduct, recommendedProducts } = useSavingsCalculator({
+    products,
+    formState,
+    selectedProductId,
+  });
 
   const handleFormChange = (updates: Partial<SavingsFormState>) => {
     setFormState(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleSelectProduct = (productId: string) => {
+    setSelectedProductId(productId);
   };
 
   return (
@@ -50,28 +50,28 @@ export function SavingsCalculatorPage() {
       <Spacing size={8} />
 
       <Tab onChange={value => setSelectedTab(value as TabValue)}>
-        <Tab.Item value="savingsProducts" selected={selectedTab === 'savingsProducts'}>
+        <Tab.Item value={TAB_VALUES.SAVINGS_PRODUCTS} selected={selectedTab === TAB_VALUES.SAVINGS_PRODUCTS}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="calculatedResult" selected={selectedTab === 'calculatedResult'}>
+        <Tab.Item value={TAB_VALUES.CALCULATED_RESULT} selected={selectedTab === TAB_VALUES.CALCULATED_RESULT}>
           계산 결과
         </Tab.Item>
       </Tab>
 
-      {selectedTab === 'savingsProducts' && (
+      {selectedTab === TAB_VALUES.SAVINGS_PRODUCTS && (
         <SavingsProductList
           products={filteredProducts}
           selectedProductId={selectedProductId}
-          onSelectProduct={setSelectedProductId}
+          onSelectProduct={handleSelectProduct}
         />
       )}
 
-      {selectedTab === 'calculatedResult' && (
+      {selectedTab === TAB_VALUES.CALCULATED_RESULT && (
         <CalculationResult
           formState={formState}
-          selectedProduct={products.find(p => p.id === selectedProductId) ?? null}
+          selectedProduct={selectedProduct}
           selectedProductId={selectedProductId}
-          filteredProducts={filteredProducts}
+          recommendedProducts={recommendedProducts}
         />
       )}
     </>
