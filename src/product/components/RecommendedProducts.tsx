@@ -6,7 +6,7 @@ import { SavingProduct } from 'product/type/internal';
 
 interface Props {
   monthlyPayment: string;
-  term: number;
+  term: number | null;
   selectedProduct: SavingProduct;
 }
 
@@ -15,7 +15,7 @@ const RecommendedProducts = ({ monthlyPayment, term, selectedProduct }: Props) =
     ...savingsProductsQueryOptions,
     select: data =>
       getFilteredProducts(data, monthlyPayment, term)
-        .sort((a, b) => a.annualRate - b.annualRate)
+        .sort((a, b) => b.annualRate - a.annualRate)
         .slice(0, 2),
   });
 

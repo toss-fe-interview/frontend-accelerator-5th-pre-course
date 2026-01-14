@@ -1,6 +1,6 @@
 import { SavingProduct } from 'product/type/internal';
 
-export const getFilteredProducts = (products: SavingProduct[], monthlyPayment: string, term: number) => {
+export const getFilteredProducts = (products: SavingProduct[], monthlyPayment: string, term: number | null) => {
   return products.filter(product => {
     if (
       product.minMonthlyAmount > Number(monthlyPayment.replace(/,/g, '')) ||

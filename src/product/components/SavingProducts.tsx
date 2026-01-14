@@ -16,9 +16,6 @@ type Props =
     };
 
 const SavingProducts = ({ type, data, selectedProduct, selectProduct }: Props) => {
-  if (data.length === 0) {
-    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 없습니다." />} />;
-  }
   return data.map(product => (
     <ListRow
       key={product.id}
