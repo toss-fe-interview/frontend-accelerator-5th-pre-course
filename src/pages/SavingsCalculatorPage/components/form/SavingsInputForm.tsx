@@ -23,7 +23,7 @@ export function SavingsInputForm({
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={targetAmount && handleFormatCurrency(targetAmount)}
-        onChange={e => handleSavingsInputChange('targetAmount', e.target.value)}
+        onChange={e => handleSavingsInputChange('targetAmount', extractNumbers(e.target.value))}
       />
       <Spacing size={16} />
       <TextField
@@ -31,14 +31,14 @@ export function SavingsInputForm({
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={monthlyAmount && handleFormatCurrency(monthlyAmount)}
-        onChange={e => handleSavingsInputChange('monthlyAmount', e.target.value)}
+        onChange={e => handleSavingsInputChange('monthlyAmount', extractNumbers(e.target.value))}
       />
       <Spacing size={16} />
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={savingsTerm}
-        onChange={value => handleSavingsInputChange('savingsTerm', value)}
+        onChange={value => handleSavingsInputChange('savingsTerm', Number(value))}
       >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
