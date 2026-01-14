@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Assets, ListRow, Tab, colors } from 'tosslib';
+import { Tab } from 'tosslib';
 import { savingsProductsQuery } from '../qeuries/savings-products.query';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { formatCurrency } from 'utils/format';
 import type { SavingsProduct } from '../models/savings-products.dto';
 import { match } from 'ts-pattern';
 import { CalculationResult } from './CalculationResult';
 import { SavingsFilterForm } from '../types/saving-filter-form';
+import { SavingsProductItem } from './SavingsProductItem';
 
 type Tab = 'products' | 'results';
 function isTab(value: string): value is Tab {
@@ -46,7 +46,7 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
         .with('products', () => (
           <>
             {filteredSavingsProducts.map(product => (
-              <SavingsProduct
+              <SavingsProductItem
                 key={product.id}
                 product={product}
                 selectedProduct={selectedProduct}
@@ -67,32 +67,6 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
         ))
         .exhaustive()}
     </>
-  );
-}
-
-interface SavingsProductProps {
-  product: SavingsProduct;
-  selectedProduct: SavingsProduct | null;
-  onSelectProduct: (product: SavingsProduct) => void;
-}
-function SavingsProduct({ product, selectedProduct, onSelectProduct }: SavingsProductProps) {
-  return (
-    <ListRow
-      key={product.id}
-      contents={
-        <ListRow.Texts
-          type="3RowTypeA"
-          top={product.name}
-          topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-          middle={`연 이자율: ${product.annualRate}%`}
-          middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-          bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-          bottomProps={{ fontSize: 13, color: colors.grey600 }}
-        />
-      }
-      right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-      onClick={() => onSelectProduct(product)}
-    />
   );
 }
 
