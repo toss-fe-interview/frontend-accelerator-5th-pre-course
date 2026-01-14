@@ -1,17 +1,16 @@
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { SavingsProduct } from 'api/savings-products/types';
+import { useSavingsProducts } from 'api/savings-products/useSavingsProducts';
+import SavingsProductsList from 'components/savings-products/SavingsProductslist';
+import { useState } from 'react';
+import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 export function SavingsCalculatorPage() {
+  const { savingsProducts } = useSavingsProducts();
+
+  console.log('데이터', savingsProducts);
+
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct>();
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -41,34 +40,10 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 3.2%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'100,000원 ~ 500,000원 | 12개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        right={<Assets.Icon name="icon-check-circle-green" />}
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 2.8%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'50,000원 ~ 1,000,000원 | 24개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
+      <SavingsProductsList
+        products={savingsProducts}
+        selectedProduct={selectedSavingsProduct && selectedSavingsProduct}
+        setSelectedProduct={setSelectedSavingsProduct}
       />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
