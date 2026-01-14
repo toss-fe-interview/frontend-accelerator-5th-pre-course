@@ -1,9 +1,38 @@
-import { Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { useMemo, useState } from 'react';
+import { Border, colors, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { SavingsForm } from 'features/savings-calculator';
 import { useSavingsProducts } from 'shared/hooks';
+import { SavingsFormState } from 'shared/types';
 import { formatNumber } from 'shared/utils';
+
+export const DEFAULT_SAVINGS_FORM_STATE: SavingsFormState = {
+  goalAmount: null,
+  monthlyAmount: null,
+  term: 12,
+};
 
 export function SavingsCalculatorPage() {
   const { data: products = [] } = useSavingsProducts();
+  const [formState, setFormState] = useState<SavingsFormState>(DEFAULT_SAVINGS_FORM_STATE);
+
+  const filteredProducts = useMemo(() => {
+    const { monthlyAmount, term } = formState;
+
+    if (monthlyAmount === null) {
+      return products;
+    }
+
+    return products.filter(
+      product =>
+        product.minMonthlyAmount < monthlyAmount &&
+        monthlyAmount < product.maxMonthlyAmount &&
+        product.availableTerms === term
+    );
+  }, [products, formState]);
+
+  const handleFormChange = (updates: Partial<SavingsFormState>) => {
+    setFormState(prev => ({ ...prev, ...updates }));
+  };
 
   return (
     <>
@@ -11,15 +40,7 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <SavingsForm formState={formState} onChange={handleFormChange} />
 
       <Spacing size={24} />
       <Border height={16} />
@@ -34,7 +55,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {products.map(product => (
+      {filteredProducts.map(product => (
         <ListRow
           key={product.id}
           contents={
