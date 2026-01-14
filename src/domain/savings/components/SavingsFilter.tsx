@@ -17,7 +17,7 @@ export const SavingsFilter = ({ filterForm }: Props) => {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={goalAmount ? goalAmount.toString() : undefined}
+        value={goalAmount ? goalAmount.toString() : ''}
         onChange={e => filterForm.setValue('goalAmount', e.target.value ? Number(e.target.value) : undefined)}
       />
       <Spacing size={16} />
@@ -25,7 +25,7 @@ export const SavingsFilter = ({ filterForm }: Props) => {
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={monthlyAmount ? monthlyAmount.toString() : undefined}
+        value={monthlyAmount ? monthlyAmount.toString() : ''}
         onChange={e => filterForm.setValue('monthlyAmount', e.target.value ? Number(e.target.value) : undefined)}
       />
       <Spacing size={16} />
