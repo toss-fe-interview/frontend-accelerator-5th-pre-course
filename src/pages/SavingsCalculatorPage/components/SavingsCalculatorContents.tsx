@@ -37,13 +37,11 @@ export function SavingsCalculatorContents({ targetAmount, monthlyPayment, term }
 
       {match(activeTab)
         .with('products', () => (
-          <>
-            <SavingsProducts
-              products={filteredSavingsProducts}
-              selectedProduct={selectedProduct}
-              onSelectProduct={handleSelectProduct}
-            />
-          </>
+          <SavingsProducts
+            products={filteredSavingsProducts}
+            selectedProduct={selectedProduct}
+            onSelectProduct={handleSelectProduct}
+          />
         ))
         .with('results', () => (
           <CalculationResult

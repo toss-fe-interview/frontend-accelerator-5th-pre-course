@@ -9,7 +9,7 @@ interface Props {
 }
 export function SavingsProducts({ products, selectedProduct, onSelectProduct }: Props) {
   if (products.length === 0) {
-    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
+    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />;
   }
 
   return (
