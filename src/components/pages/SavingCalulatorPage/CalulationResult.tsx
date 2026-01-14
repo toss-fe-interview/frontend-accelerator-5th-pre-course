@@ -1,6 +1,6 @@
 import { useSavingProductsQuery } from 'queries/useSavingProductsQuery';
 import { useWatch } from 'react-hook-form';
-import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { Border, ListHeader, ListRow, Spacing } from 'tosslib';
 import { isAffordableProducts } from 'utils/savingProductFilter';
 import { ProductItem } from './ProductItem';
 import { SavingProduct } from 'queries/types';

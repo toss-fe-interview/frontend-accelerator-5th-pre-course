@@ -1,11 +1,12 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import { CalculatorFormInputs } from 'components/pages/SavingCalulatorPage/CalculatorFormInputs';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { SavingProduct } from 'queries/types';
 import { SavingProductList } from 'components/pages/SavingCalulatorPage/SavingProductList';
 import { CalulationResult } from 'components/pages/SavingCalulatorPage/CalulationResult';
 import { isTabType, TAB_STATE, useSavingCalulatorTab } from 'hooks/useSavingCalulatorTab';
+import { Loading } from 'components/common/Loading';
 
 type CaluculatorForm = {
   monthlyAmount: number | null;
@@ -52,13 +53,15 @@ export function SavingsCalculatorPage() {
           </Tab.Item>
         </Tab>
 
-        {tabState === TAB_STATE.PRODUCTS && (
-          <SavingProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
-        )}
+        <Suspense fallback={<Loading />}>
+          {tabState === TAB_STATE.PRODUCTS && (
+            <SavingProductList selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+          )}
 
-        {tabState === TAB_STATE.RESULTS && (
-          <CalulationResult selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
-        )}
+          {tabState === TAB_STATE.RESULTS && (
+            <CalulationResult selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+          )}
+        </Suspense>
       </FormProvider>
     </>
   );

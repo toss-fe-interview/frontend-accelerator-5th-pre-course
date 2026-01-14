@@ -14,7 +14,6 @@ export const SavingProductList = ({
   const { data: savingProducts } = useSavingProductsQuery();
   const { monthlyAmount, term } = useWatch();
 
-  /* TODO: suspense 처리 */
   const filteredProducts = savingProducts?.filter(product => isAffordableProducts(product, monthlyAmount, term));
 
   return (
