@@ -1,4 +1,5 @@
 import useSavingsProductsQuery from 'queries/useSavingsProductsQuery';
+import { useState } from 'react';
 import {
   Assets,
   Border,
@@ -13,22 +14,58 @@ import {
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
+  const savingsDurations = [6, 12, 24];
   const savingsProductsQuery = useSavingsProductsQuery();
+  const [targetPrice, setTargetPrice] = useState('');
+  const [monthlyDeposit, setMonthlyDeposit] = useState('');
+  const [savingDuration, setSavingDuration] = useState(12);
+
+  const filteredSavingsProducts = savingsProductsQuery.data
+    ?.filter(product => product.availableTerms === savingDuration)
+    .filter(
+      product =>
+        product.minMonthlyAmount <= Number(monthlyDeposit) && Number(monthlyDeposit) <= product.maxMonthlyAmount
+    );
 
   return (
     <>
       <NavigationBar title="적금 계산기" />
-
       <Spacing size={16} />
-
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={targetPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+        onChange={e => {
+          const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+          setTargetPrice(onlyNumbers);
+        }}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        onChange={e => {
+          const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+          setMonthlyDeposit(onlyNumbers);
+        }}
+        value={monthlyDeposit.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={savingDuration}
+        onChange={duration => {
+          setSavingDuration(duration);
+        }}
+      >
+        {savingsDurations.map(duration => (
+          <SelectBottomSheet.Option key={duration} value={duration}>
+            {`${duration}개월`}
+          </SelectBottomSheet.Option>
+        ))}
       </SelectBottomSheet>
 
       <Spacing size={24} />
@@ -44,7 +81,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {savingsProductsQuery.data?.map(product => (
+      {filteredSavingsProducts?.map(product => (
         <ListRow
           key={product.id}
           contents={
