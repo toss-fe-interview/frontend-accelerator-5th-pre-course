@@ -4,7 +4,7 @@ import { CalculatorFormInputs } from 'components/pages/SavingCalulatorPage/Calcu
 import { Suspense, useState } from 'react';
 import { SavingProduct } from 'queries/types';
 import { SavingProductList } from 'components/pages/SavingCalulatorPage/SavingProductList';
-import { isTabType, TAB_STATE, useSavingCalulatorTab } from 'hooks/useSavingCalulatorTab';
+import { isTabType, TAB_STATE, useSavingCalculatorTab } from 'hooks/useSavingCalculatorTab';
 import { Loading } from 'components/common/Loading';
 import { CalculationResult } from 'components/pages/SavingCalulatorPage/CalculationResult';
 
@@ -16,7 +16,7 @@ type CaluculatorForm = {
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
-  const [tabState, setTabState] = useSavingCalulatorTab();
+  const [tabState, setTabState] = useSavingCalculatorTab();
   const methods = useForm<CaluculatorForm>({
     defaultValues: {
       monthlyAmount: null,
