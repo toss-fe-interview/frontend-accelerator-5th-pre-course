@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Assets, ListRow, Tab, colors } from 'tosslib';
 import { savingsProductsQuery } from '../qeuries/savings-products.query';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { formatCurrency } from 'utils/format';
 import { SavingsProduct } from '../models/savings-products.dto';
 
@@ -20,8 +20,12 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery);
 
   const [activeTab, setActiveTab] = useState<Tab>('products');
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
-  console.log('savingsProducts', savingsProducts);
+  const handleSelectProduct = (product: SavingsProduct) => {
+    setSelectedProduct(prev => (prev?.id === product.id ? null : product));
+  };
+
   const filteredSavingsProducts = filterSavingsProducts(savingsProducts, monthlyPayment, term);
   return (
     <>
@@ -54,8 +58,8 @@ export function SavingsCalculatorContent({ targetAmount, monthlyPayment, term }:
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          right={<Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {}}
+          right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
+          onClick={() => handleSelectProduct(product)}
         />
       ))}
     </>
