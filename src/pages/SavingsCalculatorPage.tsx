@@ -1,5 +1,6 @@
 import MoneyTextField from 'components/MoneyTextField';
 import { useSavingsProducts } from 'hooks/queries/savings';
+import { useState } from 'react';
 import { useSavingsFilterStore } from 'stores/savingsFilterStore';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import { formatMoney } from 'utils/format';
@@ -66,7 +67,13 @@ const SavingsFilter = () => {
 
 const SavingsTab = () => {
   const { data } = useSavingsProducts();
+  const { monthlyPay, terms } = useSavingsFilterStore();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const allSavingsList = data ?? [];
+
+  const filterdSavingsList = allSavingsList
+    .filter(item => item.minMonthlyAmount <= monthlyPay && monthlyPay <= item.maxMonthlyAmount)
+    .filter(item => item.availableTerms === terms);
 
   return (
     <>
@@ -79,7 +86,7 @@ const SavingsTab = () => {
         </Tab.Item>
       </Tab>
 
-      {allSavingsList.map(item => (
+      {filterdSavingsList.map(item => (
         <ListRow
           key={`savings-product-${item.id}`}
           contents={
@@ -93,8 +100,14 @@ const SavingsTab = () => {
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }
-          right={<Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => {}}
+          right={selectedId === item.id && <Assets.Icon name="icon-check-circle-green" />}
+          onClick={() => {
+            if (selectedId === item.id) {
+              setSelectedId(null);
+            } else {
+              setSelectedId(item.id);
+            }
+          }}
         />
       ))}
 
