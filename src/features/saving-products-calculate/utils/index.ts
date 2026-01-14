@@ -1,4 +1,6 @@
-const calculateInterestMultiplier = (terms: number, annualRate: number) => terms * (1 + annualRate * 0.5);
+const calculateInterestMultiplier = (terms: number, annualRate: number) => {
+  return terms * (1 + (annualRate / 100) * 0.5);
+};
 
 export const calculateExpectedAmount = ({
   annualRate,
