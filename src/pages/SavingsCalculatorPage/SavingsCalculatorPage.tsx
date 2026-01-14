@@ -7,6 +7,16 @@ import { useEffect, useState } from 'react';
 
 export function SavingsCalculatorPage() {
   const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
+  const [filteredSavingsProducts, setFilteredSavingsProducts] = useState<SavingsProduct[]>([]);
+  const [savingsInput, setSavingsInput] = useState({
+    targetAmount: '',
+    monthlyAmount: '',
+    savingsTerm: 12,
+  });
+
+  const handleSavingsInputChange = (key: keyof typeof savingsInput, value: string | number) => {
+    setSavingsInput({ ...savingsInput, [key]: value });
+  };
 
   useEffect(() => {
     const fetchSavingsProducts = async () => {
@@ -20,19 +30,42 @@ export function SavingsCalculatorPage() {
     fetchSavingsProducts();
   }, []);
 
+  useEffect(() => {
+    if (savingsProducts.length === 0) {
+      return;
+    }
+
+    const monthlyAmountNumber = Number(savingsInput.monthlyAmount);
+    const hasMonthlyAmount = savingsInput.monthlyAmount !== '' && !isNaN(monthlyAmountNumber);
+
+    if (!hasMonthlyAmount) {
+      setFilteredSavingsProducts(savingsProducts);
+      return;
+    }
+
+    const filteredProducts = savingsProducts.filter(product => {
+      const isMonthlyAmountValid =
+        monthlyAmountNumber >= product.minMonthlyAmount && monthlyAmountNumber <= product.maxMonthlyAmount;
+      const isTermMatched = product.availableTerms === savingsInput.savingsTerm;
+      return isMonthlyAmountValid && isTermMatched;
+    });
+
+    setFilteredSavingsProducts(filteredProducts);
+  }, [savingsProducts, savingsInput]);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <SavingsInputForm />
+      <SavingsInputForm savingsInput={savingsInput} handleSavingsInputChange={handleSavingsInputChange} />
 
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
 
-      <SavingsProductTabView savingsProducts={savingsProducts} />
+      <SavingsProductTabView savingsProducts={filteredSavingsProducts} />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
