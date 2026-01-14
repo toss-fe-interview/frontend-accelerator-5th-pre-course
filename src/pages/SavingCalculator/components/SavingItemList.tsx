@@ -1,9 +1,14 @@
-import { Assets, colors, ListRow } from 'tosslib';
+import { colors, ListRow } from 'tosslib';
+import { SavingsProduct, useGetSavingsProducts } from '../api';
 
 export default function SavingItemList() {
+  const { data: savingsProducts } = useGetSavingsProducts();
   return (
     <>
-      {/* 선택된 적금 상품인 경우 */}
+      {savingsProducts.map(product => (
+        <SavingItem key={product.id} {...product} />
+      ))}
+      {/* 선택된 적금 상품인 경우
       <ListRow
         contents={
           <ListRow.Texts
@@ -19,21 +24,26 @@ export default function SavingItemList() {
         right={<Assets.Icon name="icon-check-circle-green" />}
         onClick={() => {}}
       />
-      {/* 선택되지 않은 상품인 경우 */}
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 2.8%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'50,000원 ~ 1,000,000원 | 24개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+      */}
     </>
+  );
+}
+
+function SavingItem({ name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms }: SavingsProduct) {
+  return (
+    <ListRow
+      contents={
+        <ListRow.Texts
+          type="3RowTypeA"
+          top={name}
+          topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+          middle={`연 이자율: ${annualRate}%`}
+          middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+          bottom={`${minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${availableTerms}개월`}
+          bottomProps={{ fontSize: 13, color: colors.grey600 }}
+        />
+      }
+      onClick={() => {}}
+    />
   );
 }

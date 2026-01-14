@@ -2,11 +2,11 @@ import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import SavingCalculatorInput from './components/SavingCalculatorInput';
 import SavingItemList from './components/SavingItemList';
 import SavingResult from './components/SavingResult';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
 type SelectedTab = 'products' | 'results';
 
-export function SavingsCalculatorPage() {
+function SavingsCalculator() {
   const [selectedTab, setSelectedTab] = useState<SelectedTab>('products');
   return (
     <>
@@ -15,7 +15,6 @@ export function SavingsCalculatorPage() {
       <SavingCalculatorInput />
       <Border height={16} />
       <Spacing size={8} />
-
       <Tab onChange={value => setSelectedTab(value as SelectedTab)}>
         <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
@@ -28,5 +27,21 @@ export function SavingsCalculatorPage() {
       {selectedTab === 'results' && <SavingResult />}
       <SavingResult />
     </>
+  );
+}
+
+function SavingsCalculatorLoading() {
+  return (
+    <div>
+      <p>적금 목록 불러오는중입니다...</p>
+    </div>
+  );
+}
+
+export function SavingsCalculatorPage() {
+  return (
+    <Suspense fallback={<SavingsCalculatorLoading />}>
+      <SavingsCalculator />
+    </Suspense>
   );
 }
