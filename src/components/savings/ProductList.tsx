@@ -1,5 +1,6 @@
 import { Assets, colors, ListRow, Spacing } from 'tosslib';
 import { SavingsProduct } from 'hooks/queries/types';
+import { formatNumber } from 'utils/format';
 
 interface ProductListProps {
   products: SavingsProduct[];
@@ -7,8 +8,6 @@ interface ProductListProps {
   onProductSelect: (id: string) => void;
   emptyMessage?: string;
 }
-
-const formatNumber = (num: number) => num.toLocaleString('ko-KR');
 
 export function ProductList({
   products,

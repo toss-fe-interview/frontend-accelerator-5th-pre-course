@@ -7,7 +7,7 @@ interface CalculationParams {
   term: number;
 }
 
-interface CalculationResult {
+export interface CalculationResult {
   expectedReturn: number;
   difference: number;
   recommendedDeposit: number;

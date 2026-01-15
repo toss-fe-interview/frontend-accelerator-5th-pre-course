@@ -1,16 +1,10 @@
 import { colors, ListRow, Spacing } from 'tosslib';
-
-interface CalculationResult {
-  expectedReturn: number;
-  difference: number;
-  recommendedDeposit: number;
-}
+import { CalculationResult } from 'hooks/useCalculationResult';
+import { formatNumber } from 'utils/format';
 
 interface CalculationResultSectionProps {
   result: CalculationResult | null;
 }
-
-const formatNumber = (num: number) => num.toLocaleString('ko-KR');
 
 export function CalculationResultSection({ result }: CalculationResultSectionProps) {
   if (!result) {
