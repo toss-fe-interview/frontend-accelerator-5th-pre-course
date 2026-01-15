@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Border, colors, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 import { useCalculationResult } from 'hooks/useCalculationResult';
 import { InputSection, ProductList, CalculationResultSection, InputValues } from 'components/savings';
+import { PageStatus } from 'components/common/PageStatus';
 
 const TAB_VALUES = {
   PRODUCTS: 'products',
@@ -44,23 +45,11 @@ export function SavingsCalculatorPage() {
   });
 
   if (isLoading) {
-    return (
-      <>
-        <NavigationBar title="적금 계산기" />
-        <Spacing size={100} />
-        <div style={{ textAlign: 'center', color: colors.grey500, fontSize: 14 }}>로딩 중...</div>
-      </>
-    );
+    return <PageStatus title="적금 계산기" message="로딩 중..." />;
   }
 
   if (error) {
-    return (
-      <>
-        <NavigationBar title="적금 계산기" />
-        <Spacing size={100} />
-        <div style={{ textAlign: 'center', color: colors.grey500, fontSize: 14 }}>상품을 불러올 수 없어요</div>
-      </>
-    );
+    return <PageStatus title="적금 계산기" message="상품을 불러올 수 없어요" />;
   }
 
   return (
