@@ -1,6 +1,6 @@
 import { ListRow, Assets, colors } from 'tosslib';
-import { EmptyState } from '../EmptyState';
-import type { SavingsProduct } from '..';
+import { EmptyState } from './EmptyState';
+import { SavingsProduct } from '../types';
 
 interface ProductListProps {
   list: SavingsProduct[];

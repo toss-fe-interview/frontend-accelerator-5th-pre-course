@@ -1,33 +1,14 @@
+import { Divider } from 'domains/Savings/components/Divider';
+import { ProductList } from 'domains/Savings/components/ProductList';
+import { RecommendedProduct } from 'domains/Savings/components/RecommendedProduct';
+import { SavingsNavigationBar } from 'domains/Savings/components/SavingsNavigationBar';
+import { SavingsTabNavigation } from 'domains/Savings/components/SavingsTabNavigation';
+import { SavingTabContent } from 'domains/Savings/components/SavingTabContent';
+import type { SavingsProduct, SavingsTabValue, SavingTabListType } from 'domains/Savings/types';
+import { calculateExpectedProfit, calculateGoalDifference, calculateRecommendedDeposit, filterSavingsProducts, getTopRateProducts } from 'domains/Savings/utils/savings';
 import React, { useState, useEffect } from 'react';
 import { http, TextField, Spacing, SelectBottomSheet, ListRow, colors } from 'tosslib';
-import { SavingsProduct } from '../components/Savings';
-import { SavingsNavigationBar } from '../components/Savings/SavingsNavigationBar';
-import { SavingsDivider } from '../components/Savings/SavingsDivider';
-import { SavingsTabNavigation } from '../components/Savings/SavingsTabNavigation';
-import { SavingTabContent } from '../components/Savings/SavingTabContent';
-import { ProductList } from '../components/Savings/ProductList';
-import { RecommendedProduct } from '../components/Savings/Result/RecommendedProduct';
-import { filterSavingsProducts, getTopRateProducts } from 'utils/savings';
 
-export type SavingsTabValue = 'products' | 'results';
-
-export type SavingTabListType = {
-  value: SavingsTabValue;
-  name: string;
-}[];
-
-function calculateExpectedProfit(monthlyDeposit: number, period: number, annualRate: number): number {
-  return monthlyDeposit * period * (1 + annualRate * 0.5);
-}
-
-function calculateGoalDifference(goalAmount: number, expectedProfit: number): number {
-  return goalAmount - expectedProfit;
-}
-
-function calculateRecommendedDeposit(goalAmount: number, period: number, annualRate: number): number {
-  const rawAmount = goalAmount / (period * (1 + annualRate * 0.5));
-  return Math.round(rawAmount / 1000) * 1000;
-}
 
 export function SavingsCalculatorPage() {
   // 계산기 상태
@@ -92,7 +73,7 @@ export function SavingsCalculatorPage() {
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
       </SelectBottomSheet>
 
-      <SavingsDivider />
+      <Divider />
       <SavingsTabNavigation
         tabs={tabs}
         selectedTab={selectedTab}

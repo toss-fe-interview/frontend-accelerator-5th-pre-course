@@ -1,11 +1,11 @@
 import { Spacing, Border } from 'tosslib';
 
-interface SavingsDividerProps {
+interface DividerProps {
   spacing?: number;
   height?: number;
 }
 
-export function SavingsDivider({ spacing = 24, height = 16 }: SavingsDividerProps) {
+export function Divider({ spacing = 24, height = 16 }: DividerProps) {
   return (
     <>
       <Spacing size={spacing} />

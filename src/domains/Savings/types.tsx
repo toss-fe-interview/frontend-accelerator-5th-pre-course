@@ -6,3 +6,11 @@ export interface SavingsProduct {
   maxMonthlyAmount: number;
   availableTerms: number;
 }
+
+
+export type SavingsTabValue = 'products' | 'results';
+
+export type SavingTabListType = {
+  value: SavingsTabValue;
+  name: string;
+}[];
