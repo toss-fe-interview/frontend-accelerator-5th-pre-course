@@ -1,7 +1,8 @@
-import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { roundToThousand } from 'utils';
-import { ProductItem } from 'types/products';
+import { type ProductItem } from 'types/products';
 import { CalculatorForm } from 'types/calculate';
+import Product from './ProductItem';
 
 interface CalculationResultProps {
   // 필터된 데이터 총 연 이자율 소팅후 2개만
@@ -78,24 +79,14 @@ export default function CalculationResult({ products, userInput, onClickProduct 
       {/* 사용자가 입력한 조건에 맞는 적금 상품 중 연 이자율이 가장 높은 2개의 상품을 출력해주세요. */}
 
       {products.map(product => (
-        <ListRow
+        <button
           key={product.id}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={product.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: 3.2%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`100,000원 ~ 500,000원 | 12개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          right={product.isSelected && <Assets.Icon name="icon-check-circle-green" />}
           onClick={() => {
             onClickProduct(product.id);
           }}
-        />
+        >
+          <Product product={product} isActive={product.isSelected} />
+        </button>
       ))}
 
       <Spacing size={40} />
