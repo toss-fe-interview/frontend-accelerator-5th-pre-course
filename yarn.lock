@@ -827,6 +827,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@standard-schema/spec@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@standard-schema/spec@npm:1.0.0"
+  checksum: 10c0/a1ab9a8bdc09b5b47aa8365d0e0ec40cc2df6437be02853696a0e377321653b0d3ac6f079a8c67d5ddbe9821025584b1fb71d9cc041a6666a96f1fadf2ece15f
+  languageName: node
+  linkType: hard
+
 "@swc/core-darwin-arm64@npm:1.13.20":
   version: 1.13.20
   resolution: "@swc/core-darwin-arm64@npm:1.13.20"
@@ -956,6 +963,24 @@ __metadata:
   dependencies:
     "@swc/counter": "npm:^0.1.3"
   checksum: 10c0/847a5b20b131281f89d640a7ed4887fb65724807d53d334b230e84b98c21097aa10cd28a074f9ed287a6ce109e443dd4bafbe7dcfb62333d7806c4ea3e7f8aca
+  languageName: node
+  linkType: hard
+
+"@tanstack/query-core@npm:5.90.17":
+  version: 5.90.17
+  resolution: "@tanstack/query-core@npm:5.90.17"
+  checksum: 10c0/f10ba6d82d21fab5a3ad5df028090255f0da5368dad2a78cdb57426519bdb3608d284fbfe733ece139382f60ae17deb5eef14249fbff854b3791795effd8f06f
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.90.17":
+  version: 5.90.17
+  resolution: "@tanstack/react-query@npm:5.90.17"
+  dependencies:
+    "@tanstack/query-core": "npm:5.90.17"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/af722dbfbdfaa85d298963a175945d5089c714d83721320d24c3bd96ca5b74120ffff27866dfc6a45195ac6ec7ffe7e55cefd521fc03de55021bf997735d21cd
   languageName: node
   linkType: hard
 
@@ -3367,6 +3392,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nuqs@npm:^2.8.6":
+  version: 2.8.6
+  resolution: "nuqs@npm:2.8.6"
+  dependencies:
+    "@standard-schema/spec": "npm:1.0.0"
+  peerDependencies:
+    "@remix-run/react": ">=2"
+    "@tanstack/react-router": ^1
+    next: ">=14.2.0"
+    react: ">=18.2.0 || ^19.0.0-0"
+    react-router: ^5 || ^6 || ^7
+    react-router-dom: ^5 || ^6 || ^7
+  peerDependenciesMeta:
+    "@remix-run/react":
+      optional: true
+    "@tanstack/react-router":
+      optional: true
+    next:
+      optional: true
+    react-router:
+      optional: true
+    react-router-dom:
+      optional: true
+  checksum: 10c0/51cd3cbc77903688844daa2f189ce5548db05f43b9e98a62cd5fd0e62334dd270e413cfd9365ebcaa08d38be77bd9864563bca5c2e2a237f0f80b1d8ad1c0cad
+  languageName: node
+  linkType: hard
+
 "object-assign@npm:^4.1.1":
   version: 4.1.1
   resolution: "object-assign@npm:4.1.1"
@@ -4392,6 +4444,7 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
     "@hono/vite-dev-server": "npm:^0.18.0"
+    "@tanstack/react-query": "npm:^5.90.17"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8.18.2"
@@ -4404,6 +4457,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.3"
     eslint-plugin-react-hooks: "npm:^5.1.0"
     hono: "npm:^4.6.16"
+    nuqs: "npm:^2.8.6"
     prettier: "npm:^3.4.2"
     react: "npm:^18"
     react-dom: "npm:^18"
