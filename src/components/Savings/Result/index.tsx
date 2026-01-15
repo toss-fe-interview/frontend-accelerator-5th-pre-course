@@ -2,8 +2,9 @@ import { Spacing } from 'tosslib';
 import { ExpectedProfit } from './ExpectedProfit';
 import { GoalDifference } from './GoalDifference';
 import { RecommendedDeposit } from './RecommendedDeposit';
-import { useSavingsContext } from '../index';
 import { EmptyState } from '../EmptyState';
+import type { SavingsProduct } from '..';
+import type { SavingsCalculatorState } from '../Calculator/useSavingsCalculator';
 
 function calculateExpectedProfit(monthlyDeposit: number, period: number, annualRate: number): number {
   // 최종 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
@@ -22,12 +23,16 @@ function calculateRecommendedDeposit(goalAmount: number, period: number, annualR
   return Math.round(rawAmount / 1000) * 1000;
 }
 
-function ResultRoot() {
-  const { selectedProductId, products, calculatorState } = useSavingsContext();
+interface ResultProps {
+  selectedProductId: string | null;
+  products: SavingsProduct[];
+  calculatorState: SavingsCalculatorState;
+}
 
+function ResultRoot({ selectedProductId, products, calculatorState }: ResultProps) {
   if (!selectedProductId) return <EmptyState message="상품을 선택해주세요" />;
 
-  const selectedProduct = products.find((p) => p.id === selectedProductId);
+  const selectedProduct = products.find(p => p.id === selectedProductId);
   if (!selectedProduct) return <EmptyState message="상품을 선택해주세요" />;
 
   const monthlyDeposit = Number(calculatorState.monthlyDeposit) || 0;

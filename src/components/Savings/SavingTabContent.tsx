@@ -1,13 +1,11 @@
 import { ReactNode } from 'react';
 import { SavingsTabValue } from 'pages/SavingsCalculatorPage';
-import { useSavingsContext } from './index';
 
 interface SavingTabContentProps {
+  selectedTab: SavingsTabValue;
   renderProps: (tab: SavingsTabValue) => ReactNode;
 }
 
-export function SavingTabContent({ renderProps }: SavingTabContentProps) {
-  const { selectedTab } = useSavingsContext();
-
+export function SavingTabContent({ selectedTab, renderProps }: SavingTabContentProps) {
   return <>{renderProps(selectedTab)}</>;
 }

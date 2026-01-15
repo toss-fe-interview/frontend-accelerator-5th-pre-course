@@ -21,3 +21,7 @@ export function filterSavingsProducts(
     return isValidAmount && isValidPeriod;
   });
 }
+
+export function getTopRateProducts(products: SavingsProduct[], count: number): SavingsProduct[] {
+  return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, count);
+}

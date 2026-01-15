@@ -4,9 +4,9 @@ interface SavingsNavigationBarProps {
   title?: string;
 }
 
-export function SavingsNavigationBar({ title = '적금 계산기' }: SavingsNavigationBarProps) {
+export function SavingsNavigationBar({ title }: SavingsNavigationBarProps) {
   return <>
-  <NavigationBar title={title} />;
-     <Spacing size={16} />
-    </>
+    <NavigationBar title={title} />
+    <Spacing size={16} />
+  </>
 }
