@@ -13,6 +13,11 @@ export interface SavingsFormInput {
   terms: number;
 }
 
+export interface CalculateSavingsParams {
+  formData: SavingsFormInput;
+  annualRate: number;
+}
+
 export interface CalculationResult {
   expectedAmount: number;
   difference: number;
