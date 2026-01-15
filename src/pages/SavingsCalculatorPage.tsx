@@ -1,4 +1,5 @@
 import { fetchProducts } from 'domains/Savings/api/fetchProducts';
+import { CalculationResultItem } from 'domains/Savings/components/CalculationResultItem';
 import { Divider } from 'domains/Savings/components/Divider';
 import { ProductList } from 'domains/Savings/components/ProductList';
 import { RecommendedProduct } from 'domains/Savings/components/RecommendedProduct';
@@ -8,7 +9,7 @@ import { SavingTabContent } from 'domains/Savings/components/SavingTabContent';
 import type { SavingsProduct, SavingsTabValue, SavingTabListType } from 'domains/Savings/types';
 import { calculateExpectedProfit, calculateGoalDifference, calculateRecommendedDeposit, filterSavingsProducts, getTopRateProducts } from 'domains/Savings/utils/savings';
 import React, { useState, useEffect } from 'react';
-import { TextField, Spacing, SelectBottomSheet, ListRow, colors } from 'tosslib';
+import { TextField, Spacing, SelectBottomSheet, ListRow } from 'tosslib';
 
 
 export function SavingsCalculatorPage() {
@@ -97,39 +98,9 @@ export function SavingsCalculatorPage() {
                 ) : (
                   <>
                     <Spacing size={8} />
-                    <ListRow
-                      contents={
-                        <ListRow.Texts
-                          type="2RowTypeA"
-                          top="예상 수익 금액"
-                          topProps={{ color: colors.grey600 }}
-                          bottom={`${expectedProfit.toLocaleString()}원`}
-                          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                        />
-                      }
-                    />
-                    <ListRow
-                      contents={
-                        <ListRow.Texts
-                          type="2RowTypeA"
-                          top="목표 금액과의 차이"
-                          topProps={{ color: colors.grey600 }}
-                          bottom={`${goalDifference.toLocaleString()}원`}
-                          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                        />
-                      }
-                    />
-                    <ListRow
-                      contents={
-                        <ListRow.Texts
-                          type="2RowTypeA"
-                          top="추천 월 납입 금액"
-                          topProps={{ color: colors.grey600 }}
-                          bottom={`${recommendedDeposit.toLocaleString()}원`}
-                          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                        />
-                      }
-                    />
+                    <CalculationResultItem name="예상 수익 금액" price={expectedProfit} />
+                    <CalculationResultItem name="목표 금액과의 차이" price={goalDifference} />
+                    <CalculationResultItem name="추천 월 납입 금액" price={recommendedDeposit} />
                   </>
                 )}
                 <RecommendedProduct title="추천 상품 목록">
