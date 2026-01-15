@@ -1,6 +1,13 @@
+import { useSavingsProductsQuery } from 'entities/savings/api';
 import { SAVINGS_DURATIONS } from 'entities/savings/config/constant';
-import { extractNumbers, formatNumberWithCommas } from 'entities/savings/lib';
-import { SavingsTab, useSavingsProducts } from 'entities/savings/model';
+import {
+  extractNumbers,
+  formatNumberWithCommas,
+  getAvailableSavingsProducts,
+  getRecommendedSavingsProducts,
+  getSelectedSavingsProduct,
+} from 'entities/savings/lib';
+import { SavingsTab } from 'entities/savings/model';
 import { useState } from 'react';
 import {
   Assets,
@@ -16,16 +23,20 @@ import {
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
+  const [tab, setTab] = useState<SavingsTab>('products');
   const [targetAmount, setTargetAmount] = useState('');
+  const savingsProductsQuery = useSavingsProductsQuery();
   const [monthlyDeposit, setMonthlyDeposit] = useState('');
   const [savingDuration, setSavingDuration] = useState(12);
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState('');
-  const [tab, setTab] = useState<SavingsTab>('products');
-  const { filteredSavingsProducts, recommendedSavingsProducts, selectedSavingsProduct } = useSavingsProducts({
-    savingDuration,
+
+  const availableSavingsProducts = getAvailableSavingsProducts({
+    products: savingsProductsQuery.data,
     monthlyDeposit,
-    selectedSavingsProductId,
+    savingDuration,
   });
+  const recommendedSavingsProducts = getRecommendedSavingsProducts(availableSavingsProducts);
+  const selectedSavingsProduct = getSelectedSavingsProduct(availableSavingsProducts, selectedSavingsProductId);
 
   const onTargetPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTargetAmount(extractNumbers(e.target.value));
@@ -87,7 +98,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
       {tab === 'products' &&
-        filteredSavingsProducts?.map(product => (
+        availableSavingsProducts?.map(product => (
           <ListRow
             key={product.id}
             contents={
@@ -112,7 +123,6 @@ export function SavingsCalculatorPage() {
           {selectedSavingsProduct && (
             <>
               <Spacing size={8} />
-
               <ListRow
                 contents={
                   <ListRow.Texts
@@ -166,7 +176,7 @@ export function SavingsCalculatorPage() {
           {!selectedSavingsProduct && (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
           )}
-          {recommendedSavingsProducts?.length > 0 && (
+          {recommendedSavingsProducts.length > 0 && (
             <>
               <Spacing size={8} />
               <Border height={16} />
@@ -175,7 +185,7 @@ export function SavingsCalculatorPage() {
                 title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
               />
               <Spacing size={12} />
-              {recommendedSavingsProducts?.map(product => (
+              {recommendedSavingsProducts.map(product => (
                 <ListRow
                   key={product.id}
                   contents={
