@@ -77,7 +77,7 @@ export function SavingsCalculatorPage() {
       {tabValue === 'products' && (
         <SavingsProductsList
           products={hasAllFilterValues ? filteredProducts : savingsProducts}
-          selectedProduct={selectedSavingsProduct && selectedSavingsProduct}
+          selectedProduct={selectedSavingsProduct}
           setSelectedProduct={setSelectedSavingsProduct}
         />
       )}
@@ -87,7 +87,7 @@ export function SavingsCalculatorPage() {
           filteredProducts={filteredProducts}
           targetAmount={targetAmount}
           monthlyPayment={monthlyPayment}
-          selectedProduct={selectedSavingsProduct && selectedSavingsProduct}
+          selectedProduct={selectedSavingsProduct}
           setSelectedProduct={setSelectedSavingsProduct}
         />
       )}
