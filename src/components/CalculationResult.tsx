@@ -1,3 +1,4 @@
+import { EmptyListItem } from 'components/common/EmptyListItem';
 import { colors, ListRow } from 'tosslib';
 
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
@@ -11,10 +12,13 @@ import { formatAmount } from 'utils/formatAmount';
 
 interface CalculationResultProps {
   formState: SavingsCalculatorFormState;
-  selectedSavingsProduct: SavingsProduct;
+  selectedSavingsProduct?: SavingsProduct;
 }
 
 export function CalculationResult({ formState, selectedSavingsProduct }: CalculationResultProps) {
+  if (!selectedSavingsProduct) {
+    return <EmptyListItem message="상품을 선택해주세요." />;
+  }
   const finalAmount = calculateFinalAmount(formState.monthlyAmount, formState.term, selectedSavingsProduct.annualRate);
   const differenceAmount = calculateDifferenceAmount(formState.targetAmount, finalAmount);
   const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(

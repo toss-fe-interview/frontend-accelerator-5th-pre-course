@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 import { CalculationResult } from 'components/CalculationResult';
-import { EmptyListItem } from 'components/common/EmptyListItem';
 import { SavingsProductList } from 'components/SavingsProductList';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
@@ -121,13 +120,7 @@ export function SavingsCalculatorPage() {
         <>
           <Spacing size={8} />
 
-          <>
-            {selectedSavingsProduct ? (
-              <CalculationResult formState={formState} selectedSavingsProduct={selectedSavingsProduct} />
-            ) : (
-              <EmptyListItem message="상품을 선택해주세요." />
-            )}
-          </>
+          <CalculationResult formState={formState} selectedSavingsProduct={selectedSavingsProduct} />
 
           <Spacing size={8} />
           <Border height={16} />
