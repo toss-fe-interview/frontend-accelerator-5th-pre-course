@@ -3,8 +3,10 @@ import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
 import { SavingsGoalFormData } from 'features/calculate-savings/model/types';
 import CalculationResult from 'features/calculate-savings/ui/CalculationResult';
 import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
+import { getRecommendedProducts } from 'features/recommend-products/model/filter';
+import RecommendedProducts from 'features/recommend-products/ui/RecommendedProducts';
 import { useSavingsProducts } from 'features/savings-product/api/useSavingsProducts';
-import { SavingsProductFilter } from 'features/savings-product/model/types';
+import { SavingsProductFilter } from 'features/savings-product/model/filters';
 import { useCallback, useMemo, useState } from 'react';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 
@@ -29,6 +31,13 @@ export function SavingsCalculatorPage() {
 
   const { data: products } = useSavingsProducts(memoizedFilter);
 
+  const recommendedProducts = useMemo(() => {
+    if (filter.monthlyAmount <= 0) {
+      return [];
+    }
+    return getRecommendedProducts(products, filter.monthlyAmount, filter.term).slice(0, 2);
+  }, [products, filter.monthlyAmount, filter.term]);
+
   const handleSelectProduct = (product: SavingsProduct) => {
     setSelectedProduct(product);
   };
@@ -36,6 +45,7 @@ export function SavingsCalculatorPage() {
   const handleChangeFilter = useCallback((data: SavingsGoalFormData) => {
     setFilter(data);
   }, []);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -67,15 +77,16 @@ export function SavingsCalculatorPage() {
           />
         ))}
       {activeTab === 'results' && (
-        <CalculationResult
-          selectedProduct={selectedProduct}
-          targetAmount={filter.targetAmount}
-          monthlyAmount={filter.monthlyAmount}
-          term={filter.term}
-        />
+        <>
+          <CalculationResult
+            selectedProduct={selectedProduct}
+            targetAmount={filter.targetAmount}
+            monthlyAmount={filter.monthlyAmount}
+            term={filter.term}
+          />
+          <RecommendedProducts selectedProduct={selectedProduct} products={recommendedProducts} />
+        </>
       )}
-
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
     </>
   );
 }

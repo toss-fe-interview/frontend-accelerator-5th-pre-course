@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getSavingsProducts } from 'entities/savings-product/api/savingsProductApi';
-import { filterSavingsProducts, SavingsProductFilter } from '../model/types';
+import { filterSavingsProducts, SavingsProductFilter } from '../model/filters';
 import { useMemo } from 'react';
 
 export function useSavingsProducts(filter: SavingsProductFilter) {
