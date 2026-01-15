@@ -1,16 +1,11 @@
 import { useState } from 'react';
-import { ProductItem } from './ProductsContainer';
 import { Border, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import CalculationResult from './CalculationResult';
 import ProductList from './ProductList';
+import { ProductItem } from 'types/products';
+import { CalculatorForm } from 'types/calculate';
 
 type Tabs = 'products' | 'results';
-export type CalculatorForm = {
-  targetAmount: string;
-  monthlyPayment: string;
-  // 6, 12, 24
-  savingPeriod: number;
-};
 
 interface SavingCalculatorProps {
   products: ProductItem[];

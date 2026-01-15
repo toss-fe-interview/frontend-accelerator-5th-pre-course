@@ -1,12 +1,7 @@
 import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
-import { ProductItem } from './ProductsContainer';
-import { CalculatorForm } from './SavingCalculator';
-
-function roundToThousand(value: number) {
-  // +1, -1
-  const sign = Math.sign(value);
-  return sign * Math.round(Math.abs(value) / 1000) * 1000;
-}
+import { roundToThousand } from 'utils';
+import { ProductItem } from 'types/products';
+import { CalculatorForm } from 'types/calculate';
 
 interface CalculationResultProps {
   // 필터된 데이터 총 연 이자율 소팅후 2개만
@@ -19,6 +14,8 @@ export default function CalculationResult({ products, userInput, onClickProduct 
   // 1. isSelected을 찾아서, 그 정보와 formData를 계산해서 표출시켜줌.
 
   const selectedProduct = products.find(product => product.isSelected);
+
+  // TODO: 리액트와는 상관없는 비즈니스 로직임. 별도 추출이 필요.
   // 예상 수익 금액
   const expectedReturnAmount =
     Number(userInput.monthlyPayment) * userInput.savingPeriod * (1 + (selectedProduct?.annualRate || 0) * 0.5);

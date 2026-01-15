@@ -1,5 +1,5 @@
 import { Assets, colors, ListRow } from 'tosslib';
-import { ProductItem } from './ProductsContainer';
+import { ProductItem } from 'types/products';
 
 interface ProductListProps {
   // 필터된 products

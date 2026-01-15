@@ -1,10 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { getProducts, ProductResponseDto } from 'utils/api';
+import { getProducts } from 'utils/api';
 import SavingCalculator from './SavingCalculator';
-
-// TODO: 타입 위치 옮겨야함.
-export type ProductItem = ProductResponseDto & { isSelected: boolean };
+import { ProductItem } from 'types/products';
 
 export default function ProductContainer() {
   const { data } = useSuspenseQuery({
