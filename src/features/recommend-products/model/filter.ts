@@ -1,12 +1,9 @@
 import { SavingsProduct } from 'entities/savings-product/model/types';
+import { validateRecommendedProducts } from './validator';
 
 function getRecommendedProducts(products: SavingsProduct[], monthlyAmount: number, term: number) {
   return products
-    .filter(product => {
-      const isValidAmount = product.minMonthlyAmount <= monthlyAmount && product.maxMonthlyAmount >= monthlyAmount;
-      const isValidTerm = product.availableTerms === term;
-      return isValidAmount && isValidTerm;
-    })
+    .filter(product => validateRecommendedProducts(product, monthlyAmount, term))
     .sort((a, b) => b.annualRate - a.annualRate);
 }
 
