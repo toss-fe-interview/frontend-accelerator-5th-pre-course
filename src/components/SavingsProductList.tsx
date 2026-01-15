@@ -5,7 +5,7 @@ import { formatNumber } from 'utils/format.ts';
 interface SavingsProductListProps {
   products: SavingsProduct[];
   selectedProductId: string | null;
-  onProductSelect: (productId: string) => void;
+  onProductSelect?: (productId: string) => void;
 }
 
 const SavingsProductList = ({ products, selectedProductId, onProductSelect }: SavingsProductListProps) => {
@@ -24,7 +24,7 @@ const SavingsProductList = ({ products, selectedProductId, onProductSelect }: Sa
         />
       }
       right={product.id === selectedProductId ? <Assets.Icon name="icon-check-circle-green" /> : null}
-      onClick={() => onProductSelect(product.id)}
+      onClick={() => onProductSelect?.(product.id)}
     />
   ));
 };

@@ -70,7 +70,7 @@ export function SavingsCalculatorPage() {
       {selectedTab === 'productList' ? (
         renderProductList()
       ) : (
-        <CalculationResult formData={formData} selectedProduct={selectedProduct} />
+        <CalculationResult formData={formData} selectedProduct={selectedProduct} filteredProducts={filteredProducts} />
       )}
     </>
   );
