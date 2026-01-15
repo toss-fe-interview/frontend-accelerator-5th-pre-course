@@ -120,27 +120,30 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {savingProducts.map(product => (
-        <ListRow
-          key={product.id}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={product.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: ${product.annualRate}%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          right={selectedSavingProduct === product.id && <Assets.Icon name="icon-check-circle-green" />}
-          onClick={() => setSelectedSavingProduct(product.id)}
-        />
-      ))}
+      {savingProducts.map(product => {
+        const { annualRate, minMonthlyAmount, maxMonthlyAmount, id, name, availableTerms } = product;
+        const description = `${minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${availableTerms}개월`;
+        return (
+          <ListRow
+            key={id}
+            contents={
+              <ListRow.Texts
+                type="3RowTypeA"
+                top={name}
+                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                middle={`연 이자율: ${annualRate}%`}
+                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                bottom={description}
+                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+              />
+            }
+            right={selectedSavingProduct === id && <Assets.Icon name="icon-check-circle-green" />}
+            onClick={() => setSelectedSavingProduct(id)}
+          />
+        );
+      })}
 
-      {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
-      {/* <Spacing size={8} />
+      <Spacing size={8} />
 
       <ListRow
         contents={
@@ -212,7 +215,7 @@ export function SavingsCalculatorPage() {
         onClick={() => {}}
       />
 
-      <Spacing size={40} /> */}
+      <Spacing size={40} />
 
       {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
       {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
