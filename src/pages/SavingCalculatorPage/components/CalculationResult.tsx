@@ -2,19 +2,14 @@ import { SavingProduct } from 'models/SavingProduct';
 import { colors, ListRow } from 'tosslib';
 import { priceFormatterToString } from 'utils/priceFormatter';
 import { roundToUnit } from 'utils/math';
+import { SavingCalculationParams } from '../hooks/useSavingCalculationParams';
 
 interface CalculationResultProps {
   selectedSavingProduct: SavingProduct;
-  targetAmount: number;
-  monthlyPayment: number;
-  term: number;
+  calculationParams: SavingCalculationParams;
 }
-export const CalculationResult = ({
-  selectedSavingProduct,
-  targetAmount,
-  monthlyPayment,
-  term,
-}: CalculationResultProps) => {
+export const CalculationResult = ({ selectedSavingProduct, calculationParams }: CalculationResultProps) => {
+  const { targetAmount, monthlyPayment, term } = calculationParams;
   const annualRate = selectedSavingProduct.annualRate / 100;
   const expectedProfit = monthlyPayment * term * (1 + annualRate * 0.5);
   const diffFromTargetAmount = targetAmount - expectedProfit;

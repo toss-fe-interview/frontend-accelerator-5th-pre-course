@@ -6,6 +6,7 @@ import { SavingProductList } from './components/SavingProductList';
 import { CalculationResult } from './components/CalculationResult';
 import { NavigationTab } from 'components/NavigationTab';
 import { PriceTextField } from 'components/PriceTextField';
+import { useSavingCalculationParams } from './hooks/useSavingCalculationParams';
 
 const SELECT_TERM_OPTIONS = [
   { value: 6, label: '6개월' },
@@ -14,9 +15,8 @@ const SELECT_TERM_OPTIONS = [
 ];
 
 export function SavingsCalculatorPage() {
-  const [targetAmount, setTargetAmount] = useState<number>(1000000);
-  const [monthlyPayment, setMonthlyPayment] = useState<number>(50000);
-  const [term, setTerm] = useState<number>(12);
+  const { calculationParams, updateCalculationParams } = useSavingCalculationParams();
+  const { targetAmount, monthlyPayment, term } = calculationParams;
 
   const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingProduct | null>(null);
 
@@ -39,21 +39,21 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         value={targetAmount}
-        onChange={setTargetAmount}
+        onChange={value => updateCalculationParams({ targetAmount: value })}
       />
       <Spacing size={16} />
       <PriceTextField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         value={monthlyPayment}
-        onChange={setMonthlyPayment}
+        onChange={value => updateCalculationParams({ monthlyPayment: value })}
       />
       <Spacing size={16} />
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={term}
-        onChange={value => setTerm(value)}
+        onChange={value => updateCalculationParams({ term: value })}
       >
         {SELECT_TERM_OPTIONS.map(option => (
           <SelectBottomSheet.Option key={option.value} value={option.value}>
@@ -88,9 +88,7 @@ export function SavingsCalculatorPage() {
                 {selectedSavingProduct ? (
                   <CalculationResult
                     selectedSavingProduct={selectedSavingProduct}
-                    targetAmount={targetAmount}
-                    monthlyPayment={monthlyPayment}
-                    term={term}
+                    calculationParams={calculationParams}
                   />
                 ) : (
                   <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
@@ -104,13 +102,11 @@ export function SavingsCalculatorPage() {
                   title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
                 />
                 <Spacing size={12} />
-
                 <SavingProductList
                   savingsProducts={savingsProducts.slice(0, 2) ?? []}
                   selectedSavingProduct={selectedSavingProduct}
                   selectSavingProduct={product => setSelectedSavingProduct(product)}
                 />
-
                 <Spacing size={40} />
               </div>
             ),
