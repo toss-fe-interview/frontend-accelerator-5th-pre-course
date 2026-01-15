@@ -12,6 +12,16 @@ import {
   TextField,
 } from 'tosslib';
 
+// features의 어딘가... type 폴더
+type SavingProduct = {
+  id: string;
+  name: string;
+  annualRate: number;
+  minMonthlyAmount: number;
+  maxMonthlyAmount: number;
+  availableTerms: number;
+};
+
 // constants/regex
 const CHECK_AMOUNT_REGEX = /^[0-9]*$/;
 
@@ -27,11 +37,14 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState('');
   const [monthlyAmount, setMonthlyAmount] = useState('');
   const [savingPeriod, setSavingPeriod] = useState(12);
+  const [selectedTab, setSelectedTab] = useState('products');
+  const [selectedSavingProduct, setSelectedSavingProduct] = useState('savings-001');
 
   console.log(targetAmount, monthlyAmount, savingPeriod);
 
   return (
     <>
+      {/* 적금 계산기 컴포넌트 시작 */}
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
@@ -76,15 +89,17 @@ export function SavingsCalculatorPage() {
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
       </SelectBottomSheet>
 
+      {/* 적금 상품 컴포넌트 끝 */}
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      {/* 탭 컴포넌트의 상위 컨트롤 래핑 컴포넌트 시작 */}
+      <Tab onChange={setSelectedTab}>
+        <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={selectedTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
@@ -101,8 +116,8 @@ export function SavingsCalculatorPage() {
             bottomProps={{ fontSize: 13, color: colors.grey600 }}
           />
         }
-        right={<Assets.Icon name="icon-check-circle-green" />}
-        onClick={() => {}}
+        right={selectedSavingProduct === 'savings-001' && <Assets.Icon name="icon-check-circle-green" />}
+        onClick={() => setSelectedSavingProduct('savings-001')}
       />
       <ListRow
         contents={
@@ -116,7 +131,8 @@ export function SavingsCalculatorPage() {
             bottomProps={{ fontSize: 13, color: colors.grey600 }}
           />
         }
-        onClick={() => {}}
+        right={selectedSavingProduct === 'savings-002' && <Assets.Icon name="icon-check-circle-green" />}
+        onClick={() => setSelectedSavingProduct('savings-002')}
       />
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
@@ -196,6 +212,8 @@ export function SavingsCalculatorPage() {
 
       {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
       {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
+
+      {/* 탭 컴포넌트의 상위 컨트롤 래핑 컴포넌트 끝 */}
     </>
   );
 }
