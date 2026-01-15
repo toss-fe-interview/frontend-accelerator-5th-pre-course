@@ -1,16 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
 import { AmountDisplay } from 'components/AmountDisplay';
 import { AmountInput } from 'components/AmountInput';
 import { GetFilteredProducts } from 'components/GetFilteredProuducts';
+import { GetRecommendedProducts } from 'components/GetRecommendedProuducts';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { SavingsTermSelect } from 'components/SavingsTermSelect';
 import { TAB_STATE, Tabs } from 'components/Tabs';
 import { SavingProduct } from 'queries/types';
-import { URLS } from 'queries/urls';
 import { Suspense, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Border, http, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
-import { filterSavingsProduct } from 'utils/filterSavingsProduct';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
@@ -20,11 +18,6 @@ type CalculatorForm = {
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
-  const { data: savingProducts } = useQuery({
-    queryKey: [URLS.SAVINGS_PRODUCTS],
-    queryFn: () => http.get<SavingProduct[]>(URLS.SAVINGS_PRODUCTS),
-  });
-
   const methods = useForm<CalculatorForm>({
     defaultValues: {
       monthlyAmount: null,
@@ -33,11 +26,6 @@ export function SavingsCalculatorPage() {
     },
   });
   const { monthlyAmount, term, targetAmount } = methods.watch();
-
-  const recommendProductList = savingProducts
-    ?.filter(product => filterSavingsProduct(product, monthlyAmount ?? 0, term))
-    .sort((a, b) => b.annualRate - a.annualRate)
-    .slice(0, 2);
 
   const expectedIncome = (monthlyAmount ?? 0) * (term ?? 0) * (1 + (selectedProduct?.annualRate ?? 0) * 0.01 * 0.5);
   const targetDiff = (targetAmount ?? 0) - expectedIncome;
@@ -129,14 +117,20 @@ export function SavingsCalculatorPage() {
             />
             <Spacing size={12} />
 
-            {recommendProductList?.map(product => (
-              <SavingsProductItem
-                product={product}
-                key={product.id}
-                checked={selectedProduct?.id === product.id}
-                onClick={() => setSelectedProduct(product)}
-              />
-            ))}
+            <Suspense fallback={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />}>
+              <GetRecommendedProducts>
+                {recommendedProducts =>
+                  recommendedProducts.map(product => (
+                    <SavingsProductItem
+                      key={product.id}
+                      product={product}
+                      checked={selectedProduct?.id === product.id}
+                      onClick={() => setSelectedProduct(product)}
+                    />
+                  ))
+                }
+              </GetRecommendedProducts>
+            </Suspense>
             <Spacing size={40} />
           </>
         </Tabs.Panel>
