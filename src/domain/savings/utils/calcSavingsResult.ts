@@ -1,8 +1,8 @@
-import { SavingsProduct } from 'apis/type';
-import { SavingsFilterForm } from 'hooks/useSavingsFilterForm';
+import { SavingsForm } from '@savings/hooks';
+import type { SavingsProduct } from '@savings/apis/type';
 
 type CalcSavingResultProps = {
-  savingsFilterForm: SavingsFilterForm;
+  savingsForm: SavingsForm;
   selectedProduct?: SavingsProduct;
 };
 
@@ -16,12 +16,12 @@ export type SavingsResult = {
 };
 
 export const calcSavingResult = (props: CalcSavingResultProps): SavingsResult => {
-  const { savingsFilterForm, selectedProduct } = props;
+  const { savingsForm, selectedProduct } = props;
 
   if (!selectedProduct) {
     return { differanceFromGoal: 0, expectedReturn: 0, recommendedMonthlySaving: 0 };
   }
-  const { goalAmount, monthlySaving, savingPeriod } = savingsFilterForm;
+  const { goalAmount, monthlySaving, savingPeriod } = savingsForm;
   const { annualRate } = selectedProduct;
 
   const expectedReturn = Number(monthlySaving) * savingPeriod * (1 + annualRate + 0.5);

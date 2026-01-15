@@ -1,23 +1,34 @@
 import { useState } from 'react';
-import { Tab } from 'tosslib';
-import { SavingsFilterForm } from 'hooks/useSavingsFilterForm';
-import { CalculationResult } from './CalculationResult';
-import { SavingsProduct } from 'apis/type';
-import { useFetch } from 'hooks/useFetch';
-import { savingsApis } from 'apis';
+import { Button, ListRow, Tab } from 'tosslib';
+import { arrayIncludes } from '@shared/utils';
+import { SuspenseBoundary, SwitchCase, Delay } from '@shared/ui';
+import { calcSavingResult } from '@savings/utils';
+import { useSavingsProducts } from '@savings/hooks/queries';
 import { ProductListItem } from './ProductListItem';
-import { calcSavingResult } from 'utils/calcSavingsResult';
+import { CalculationResult } from './CalculationResult';
+import type { SavingsProduct } from '@savings/apis/type';
+import type { SavingsForm } from '@savings/hooks';
 
 type SavingsTabsProps = {
-  savingsFilterForm: SavingsFilterForm;
+  savingsForm: SavingsForm;
 };
 
+type ActiveTab = 'products' | 'results';
+
 export const SavingsTabs = (props: SavingsTabsProps) => {
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('products');
+
+  const handleChangeTab = (value: string) => {
+    if (!arrayIncludes(['products', 'results'] as const, value)) {
+      return;
+    }
+
+    setActiveTab(value);
+  };
 
   return (
     <>
-      <Tab onChange={setActiveTab}>
+      <Tab onChange={handleChangeTab}>
         <Tab.Item value="products" selected={activeTab === 'products'}>
           적금 상품
         </Tab.Item>
@@ -25,56 +36,58 @@ export const SavingsTabs = (props: SavingsTabsProps) => {
           계산 결과
         </Tab.Item>
       </Tab>
-      <Contents activeTab={activeTab} {...props} />
+      <SuspenseBoundary
+        pendingFallback={
+          <Delay>
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="데이터를 불러오고 있어요." />} />
+          </Delay>
+        }
+        rejectedFallback={({ reset }) => (
+          <ListRow
+            contents={
+              <ListRow.Texts
+                type="2RowTypeA"
+                top="데이터를 불러오는 중 오류가 발생했어요."
+                bottom={<Button onClick={reset}>다시 시도</Button>}
+              />
+            }
+          />
+        )}
+      >
+        <Contents activeTab={activeTab} {...props} />
+      </SuspenseBoundary>
     </>
   );
 };
 
-const Contents = ({ activeTab, savingsFilterForm }: SavingsTabsProps & { activeTab: string }) => {
-  const { data: savingsProducts = [] } = useFetch(savingsApis.getSavingsProducts);
-  const [selectedProduct, setSelectedProductId] = useState<SavingsProduct>();
+const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: string }) => {
+  const { data: savingsProducts } = useSavingsProducts({ filterParams: savingsForm });
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct>();
 
   const handleClickProduct = (sp: SavingsProduct) => {
-    setSelectedProductId(sp);
+    setSelectedProduct(sp);
   };
-
-  const { monthlySaving, savingPeriod } = savingsFilterForm ?? {};
-
-  const filterProduct = (savingsProduct: SavingsProduct) => {
-    const { minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
-    // 월 납입액 조건
-    const monthlyMatchs =
-      monthlySaving === '' || (Number(monthlySaving) >= minMonthlyAmount && Number(monthlySaving) <= maxMonthlyAmount);
-    // 저축 기간 조건
-    const termMathcs = availableTerms === savingPeriod;
-
-    return monthlyMatchs && termMathcs;
-  };
-
-  const filteredProduct = savingsProducts.filter(filterProduct);
 
   return (
-    <>
-      {activeTab === 'products' &&
-        filteredProduct.map(sp => (
+    <SwitchCase
+      value={activeTab}
+      caseBy={{
+        products: savingsProducts.map(p => (
           <ProductListItem
-            key={sp.id}
-            savingsProduct={sp}
+            key={p.id}
+            savingsProduct={p}
             onClick={handleClickProduct}
-            selected={sp.id === selectedProduct?.id}
+            selected={p.id === selectedProduct?.id}
           />
-        ))}
-      {activeTab === 'results' && (
-        <CalculationResult
-          result={calcSavingResult({
-            savingsFilterForm,
-            selectedProduct,
-          })}
-          recommendedProducts={[...filteredProduct].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2)}
-          selectedProduct={selectedProduct}
-          onClickProduct={handleClickProduct}
-        />
-      )}
-    </>
+        )),
+        results: (
+          <CalculationResult
+            result={calcSavingResult({ savingsForm, selectedProduct })}
+            recommendedProducts={[...savingsProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2)}
+            selectedProduct={selectedProduct}
+          />
+        ),
+      }}
+    />
   );
 };

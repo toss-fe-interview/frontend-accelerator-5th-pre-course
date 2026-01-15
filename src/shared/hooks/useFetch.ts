@@ -1,25 +1,37 @@
-import { useCallback, useEffect, useState } from 'react';
+const cache = new Map<() => Promise<any>, { status: 'pending' | 'fulfilled' | 'rejected'; value?: any; error?: any }>();
 
-export function useFetch<T>(fetcher: () => Promise<T>) {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<T>();
+export function useFetch<T>(fetcher: () => Promise<T>): { data: T } {
+  const cached = cache.get(fetcher);
 
-  const doFetch = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetcher();
-
-      setData(response);
-    } catch (e) {
-      console.error(e);
-      // error 처리
+  if (cached) {
+    if (cached.status === 'fulfilled') {
+      return { data: cached.value as T };
     }
-    setLoading(false);
-  }, [fetcher]);
+    if (cached.status === 'rejected') {
+      throw cached.error;
+    }
+    if (cached.status === 'pending') {
+      throw cached.value;
+    }
+  }
 
-  useEffect(() => {
-    doFetch();
-  }, [doFetch]);
+  const promise = fetcher()
+    .then(data => {
+      cache.set(fetcher, { status: 'fulfilled', value: data });
+      return data;
+    })
+    .catch(error => {
+      // 에러 내부에 _retry 메소드 추가
+      // Boundary내부에서 _retry를 호출하여 cache를 삭제하고 재시도
+      const errorWithRetry = error as any;
+      errorWithRetry._retry = () => {
+        cache.delete(fetcher);
+      };
 
-  return { data, loading, reset: doFetch };
+      cache.set(fetcher, { status: 'rejected', error: errorWithRetry });
+      throw errorWithRetry;
+    });
+
+  cache.set(fetcher, { status: 'pending', value: promise });
+  throw promise;
 }
