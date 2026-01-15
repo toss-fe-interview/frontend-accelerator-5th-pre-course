@@ -1,4 +1,4 @@
-import { SavingProduct } from 'pages/SavingsCalculatorPage';
+import { SavingProduct } from 'queries/types';
 import { Assets, colors, ListRow } from 'tosslib';
 
 export const SavingsProductItem = ({

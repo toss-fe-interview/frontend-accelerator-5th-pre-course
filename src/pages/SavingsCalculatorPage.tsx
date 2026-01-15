@@ -1,27 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { AmountDisplay } from 'components/AmountDisplay';
 import { AmountInput } from 'components/AmountInput';
+import { GetFilteredProducts } from 'components/GetFilteredProuducts';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { SavingsTermSelect } from 'components/SavingsTermSelect';
 import { TAB_STATE, Tabs } from 'components/Tabs';
-import { URLS } from 'consts';
-import { useState } from 'react';
+import { SavingProduct } from 'queries/types';
+import { URLS } from 'queries/urls';
+import { Suspense, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Border, http, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { filterSavingsProduct } from 'utils/filterSavingsProduct';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
   targetAmount: number | null;
   term: number;
-};
-
-export type SavingProduct = {
-  annualRate: number;
-  availableTerms: number;
-  id: string;
-  maxMonthlyAmount: number;
-  minMonthlyAmount: number;
-  name: string;
 };
 
 export function SavingsCalculatorPage() {
@@ -40,14 +34,10 @@ export function SavingsCalculatorPage() {
   });
   const { monthlyAmount, term, targetAmount } = methods.watch();
 
-  const filteredProducts = (savingProducts ?? []).filter(product => {
-    const isTermMatched = product.availableTerms === term;
-    const isMonthlyAmountMatched = monthlyAmount
-      ? product.minMonthlyAmount <= monthlyAmount && monthlyAmount <= product.maxMonthlyAmount
-      : true;
-    return isTermMatched && isMonthlyAmountMatched;
-  });
-  const recommendProductList = filteredProducts.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  const recommendProductList = savingProducts
+    ?.filter(product => filterSavingsProduct(product, monthlyAmount ?? 0, term))
+    .sort((a, b) => b.annualRate - a.annualRate)
+    .slice(0, 2);
 
   const expectedIncome = (monthlyAmount ?? 0) * (term ?? 0) * (1 + (selectedProduct?.annualRate ?? 0) * 0.01 * 0.5);
   const targetDiff = (targetAmount ?? 0) - expectedIncome;
@@ -101,14 +91,20 @@ export function SavingsCalculatorPage() {
         ]}
       >
         <Tabs.Panel value={TAB_STATE.PRODUCTS}>
-          {filteredProducts.map(product => (
-            <SavingsProductItem
-              product={product}
-              key={product.id}
-              checked={selectedProduct?.id === product.id}
-              onClick={() => setSelectedProduct(product)}
-            />
-          ))}
+          <Suspense fallback={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />}>
+            <GetFilteredProducts>
+              {filteredProducts =>
+                filteredProducts.map(product => (
+                  <SavingsProductItem
+                    key={product.id}
+                    product={product}
+                    checked={selectedProduct?.id === product.id}
+                    onClick={() => setSelectedProduct(product)}
+                  />
+                ))
+              }
+            </GetFilteredProducts>
+          </Suspense>
         </Tabs.Panel>
 
         <Tabs.Panel value={TAB_STATE.RESULTS}>
