@@ -7,7 +7,10 @@ import { SavingsProductFilter } from 'features/savings-product/model/types';
 import { useCallback, useMemo, useState } from 'react';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 
+type TabValue = 'products' | 'results';
+
 export function SavingsCalculatorPage() {
+  const [activeTab, setActiveTab] = useState<TabValue>('products');
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   const [filter, setFilter] = useState<SavingsGoalFormData>({
@@ -44,11 +47,11 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={value => setActiveTab(value as TabValue)}>
+        <Tab.Item value="products" selected={activeTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={activeTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
