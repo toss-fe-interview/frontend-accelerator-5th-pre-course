@@ -1,17 +1,9 @@
 import { useState } from 'react';
 import SavingsProductList from 'components/SavingsProductList';
 import SavingsTargetForm from 'components/SavingsTargetForm';
+import { useFilteredProducts } from 'hooks/useFilteredProducts';
 import { useSavingProducts } from 'hooks/useSavingsProducts';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  Spacing,
-  Tab,
-} from 'tosslib';
+import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { SavingsFormInput } from 'types/savings';
 
 export function SavingsCalculatorPage() {
@@ -23,7 +15,9 @@ export function SavingsCalculatorPage() {
     terms: 12,
   });
 
-  const { data, isLoading, isError } = useSavingProducts();
+  const { data: products = [], isLoading, isError } = useSavingProducts();
+
+  const filteredProducts = useFilteredProducts(products, formData.monthlyAmount, formData.terms);
 
   const renderProductList = () => {
     if (isLoading) {
@@ -32,10 +26,16 @@ export function SavingsCalculatorPage() {
     if (isError) {
       return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중에 오류가 발생했습니다." />} />;
     }
-    if (!data) {
-      return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품 데이터가 없습니다." />} />;
+    if (filteredProducts.length === 0) {
+      return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />;
     }
-    return <SavingsProductList products={data} selectedProductId={selectedProductId} onProductSelect={setSelectedProductId} />;
+    return (
+      <SavingsProductList
+        products={filteredProducts}
+        selectedProductId={selectedProductId}
+        onProductSelect={setSelectedProductId}
+      />
+    );
   };
 
   return (
