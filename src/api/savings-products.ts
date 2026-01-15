@@ -15,7 +15,7 @@ export const getSavingsProducts = async () => {
   return response;
 };
 
-export const useSavingsProducts = () => {
+export const useFetchSavingProducts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);

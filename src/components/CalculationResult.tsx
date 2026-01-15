@@ -1,4 +1,3 @@
-import React from 'react';
 import type { SavingsProduct } from 'api/savings-products';
 import { colors, ListRow } from 'tosslib';
 import { addComma } from 'utils/add-comma';
@@ -7,14 +6,45 @@ import {
   calculateRecommendedMonthlyAmount,
   calculateTargetDifference,
 } from 'utils/savings-calculator';
-import { roundNumber } from 'utils/round-number';
+import { MessageText } from './MessageText';
 
 interface CalculationResultProps {
   targetAmount?: number;
   monthlyAmount?: number;
   term: number;
-  selectedSavingsProduct?: SavingsProduct;
+  selectedSavingsProduct: SavingsProduct | null;
 }
+
+interface CalculationResultItemProps {
+  label: string;
+  value: number;
+}
+
+/*
+ * 원 단위로 반올림하는 함수
+ * @param value 숫자
+ * @param precision 소수점 자리수 (0: 원 단위, 1: 십원 단위, 2: 백원 단위, 3: 천원 단위)
+ */
+const roundToWon = (value: number, precision: number) => {
+  const multiplier = 10 ** precision;
+  return Math.round(value / multiplier) * multiplier;
+};
+
+const CalculationResultItem = ({ label, value }: CalculationResultItemProps) => {
+  return (
+    <ListRow
+      contents={
+        <ListRow.Texts
+          type="2RowTypeA"
+          top={label}
+          topProps={{ color: colors.grey600 }}
+          bottom={`${addComma(value)}원`}
+          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+        />
+      }
+    />
+  );
+};
 
 export const CalculationResult = ({
   targetAmount,
@@ -22,20 +52,20 @@ export const CalculationResult = ({
   term,
   selectedSavingsProduct,
 }: CalculationResultProps) => {
-  /**
-   * 적금 상품 선택 안한 경우
-   */
-  if (!selectedSavingsProduct) {
-    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
+  // 적금 상품 선택 안한 경우
+  const isNoSavingsProductSelected = !selectedSavingsProduct;
+  // 목표금액, 월 납입액 없는 경우
+  const isNoAmountInput = !(monthlyAmount && targetAmount);
+
+  if (isNoSavingsProductSelected) {
+    return <MessageText message="상품을 선택해주세요." />;
   }
 
-  /**
-   * 목표금액, 월 납입액 없는 경우
-   */
-  if (!(monthlyAmount && targetAmount)) {
-    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="적금 계산기를 완료해주세요." />} />;
+  if (isNoAmountInput) {
+    return <MessageText message="적금 계산기를 완료해주세요." />;
   }
 
+  // 계산
   const expectedProfit = calculateExpectedProfit(monthlyAmount, term, selectedSavingsProduct?.annualRate);
   const targetDifference = calculateTargetDifference(targetAmount, expectedProfit);
   const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(
@@ -43,45 +73,12 @@ export const CalculationResult = ({
     term,
     selectedSavingsProduct?.annualRate
   );
+
   return (
     <>
-      {targetAmount && monthlyAmount && selectedSavingsProduct && (
-        <>
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="예상 수익 금액"
-                topProps={{ color: colors.grey600 }}
-                bottom={`${addComma(roundNumber(expectedProfit, 0))}원`}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
-          />
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="목표 금액과의 차이"
-                topProps={{ color: colors.grey600 }}
-                bottom={`${addComma(roundNumber(targetDifference, 0))}원`}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
-          />
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="추천 월 납입 금액"
-                topProps={{ color: colors.grey600 }}
-                bottom={`${addComma(roundNumber(recommendedMonthlyAmount, 3))}원`}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
-          />
-        </>
-      )}
+      <CalculationResultItem label="예상 수익 금액" value={roundToWon(expectedProfit, 0)} />
+      <CalculationResultItem label="목표 금액과의 차이" value={roundToWon(targetDifference, 0)} />
+      <CalculationResultItem label="추천 월 납입 금액" value={roundToWon(recommendedMonthlyAmount, 3)} />
     </>
   );
 };

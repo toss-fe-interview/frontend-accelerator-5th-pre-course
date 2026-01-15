@@ -1,5 +1,5 @@
-import { SavingsProduct } from 'api/savings-products';
 import React from 'react';
+import { SavingsProduct } from 'api/savings-products';
 import { colors, ListRow } from 'tosslib';
 import { addComma } from 'utils/add-comma';
 
