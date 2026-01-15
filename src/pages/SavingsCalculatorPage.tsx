@@ -6,17 +6,16 @@ import { filterByMonthlyAmount, filterBySavingsTerm, orderByAnnualRate } from 'd
 import { useSavingsQueryParams } from 'hooks/useSavingsQueryParams';
 import { Suspense, useState } from 'react';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+
 type Tab = 'products' | 'results';
 export const useTab = (defaultTab: Tab): [Tab, (tab: Tab) => void] => {
   const [tab, setTab] = useState<Tab>(defaultTab);
-
   return [tab, (tab: Tab) => setTab(tab)];
 };
 
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useTab('products');
-
-  const [{ targetAmount, monthlyPayment, selectedTerm }, setSavingsQueryParams] = useSavingsQueryParams();
+  const [{ targetAmount, monthlyAmount, selectedTerm }, setSavingsQueryParams] = useSavingsQueryParams();
 
   return (
     <>
@@ -34,14 +33,15 @@ export function SavingsCalculatorPage() {
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={monthlyPayment ?? 0}
-        onChange={amount => setSavingsQueryParams({ monthlyPayment: amount })}
+        value={monthlyAmount ?? 0}
+        onChange={amount => setSavingsQueryParams({ monthlyAmount: amount })}
       />
       <Spacing size={16} />
       <SavingTermsSelect value={selectedTerm ?? 0} onChange={value => setSavingsQueryParams({ selectedTerm: value })} />
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
+
       <Tab onChange={value => setTab(value as Tab)}>
         <Tab.Item value="products" selected={tab === 'products'}>
           적금 상품
@@ -55,7 +55,7 @@ export function SavingsCalculatorPage() {
         <Suspense fallback={<ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중...." />} />}>
           <ProductList
             filters={[
-              product => filterByMonthlyAmount(product, monthlyPayment),
+              product => filterByMonthlyAmount(product, monthlyAmount),
               product => filterBySavingsTerm(product, selectedTerm),
             ]}
           />
@@ -65,20 +65,26 @@ export function SavingsCalculatorPage() {
       {tab === 'results' && (
         <Suspense fallback={<ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중..." />} />}>
           <Spacing size={8} />
+
           <CalculationResult />
+
           <Spacing size={8} />
           <Border height={16} />
           <Spacing size={8} />
+
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+
           <Spacing size={12} />
+
           <ProductList
             filters={[
-              product => filterByMonthlyAmount(product, monthlyPayment),
+              product => filterByMonthlyAmount(product, monthlyAmount),
               product => filterBySavingsTerm(product, selectedTerm),
             ]}
             sortBy={orderByAnnualRate}
             limit={2}
           />
+
           <Spacing size={40} />
         </Suspense>
       )}
