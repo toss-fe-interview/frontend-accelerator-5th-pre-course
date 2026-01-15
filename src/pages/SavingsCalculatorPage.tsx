@@ -6,9 +6,10 @@ import { EmptyListItem } from 'components/common/EmptyListItem';
 import { SavingsProductList } from 'components/SavingsProductList';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
-import { SavingsProduct } from 'types/SavingsProduct.type';
 import { filterSavingsProduct } from 'utils/filterSavingsProduct';
 import { formatTextFieldValue } from 'utils/formatTextFieldValue';
+import { sanitizeAmount } from 'utils/sanitizeAmount';
+import { validateAmount } from 'utils/validateAmount';
 
 /**
  * 개선할 부분
@@ -25,23 +26,6 @@ export function SavingsCalculatorPage() {
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
-  const handleChangeTextField = (key: keyof SavingsCalculatorFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (value === '') {
-      setFormState({ ...formState, [key]: 0 });
-      return;
-    }
-
-    const digits = value.replace(/[^0-9]/g, '');
-    const parsedValue = Number(digits);
-
-    if (isNaN(parsedValue) || parsedValue <= 0) {
-      return;
-    }
-    setFormState({ ...formState, [key]: parsedValue });
-  };
-
   const filteredSavingsProducts = savingsProducts.filter(savingsProduct =>
     filterSavingsProduct(savingsProduct, formState)
   );
@@ -49,10 +33,6 @@ export function SavingsCalculatorPage() {
   const recommendedSavingsProducts = [...filteredSavingsProducts]
     .sort((a, b) => b.annualRate - a.annualRate)
     .slice(0, 2);
-
-  const handleSelectProduct = (savingsProduct: SavingsProduct | null) => {
-    setSelectedSavingsProductId(savingsProduct?.id || null);
-  };
 
   const selectedSavingsProduct = filteredSavingsProducts.find(
     savingsProduct => savingsProduct.id === selectedSavingsProductId
@@ -70,7 +50,17 @@ export function SavingsCalculatorPage() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={formatTextFieldValue(formState.targetAmount)}
-        onChange={handleChangeTextField('targetAmount')}
+        onChange={e => {
+          const value = e.target.value;
+          if (value === '') {
+            setFormState({ ...formState, targetAmount: 0 });
+            return;
+          }
+          const targetAmount = sanitizeAmount(value);
+          if (validateAmount(targetAmount)) {
+            setFormState({ ...formState, targetAmount });
+          }
+        }}
       />
       <Spacing size={16} />
       <TextField
@@ -78,7 +68,17 @@ export function SavingsCalculatorPage() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={formatTextFieldValue(formState.monthlyAmount)}
-        onChange={handleChangeTextField('monthlyAmount')}
+        onChange={e => {
+          const value = e.target.value;
+          if (value === '') {
+            setFormState({ ...formState, monthlyAmount: 0 });
+            return;
+          }
+          const monthlyAmount = sanitizeAmount(value);
+          if (validateAmount(monthlyAmount)) {
+            setFormState({ ...formState, monthlyAmount });
+          }
+        }}
       />
       <Spacing size={16} />
       <SelectBottomSheet
@@ -111,7 +111,7 @@ export function SavingsCalculatorPage() {
         <SavingsProductList
           savingsProducts={filteredSavingsProducts}
           selectedSavingsProductId={selectedSavingsProductId}
-          handleSelectProduct={handleSelectProduct}
+          handleSelectProduct={savingsProduct => setSelectedSavingsProductId(savingsProduct?.id || null)}
           emptyText="적합한 적금 상품이 없습니다."
         />
       )}
@@ -139,7 +139,7 @@ export function SavingsCalculatorPage() {
           <SavingsProductList
             savingsProducts={recommendedSavingsProducts}
             selectedSavingsProductId={selectedSavingsProductId}
-            handleSelectProduct={handleSelectProduct}
+            handleSelectProduct={savingsProduct => setSelectedSavingsProductId(savingsProduct?.id || null)}
             emptyText="적합한 추천 상품이 없습니다."
           />
 
