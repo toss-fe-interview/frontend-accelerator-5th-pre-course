@@ -42,7 +42,6 @@ export function ProductTabs({
     loadProducts();
   }, []);
 
-  // 필터링 로직
   const hasAllValues = targetAmount && monthlyAmount && savingTerms;
   const filteredProducts = hasAllValues
     ? products.filter(product => {
@@ -73,6 +72,7 @@ export function ProductTabs({
           expectedProfit={expectedProfit}
           diffAmount={diffAmount}
           recommendMonthlyPayment={recommendMonthlyPayment}
+          filteredProducts={filteredProducts}
         />
       )}
     </>
