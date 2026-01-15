@@ -1,10 +1,10 @@
 import CalculatorForm from 'component/CalculatorForm';
+import Tabs from 'component/Tabs';
 import { useSavingsProducts } from 'hooks/useSavingsProducts';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
-
-type TabValue = 'products' | 'results';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { TabValue } from 'types/calculator';
 
 export function SavingsCalculatorPage() {
   // 폼 상태
@@ -56,7 +56,6 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
 
       {/* 폼 입력 영역 */}
-
       <CalculatorForm />
 
       <Spacing size={24} />
@@ -64,14 +63,7 @@ export function SavingsCalculatorPage() {
       <Spacing size={8} />
 
       {/* 탭 */}
-      <Tab onChange={value => setSelectedTab(value as TabValue)}>
-        <Tab.Item value="products" selected={selectedTab === 'products'}>
-          적금 상품
-        </Tab.Item>
-        <Tab.Item value="results" selected={selectedTab === 'results'}>
-          계산 결과
-        </Tab.Item>
-      </Tab>
+      <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
       {/* 적금 상품 탭 */}
       {selectedTab === 'products' && (
