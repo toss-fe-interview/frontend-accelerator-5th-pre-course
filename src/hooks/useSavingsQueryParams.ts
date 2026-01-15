@@ -3,7 +3,7 @@ import { useQueryStates, parseAsInteger } from 'nuqs';
 export function useSavingsQueryParams() {
   return useQueryStates({
     targetAmount: parseAsInteger,
-    monthlyPayment: parseAsInteger,
+    monthlyAmount: parseAsInteger,
     selectedTerm: parseAsInteger,
   });
 }

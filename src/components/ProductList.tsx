@@ -17,8 +17,8 @@ export function ProductList({ filters, sortBy, limit }: ProductListProps) {
   const { data: products } = useSavingsProductsQuery({ filters, sortBy, limit });
   const [selectedProductId, setSelectedProductId] = useSelectedProductId();
 
-  const handleSelectProduct = (producId: string) => {
-    setSelectedProductId(producId);
+  const handleSelectProduct = (productId: string) => {
+    setSelectedProductId(productId);
   };
 
   if (products.length === 0) {
