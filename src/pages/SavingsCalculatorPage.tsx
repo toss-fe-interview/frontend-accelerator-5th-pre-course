@@ -3,10 +3,10 @@ import { Border, http, ListHeader, ListRow, NavigationBar, Spacing, Tab } from '
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { URLS } from 'consts';
-import { KRWInput } from 'components/pages/KRWInput';
-import { NumberSelect } from 'components/pages/NumberSelect';
-import { SavingsProductItem } from 'components/pages/SavingsProductItem';
-import { AmountDisplay } from 'components/pages/AmountDisplay';
+import { KRWInput } from 'components/KRWInput';
+import { NumberSelect } from 'components/NumberSelect';
+import { SavingsProductItem } from 'components/SavingsProductItem';
+import { AmountDisplay } from 'components/AmountDisplay';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
