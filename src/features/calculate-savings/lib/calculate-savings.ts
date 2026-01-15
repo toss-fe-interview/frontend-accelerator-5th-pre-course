@@ -1,5 +1,12 @@
+import { CALCULATION_CONFIG } from '../model/constants';
+
+function getDepositAmount(term: number, annualRate: number) {
+  const { DEPOSIT_AMOUNT_COEFFICIENT, PERCENT_TO_DECIMAL } = CALCULATION_CONFIG;
+  return term * (1 + annualRate * DEPOSIT_AMOUNT_COEFFICIENT * PERCENT_TO_DECIMAL);
+}
+
 function calculateExpectedProfit(monthlyAmount: number, term: number, annualRate: number) {
-  return monthlyAmount * term * (1 + annualRate * 0.5 * 0.01);
+  return monthlyAmount * getDepositAmount(term, annualRate);
 }
 
 function calculateDifference(targetAmount: number, expectedProfit: number) {
@@ -7,7 +14,7 @@ function calculateDifference(targetAmount: number, expectedProfit: number) {
 }
 
 function calculateRecommendedMonthlyAmount(targetAmount: number, term: number, annualRate: number) {
-  const calculated = targetAmount / (term * (1 + annualRate * 0.5));
+  const calculated = targetAmount / getDepositAmount(term, annualRate);
   return Math.round(calculated / 1000) * 1000;
 }
 
