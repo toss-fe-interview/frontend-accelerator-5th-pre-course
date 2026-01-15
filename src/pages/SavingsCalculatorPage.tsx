@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import { Assets, Border, colors, ListRow, NavigationBar, SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { useSavingsCalculatorForm } from 'features/savings-calculator/model/useSavingsCalculatorForm';
@@ -76,11 +76,19 @@ export function SavingsCalculatorPage() {
         <Tabs.List />
         <Tabs.Content value="products">
           <Suspense>
-            <ProductListContent
-              monthlyAmount={monthlyAmount}
-              availableTerms={availableTerms}
-              selectedProductId={selectedProduct?.id}
-              onSelectProduct={setSelectedProduct}
+            <ProductList
+              filterBy={product =>
+                product.minMonthlyAmount <= monthlyAmount &&
+                product.maxMonthlyAmount >= monthlyAmount &&
+                product.availableTerms <= availableTerms
+              }
+              renderItem={product => (
+                <ProductListItem
+                  product={product}
+                  isSelected={selectedProduct?.id === product.id}
+                  onClick={() => setSelectedProduct(product)}
+                />
+              )}
             />
           </Suspense>
         </Tabs.Content>
@@ -99,22 +107,31 @@ export function SavingsCalculatorPage() {
   );
 }
 
-function ProductListContent({
-  monthlyAmount,
-  availableTerms,
-  selectedProductId,
-  onSelectProduct,
+function ProductList({
+  filterBy,
+  renderItem,
 }: {
-  monthlyAmount: number;
-  availableTerms: number;
-  selectedProductId?: string;
-  onSelectProduct: (product: SavingsProduct) => void;
+  filterBy: (product: SavingsProduct) => boolean;
+  renderItem: (product: SavingsProduct) => React.ReactNode;
 }) {
-  const { products } = useSavingsProducts({ monthlyAmount, availableTerms });
+  const { products } = useSavingsProducts();
+  const filteredProducts = products.filter(filterBy);
 
-  return products.map((product: SavingsProduct) => (
+  return filteredProducts.map(product => <React.Fragment key={product.id}>{renderItem(product)}</React.Fragment>);
+}
+
+function ProductListItem({
+  product,
+  isSelected,
+  onClick,
+}: {
+  product: SavingsProduct;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  return (
     <ListRow
-      key={product.id}
+      onClick={onClick}
       contents={
         <ListRow.Texts
           type="3RowTypeA"
@@ -126,13 +143,11 @@ function ProductListContent({
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
-      right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-      onClick={() => onSelectProduct(product)}
+      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
     />
-  ));
+  );
 }
 
-// SavingsCalculatorResults 내부를 꺼냄
 function ResultsContent({
   targetAmount,
   monthlyAmount,
