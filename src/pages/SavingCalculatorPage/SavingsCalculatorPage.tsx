@@ -1,18 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { isSuitableSavingProduct, SavingProduct } from 'models/SavingProduct';
 import { useState } from 'react';
-import { Border, http, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
+import { Border, http, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
 import { SavingProductList } from './components/SavingProductList';
 import { CalculationResult } from './components/CalculationResult';
 import { NavigationTab } from 'components/NavigationTab';
 import { PriceTextField } from 'components/PriceTextField';
 import { useSavingCalculationParams } from './hooks/useSavingCalculationParams';
-
-const SELECT_TERM_OPTIONS = [
-  { value: 6, label: '6개월' },
-  { value: 12, label: '12개월' },
-  { value: 24, label: '24개월' },
-];
+import { RecommendedSavingProductList } from './components/RecommendedSavingProductList';
+import { TERM_OPTIONS } from 'pages/SavingCalculatorPage/types/SavingCalculationParam';
 
 export function SavingsCalculatorPage() {
   const { calculationParams, updateCalculationParams } = useSavingCalculationParams();
@@ -55,7 +51,7 @@ export function SavingsCalculatorPage() {
         value={term}
         onChange={value => updateCalculationParams({ term: value })}
       >
-        {SELECT_TERM_OPTIONS.map(option => (
+        {TERM_OPTIONS.map(option => (
           <SelectBottomSheet.Option key={option.value} value={option.value}>
             {option.label}
           </SelectBottomSheet.Option>
