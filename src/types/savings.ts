@@ -7,7 +7,7 @@ export interface SavingsProduct {
   availableTerms: number;
 }
 
-export interface SavingsInput {
+export interface SavingsFormInput {
   targetAmount: number;
   monthlyAmount: number;
   terms: number;
