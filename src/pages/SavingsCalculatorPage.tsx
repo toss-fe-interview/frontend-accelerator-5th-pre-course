@@ -1,33 +1,44 @@
 import { SavingsProduct } from 'entities/savings-product/model/types';
 import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
+import { SavingsGoalFormData } from 'features/calculate-savings/model/types';
+import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
 import { useSavingsProducts } from 'features/savings-product/api/useSavingsProducts';
-import { useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { SavingsProductFilter } from 'features/savings-product/model/types';
+import { useCallback, useMemo, useState } from 'react';
+import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
-  const { data: products } = useSavingsProducts();
+  const [filter, setFilter] = useState<SavingsGoalFormData>({
+    targetAmount: 0,
+    monthlyAmount: 0,
+    term: 12,
+  });
+  const memoizedFilter: SavingsProductFilter = useMemo(() => {
+    return {
+      targetAmount: filter.targetAmount,
+      monthlyAmount: filter.monthlyAmount,
+      term: filter.term,
+    };
+  }, [filter]);
+
+  const { data: products } = useSavingsProducts(memoizedFilter);
 
   const handleSelectProduct = (product: SavingsProduct) => {
     setSelectedProduct(product);
   };
-  console.log(products);
+
+  const handleChangeFilter = useCallback((data: SavingsGoalFormData) => {
+    setFilter(data);
+  }, []);
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <SavingsGoalForm onChange={handleChangeFilter} />
 
       <Spacing size={24} />
       <Border height={16} />

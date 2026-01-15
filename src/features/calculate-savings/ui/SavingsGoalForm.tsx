@@ -9,6 +9,7 @@ const DEFAULT_VALUES: SavingsGoalFormData = {
   monthlyAmount: 0,
   term: 12,
 };
+
 interface SavingsGoalFormProps {
   defaultValues?: SavingsGoalFormData;
   onChange?: SavingsGoalFormChangeHandler;
