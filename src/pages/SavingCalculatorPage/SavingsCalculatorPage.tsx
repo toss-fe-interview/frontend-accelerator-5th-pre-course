@@ -1,11 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { isSuitableSavingProduct, SavingProduct } from 'models/SavingProduct';
 import { useState } from 'react';
-import { Border, http, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
-import { priceFormatterToString, priceParserToNumber } from 'utils/priceFormatter';
+import { Border, http, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
 import { SavingProductList } from './components/SavingProductList';
 import { CalculationResult } from './components/CalculationResult';
 import { NavigationTab } from 'components/NavigationTab';
+import { PriceTextField } from 'components/PriceTextField';
+
+const SELECT_TERM_OPTIONS = [
+  { value: 6, label: '6개월' },
+  { value: 12, label: '12개월' },
+  { value: 24, label: '24개월' },
+];
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number>(1000000);
@@ -29,20 +35,18 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField
+      <PriceTextField
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
-        suffix="원"
-        value={priceFormatterToString(targetAmount)}
-        onChange={e => setTargetAmount(priceParserToNumber(e.target.value))}
+        value={targetAmount}
+        onChange={setTargetAmount}
       />
       <Spacing size={16} />
-      <TextField
+      <PriceTextField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
-        value={priceFormatterToString(monthlyPayment)}
-        onChange={e => setMonthlyPayment(priceParserToNumber(e.target.value))}
+        value={monthlyPayment}
+        onChange={setMonthlyPayment}
       />
       <Spacing size={16} />
       <SelectBottomSheet
@@ -51,9 +55,11 @@ export function SavingsCalculatorPage() {
         value={term}
         onChange={value => setTerm(value)}
       >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+        {SELECT_TERM_OPTIONS.map(option => (
+          <SelectBottomSheet.Option key={option.value} value={option.value}>
+            {option.label}
+          </SelectBottomSheet.Option>
+        ))}
       </SelectBottomSheet>
 
       <Spacing size={24} />
