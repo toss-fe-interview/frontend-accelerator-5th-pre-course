@@ -26,7 +26,7 @@ export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
   const filteredSavingsProducts = savingsProducts.filter(savingsProduct =>
-    filterSavingsProduct(savingsProduct, formState)
+    filterSavingsProduct({ savingsProduct, formState })
   );
 
   const recommendedSavingsProducts = [...filteredSavingsProducts]

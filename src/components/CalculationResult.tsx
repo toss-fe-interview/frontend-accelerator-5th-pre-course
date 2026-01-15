@@ -19,13 +19,15 @@ export function CalculationResult({ formState, selectedSavingsProduct }: Calcula
   if (!selectedSavingsProduct) {
     return <EmptyListItem message="상품을 선택해주세요." />;
   }
-  const finalAmount = calculateFinalAmount(formState.monthlyAmount, formState.term, selectedSavingsProduct.annualRate);
-  const differenceAmount = calculateDifferenceAmount(formState.targetAmount, finalAmount);
-  const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(
-    formState.targetAmount,
-    formState.term,
-    selectedSavingsProduct.annualRate
-  );
+  const { targetAmount, monthlyAmount, term } = formState;
+  const { annualRate } = selectedSavingsProduct;
+  const finalAmount = calculateFinalAmount({ monthlyAmount, term, annualRate });
+  const differenceAmount = calculateDifferenceAmount({ targetAmount, finalAmount });
+  const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount({
+    targetAmount,
+    term,
+    annualRate,
+  });
   return (
     <>
       <ListRow
