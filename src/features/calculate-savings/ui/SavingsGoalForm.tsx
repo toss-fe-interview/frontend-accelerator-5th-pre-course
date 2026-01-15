@@ -11,7 +11,7 @@ const DEFAULT_VALUES: SavingsGoalFormData = {
 };
 
 interface SavingsGoalFormProps {
-  defaultValues?: SavingsGoalFormData;
+  defaultValues?: Partial<SavingsGoalFormData>;
   onChange?: SavingsGoalFormChangeHandler;
 }
 
