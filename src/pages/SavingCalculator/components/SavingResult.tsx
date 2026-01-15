@@ -18,7 +18,15 @@ export default function SavingResult({ calculationResult, recommendedProducts }:
   const hasResult = calculationResult !== null;
   return (
     <>
-      {hasResult ? <CalculationResult {...calculationResult} /> : <NoProductSelected />}
+      {hasResult ? (
+        <CalculationResult
+          expectedProfit={calculationResult.expectedProfit}
+          difference={calculationResult.difference}
+          recommendedMonthly={calculationResult.recommendedMonthly}
+        />
+      ) : (
+        <NoProductSelected />
+      )}
       <Border height={16} />
       <Spacing size={8} />
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
