@@ -1,4 +1,4 @@
-import { SavingsProduct } from "components/Savings";
+import type { SavingsProduct } from "../types";
 
 interface FilterCriteria {
   monthlyDeposit: number;

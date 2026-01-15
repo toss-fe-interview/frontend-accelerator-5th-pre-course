@@ -1,3 +1,4 @@
+import { fetchProducts } from 'domains/Savings/api/fetchProducts';
 import { Divider } from 'domains/Savings/components/Divider';
 import { ProductList } from 'domains/Savings/components/ProductList';
 import { RecommendedProduct } from 'domains/Savings/components/RecommendedProduct';
@@ -7,7 +8,7 @@ import { SavingTabContent } from 'domains/Savings/components/SavingTabContent';
 import type { SavingsProduct, SavingsTabValue, SavingTabListType } from 'domains/Savings/types';
 import { calculateExpectedProfit, calculateGoalDifference, calculateRecommendedDeposit, filterSavingsProducts, getTopRateProducts } from 'domains/Savings/utils/savings';
 import React, { useState, useEffect } from 'react';
-import { http, TextField, Spacing, SelectBottomSheet, ListRow, colors } from 'tosslib';
+import { TextField, Spacing, SelectBottomSheet, ListRow, colors } from 'tosslib';
 
 
 export function SavingsCalculatorPage() {
@@ -23,11 +24,7 @@ export function SavingsCalculatorPage() {
 
   // API fetch
   useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await http.get<SavingsProduct[]>('/api/savings-products');
-      setProducts(response);
-    };
-    fetchProducts();
+    fetchProducts().then(setProducts);
   }, []);
 
   const tabs: SavingTabListType = [
