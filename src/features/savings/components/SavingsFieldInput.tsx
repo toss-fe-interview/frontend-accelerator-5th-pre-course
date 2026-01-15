@@ -9,11 +9,11 @@ interface SavingsFieldInputProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function SavingsFieldInput({ value, onChange }: SavingsFieldInputProps) {
+export default function SavingsFieldInput({ label, placeholder, value, onChange }: SavingsFieldInputProps) {
   return (
     <TextField
-      label="목표 금액"
-      placeholder="목표 금액을 입력하세요"
+      label={label}
+      placeholder={placeholder}
       suffix="원"
       value={formatNumberWithComma(value)}
       onChange={onChange}
