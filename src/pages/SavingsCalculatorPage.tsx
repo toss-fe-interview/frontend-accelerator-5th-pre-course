@@ -1,11 +1,12 @@
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
-import { Border, colors, http, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, http, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { URLS } from 'consts';
 import { KRWInput } from 'components/pages/KRWInput';
 import { NumberSelect } from 'components/pages/NumberSelect';
 import { SavingsProductItem } from 'components/pages/SavingsProductItem';
+import { AmountDisplay } from 'components/pages/AmountDisplay';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
@@ -122,39 +123,9 @@ export function SavingsCalculatorPage() {
           <Spacing size={8} />
           {selectedProduct ? (
             <>
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="예상 수익 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${expectedIncome.toLocaleString('kr-KR')}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                  />
-                }
-              />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="목표 금액과의 차이"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${targetDiff.toLocaleString('kr-KR')}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                  />
-                }
-              />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="추천 월 납입 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${recommendedMonthlyPayment.toLocaleString('kr-KR')}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                  />
-                }
-              />
+              <AmountDisplay title="예상 수익 금액" value={expectedIncome} />
+              <AmountDisplay title="목표 금액과의 차이" value={targetDiff} />
+              <AmountDisplay title="추천 월 납입 금액" value={recommendedMonthlyPayment} />
             </>
           ) : (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
@@ -166,6 +137,7 @@ export function SavingsCalculatorPage() {
 
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
+
           {recommendProductList?.map(product => (
             <SavingsProductItem
               product={product}
