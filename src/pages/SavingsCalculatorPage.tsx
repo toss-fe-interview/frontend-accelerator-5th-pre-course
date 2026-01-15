@@ -1,9 +1,17 @@
+import { SavingsProduct } from 'entities/savings-product/model/types';
 import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
 import { useSavingsProducts } from 'features/savings-product/api/useSavingsProducts';
+import { useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 export function SavingsCalculatorPage() {
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+
   const { data: products } = useSavingsProducts();
+
+  const handleSelectProduct = (product: SavingsProduct) => {
+    setSelectedProduct(product);
+  };
   console.log(products);
   return (
     <>
@@ -35,7 +43,12 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {products?.map(product => (
-        <SavingsProductItem key={product.id} product={product} selected={false} onClick={() => {}} />
+        <SavingsProductItem
+          key={product.id}
+          product={product}
+          selected={selectedProduct?.id === product.id}
+          onClick={() => handleSelectProduct(product)}
+        />
       ))}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
