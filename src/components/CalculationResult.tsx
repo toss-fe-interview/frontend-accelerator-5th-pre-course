@@ -6,7 +6,17 @@ import { roundToThousand } from 'utils/number';
 
 function savingCalculator(userInput: CalculatorForm, targetProduct?: ProductItem) {
   if (!targetProduct) {
-    return;
+    return {
+      getExpectedReturnAmount() {
+        return 0;
+      },
+      getTargetGapAmount() {
+        return 0;
+      },
+      getRecommendedMonthlyContribution() {
+        return 0;
+      },
+    };
   }
   return {
     // 최종 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
@@ -38,11 +48,11 @@ export default function CalculationResult({ products, userInput, onClickProduct 
   const caculator = savingCalculator(userInput, selectedProduct);
 
   // 예상 수익 금액
-  const expectedReturnAmount = caculator?.getExpectedReturnAmount() ?? 0;
+  const expectedReturnAmount = caculator.getExpectedReturnAmount();
   // 목표 금액과의 차이
-  const targetGapAmount = caculator?.getTargetGapAmount() ?? 0;
+  const targetGapAmount = caculator.getTargetGapAmount();
   // 추천 월 납입 금액
-  const recommendedMonthlyContribution = caculator?.getRecommendedMonthlyContribution() ?? 0;
+  const recommendedMonthlyContribution = caculator.getRecommendedMonthlyContribution();
 
   return (
     <>
