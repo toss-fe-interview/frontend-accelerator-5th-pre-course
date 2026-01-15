@@ -73,6 +73,7 @@ export function ProductTabs({
           diffAmount={diffAmount}
           recommendMonthlyPayment={recommendMonthlyPayment}
           filteredProducts={filteredProducts}
+          onProductSelect={onProductSelect}
         />
       )}
     </>

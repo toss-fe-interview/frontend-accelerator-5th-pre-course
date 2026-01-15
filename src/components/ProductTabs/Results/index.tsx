@@ -1,4 +1,4 @@
-import { ListRow, ListHeader, Border, Spacing, colors } from 'tosslib';
+import { ListRow, ListHeader, Border, Spacing, colors, Assets } from 'tosslib';
 import { SavingsProduct } from '../types';
 
 type ResultsProps = {
@@ -7,6 +7,7 @@ type ResultsProps = {
   diffAmount: number;
   recommendMonthlyPayment: number;
   filteredProducts: SavingsProduct[];
+  onProductSelect: (product: SavingsProduct) => void;
 };
 
 export function Results({
@@ -15,12 +16,13 @@ export function Results({
   diffAmount,
   recommendMonthlyPayment,
   filteredProducts,
+  onProductSelect,
 }: ResultsProps) {
   if (!selectedProduct) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
   }
 
-  const recommendedProducts = filteredProducts.sort((prev, curr) => curr.annualRate - prev.annualRate).slice(0, 2);
+  const recommendedProducts = [...filteredProducts].sort((prev, curr) => curr.annualRate - prev.annualRate).slice(0, 2);
 
   return (
     <>
@@ -81,7 +83,8 @@ export function Results({
                   bottomProps={{ fontSize: 13, color: colors.grey600 }}
                 />
               }
-              onClick={() => {}}
+              right={selectedProduct?.id === id && <Assets.Icon name="icon-check-circle-green" />}
+              onClick={() => onProductSelect(product)}
             />
           );
         })
