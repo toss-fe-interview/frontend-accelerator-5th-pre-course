@@ -1,13 +1,13 @@
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
-import { Border, http, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { URLS } from 'consts';
-import { KRWInput } from 'components/KRWInput';
-import { NumberSelect } from 'components/NumberSelect';
-import { SavingsProductItem } from 'components/SavingsProductItem';
 import { AmountDisplay } from 'components/AmountDisplay';
+import { AmountInput } from 'components/AmountInput';
+import { SavingsProductItem } from 'components/SavingsProductItem';
+import { SavingsTermSelect } from 'components/SavingsTermSelect';
 import { TAB_STATE, Tabs } from 'components/Tabs';
+import { URLS } from 'consts';
+import { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { Border, http, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
@@ -38,9 +38,7 @@ export function SavingsCalculatorPage() {
       term: 12,
     },
   });
-  const { monthlyAmount, term, targetAmount } = useWatch({
-    control: methods.control,
-  });
+  const { monthlyAmount, term, targetAmount } = methods.watch();
 
   const filteredProducts = (savingProducts ?? []).filter(product => {
     const isTermMatched = product.availableTerms === term;
@@ -62,14 +60,25 @@ export function SavingsCalculatorPage() {
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      <KRWInput name="targetAmount" label="목표 금액" placeholder="목표 금액을 입력하세요" />
+      <AmountInput
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        value={targetAmount}
+        onChange={val => methods.setValue('targetAmount', val)}
+      />
       <Spacing size={16} />
-      <KRWInput name="monthlyAmount" label="월 납입액" placeholder="희망 월 납입액을 입력하세요" />
+      <AmountInput
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        value={monthlyAmount}
+        onChange={val => methods.setValue('monthlyAmount', val)}
+      />
       <Spacing size={16} />
-      <NumberSelect
-        name="term"
+      <SavingsTermSelect
         label="저축 기간"
         placeholder="저축 기간을 선택해주세요"
+        value={term}
+        onSelect={val => methods.setValue('term', val)}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
