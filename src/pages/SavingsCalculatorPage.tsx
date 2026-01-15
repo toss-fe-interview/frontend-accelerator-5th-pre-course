@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 import { useCalculationResult } from 'hooks/useCalculationResult';
-import { InputSection, ProductList, CalculationResultSection, InputValues } from 'components/savings';
+import { ProductList, CalculationResultSection } from 'components/savings';
 import { PageStatus } from 'components/common/PageStatus';
+import { CurrencyInput } from 'components/common/CurrencyInput';
+import { TermSelect } from 'components/common/TermSelect';
 
 const TAB_VALUES = {
   PRODUCTS: 'products',
@@ -12,9 +14,15 @@ const TAB_VALUES = {
 
 type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
+interface InputValues {
+  targetAmount: string;
+  monthlyDeposit: string;
+  term: number;
+}
+
 export function SavingsCalculatorPage() {
   const { products, isLoading, error } = useSavingsProducts();
-  const [inputValues, setInputValues] = useState<InputValues>({
+  const [values, setValues] = useState<InputValues>({
     targetAmount: '',
     monthlyDeposit: '',
     term: 12,
@@ -22,13 +30,13 @@ export function SavingsCalculatorPage() {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
 
-  const handleInputChange = (partial: Partial<InputValues>) => {
-    setInputValues(prev => ({ ...prev, ...partial }));
+  const handleChange = (partial: Partial<InputValues>) => {
+    setValues(prev => ({ ...prev, ...partial }));
   };
 
-  const depositAmount = Number(inputValues.monthlyDeposit.replace(/,/g, '')) || 0;
+  const depositAmount = Number(values.monthlyDeposit.replace(/,/g, '')) || 0;
   const filteredProducts = products.filter(product => {
-    const termMatch = product.availableTerms === inputValues.term;
+    const termMatch = product.availableTerms === values.term;
     const depositMatch =
       depositAmount === 0 || (depositAmount > product.minMonthlyAmount && depositAmount < product.maxMonthlyAmount);
     return termMatch && depositMatch;
@@ -39,9 +47,9 @@ export function SavingsCalculatorPage() {
 
   const calculationResult = useCalculationResult({
     selectedProduct,
-    monthlyDeposit: inputValues.monthlyDeposit,
-    targetAmount: inputValues.targetAmount,
-    term: inputValues.term,
+    monthlyDeposit: values.monthlyDeposit,
+    targetAmount: values.targetAmount,
+    term: values.term,
   });
 
   if (isLoading) {
@@ -56,7 +64,9 @@ export function SavingsCalculatorPage() {
     <>
       <NavigationBar title="적금 계산기" />
 
-      <InputSection values={inputValues} onChange={handleInputChange} />
+      <CurrencyInput label="목표 금액" field="targetAmount" value={values.targetAmount} onChange={handleChange} />
+      <CurrencyInput label="월 납입액" field="monthlyDeposit" value={values.monthlyDeposit} onChange={handleChange} />
+      <TermSelect label="저축 기간" value={values.term} onChange={handleChange} />
 
       <Spacing size={24} />
       <Border height={16} />
