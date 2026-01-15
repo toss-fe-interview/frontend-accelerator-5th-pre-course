@@ -14,28 +14,22 @@ export function SavingsProductListItem({
   isSelected,
   handleSelectSavingsProduct,
 }: SavingsProductListItemProps) {
-  const handleClick = () => {
-    if (isSelected) {
-      handleSelectSavingsProduct(null);
-      return;
-    }
-    handleSelectSavingsProduct(savingsProduct);
-  };
+  const { name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
   return (
     <ListRow
       contents={
         <ListRow.Texts
           type="3RowTypeA"
-          top={savingsProduct.name}
+          top={name}
           topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-          middle={`연 이자율: ${savingsProduct.annualRate}%`}
+          middle={`연 이자율: ${annualRate}%`}
           middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-          bottom={`${formatAmount(savingsProduct.minMonthlyAmount)}원 ~ ${formatAmount(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
+          bottom={`${formatAmount(minMonthlyAmount)}원 ~ ${formatAmount(maxMonthlyAmount)}원 | ${availableTerms}개월`}
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
       right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
-      onClick={handleClick}
+      onClick={() => handleSelectSavingsProduct(isSelected ? null : savingsProduct)}
     />
   );
 }
