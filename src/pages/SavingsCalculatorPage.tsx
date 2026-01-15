@@ -16,7 +16,7 @@ import {
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
-  const [targetPrice, setTargetPrice] = useState('');
+  const [targetAmount, setTargetAmount] = useState('');
   const [monthlyDeposit, setMonthlyDeposit] = useState('');
   const [savingDuration, setSavingDuration] = useState(12);
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState('');
@@ -28,11 +28,19 @@ export function SavingsCalculatorPage() {
   });
 
   const onTargetPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTargetPrice(extractNumbers(e.target.value));
+    setTargetAmount(extractNumbers(e.target.value));
   };
 
   const onMonthlyDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMonthlyDeposit(extractNumbers(e.target.value));
+  };
+
+  const onSavingDurationChange = (duration: number) => {
+    setSavingDuration(duration);
+  };
+
+  const onSavingsTabChange = (value: string) => {
+    setTab(value as SavingsTab);
   };
 
   return (
@@ -43,7 +51,7 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={formatNumberWithCommas(targetPrice)}
+        value={formatNumberWithCommas(targetAmount)}
         onChange={onTargetPriceChange}
       />
       <Spacing size={16} />
@@ -59,9 +67,7 @@ export function SavingsCalculatorPage() {
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={savingDuration}
-        onChange={duration => {
-          setSavingDuration(duration);
-        }}
+        onChange={onSavingDurationChange}
       >
         {SAVINGS_DURATIONS.map(duration => (
           <SelectBottomSheet.Option key={duration} value={duration}>
@@ -69,20 +75,14 @@ export function SavingsCalculatorPage() {
           </SelectBottomSheet.Option>
         ))}
       </SelectBottomSheet>
-
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
-
-      <Tab
-        onChange={value => {
-          setTab(value as SavingsTab);
-        }}
-      >
+      <Tab onChange={onSavingsTabChange}>
         <Tab.Item value="products" selected={tab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="result" selected={tab === 'result'}>
+        <Tab.Item value="results" selected={tab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
@@ -107,8 +107,7 @@ export function SavingsCalculatorPage() {
             }}
           />
         ))}
-
-      {tab === 'result' && (
+      {tab === 'results' && (
         <>
           {selectedSavingsProduct && (
             <>
@@ -136,7 +135,7 @@ export function SavingsCalculatorPage() {
                     top="목표 금액과의 차이"
                     topProps={{ color: colors.grey600 }}
                     bottom={`${(
-                      Number(targetPrice) -
+                      Number(targetAmount) -
                       Number(monthlyDeposit) *
                         selectedSavingsProduct.availableTerms *
                         (1 + selectedSavingsProduct.annualRate * 0.5)
@@ -153,7 +152,7 @@ export function SavingsCalculatorPage() {
                     topProps={{ color: colors.grey600 }}
                     bottom={`${(
                       Math.round(
-                        Number(targetPrice) /
+                        Number(targetAmount) /
                           (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) /
                           1000
                       ) * 1000
@@ -172,12 +171,10 @@ export function SavingsCalculatorPage() {
               <Spacing size={8} />
               <Border height={16} />
               <Spacing size={8} />
-
               <ListHeader
                 title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
               />
               <Spacing size={12} />
-
               {recommendedSavingsProducts?.map(product => (
                 <ListRow
                   key={product.id}
@@ -195,7 +192,6 @@ export function SavingsCalculatorPage() {
                   right={product.id === selectedSavingsProductId && <Assets.Icon name="icon-check-circle-green" />}
                 />
               ))}
-
               <Spacing size={40} />
             </>
           )}

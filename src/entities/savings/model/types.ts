@@ -7,4 +7,4 @@ export type SavingsProduct = {
   availableTerms: number;
 };
 
-export type SavingsTab = 'products' | 'result';
+export type SavingsTab = 'products' | 'results';
