@@ -98,15 +98,12 @@ export function SavingsCalculatorPage() {
                 <Border height={16} />
                 <Spacing size={8} />
 
-                <ListHeader
-                  title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-                />
-                <Spacing size={12} />
-                <SavingProductList
-                  savingsProducts={savingsProducts.slice(0, 2) ?? []}
+                <RecommendedSavingProductList
+                  savingsProducts={savingsProducts}
                   selectedSavingProduct={selectedSavingProduct}
                   selectSavingProduct={product => setSelectedSavingProduct(product)}
                 />
+
                 <Spacing size={40} />
               </div>
             ),
