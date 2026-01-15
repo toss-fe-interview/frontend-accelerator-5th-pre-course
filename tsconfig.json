@@ -3,11 +3,7 @@
     "baseUrl": "src",
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "allowImportingTsExtensions": true,
     "noUnusedLocals": true,
     "allowJs": true,
@@ -24,9 +20,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react"
+    "jsxImportSource": "@emotion/react",
+    "paths": {
+      "@savings/*": ["domain/savings/*"],
+      "@shared/*": ["shared/*"]
+    }
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

@@ -1,9 +1,8 @@
-import { SavingsProduct } from 'apis/type';
 import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
-import { commaizeNumber } from 'utils';
-import { roundToUnit } from 'utils/roundToUnit';
+import { commaizeNumber, roundToUnit } from '@shared/utils';
 import { ProductListItem } from './ProductListItem';
-import type { SavingsResult } from 'utils/calcSavingsResult';
+import type { SavingsProduct } from '@savings/apis/type';
+import type { SavingsResult } from '@savings/utils/calcSavingsResult';
 
 type CalculationResultProps = {
   result: SavingsResult;

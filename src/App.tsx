@@ -1,5 +1,5 @@
 import { GlobalPortal, GlobalStyles } from 'tosslib';
-import { Routes } from './pages/Routes';
+import { Routes } from './Routes';
 
 export function App() {
   return (

@@ -1,6 +1,6 @@
 import { Assets, colors, ListRow } from 'tosslib';
-import { commaizeNumber } from 'utils';
-import type { SavingsProduct } from 'apis/type';
+import { commaizeNumber } from '@shared/utils';
+import type { SavingsProduct } from '@savings/apis/type';
 
 type ProductListItemProps = {
   savingsProduct: SavingsProduct;
