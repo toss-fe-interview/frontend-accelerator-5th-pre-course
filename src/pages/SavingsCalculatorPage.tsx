@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { SavingProduct } from 'models/SavingProduct';
+import { isSuitableSavingProduct, SavingProduct } from 'models/SavingProduct';
+import { useState } from 'react';
 import {
   Assets,
   Border,
@@ -13,11 +14,17 @@ import {
   Tab,
   TextField,
 } from 'tosslib';
+import { priceFormatterToString, priceParserToNumber } from 'utils/priceFormatter';
 
 export function SavingsCalculatorPage() {
+  const [targetAmount, setTargetAmount] = useState<number>(1000000);
+  const [monthlyPayment, setMonthlyPayment] = useState<number>(50000);
+  const [term, setTerm] = useState<number>(12);
+
   const { data: savingsProducts } = useQuery({
     queryKey: ['savings-products'],
     queryFn: () => http.get<SavingProduct[]>('/api/savings-products'),
+    select: data => data.filter(product => isSuitableSavingProduct(product, monthlyPayment, term)),
   });
 
   return (
@@ -26,11 +33,28 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={priceFormatterToString(targetAmount)}
+        onChange={e => setTargetAmount(priceParserToNumber(e.target.value))}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={priceFormatterToString(monthlyPayment)}
+        onChange={e => setMonthlyPayment(priceParserToNumber(e.target.value))}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={term}
+        onChange={value => setTerm(value)}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
@@ -59,7 +83,7 @@ export function SavingsCalculatorPage() {
               topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
               middle={`연 이자율: ${product.annualRate}%`}
               middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`}
+              bottom={`${priceFormatterToString(product.minMonthlyAmount)}원 ~ ${priceFormatterToString(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
               bottomProps={{ fontSize: 13, color: colors.grey600 }}
             />
           }

@@ -6,3 +6,11 @@ export interface SavingProduct {
   maxMonthlyAmount: number;
   availableTerms: number;
 }
+
+export const isSuitableSavingProduct = (product: SavingProduct, monthlyPayment: number, term: number) => {
+  return (
+    product.minMonthlyAmount <= monthlyPayment &&
+    product.maxMonthlyAmount >= monthlyPayment &&
+    product.availableTerms === term
+  );
+};
