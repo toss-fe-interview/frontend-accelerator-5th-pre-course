@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import SavingsProductList from 'components/SavingsProductList';
 import SavingsTargetForm from 'components/SavingsTargetForm';
 import CalculationResult from 'components/CalculationResult';
@@ -46,6 +46,12 @@ export function SavingsCalculatorPage() {
       />
     );
   };
+
+  useEffect(() => {
+    if (selectedProductId && !filteredProducts.some(product => product.id === selectedProductId)) {
+      setSelectedProductId(null);
+    }
+  }, [filteredProducts, selectedProductId]);
 
   return (
     <>
