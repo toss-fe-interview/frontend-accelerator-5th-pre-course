@@ -8,7 +8,7 @@ import { NavigationTab } from 'components/NavigationTab';
 import { PriceTextField } from 'components/PriceTextField';
 import { useSavingCalculationParams } from './hooks/useSavingCalculationParams';
 import { RecommendedSavingProductList } from './components/RecommendedSavingProductList';
-import { TERM_OPTIONS } from 'pages/SavingCalculatorPage/types/SavingCalculationParam';
+import { SavingCalculationParams, TERM_OPTIONS } from 'pages/SavingCalculatorPage/types/SavingCalculationParam';
 
 export function SavingsCalculatorPage() {
   const { calculationParams, updateCalculationParams } = useSavingCalculationParams();
@@ -25,6 +25,11 @@ export function SavingsCalculatorPage() {
         .sort((a, b) => b.annualRate - a.annualRate),
   });
 
+  const handleChangeCalculationParams = (params: Partial<SavingCalculationParams>) => {
+    updateCalculationParams(params);
+    setSelectedSavingProduct(null);
+  };
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -35,21 +40,21 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         value={targetAmount}
-        onChange={value => updateCalculationParams({ targetAmount: value })}
+        onChange={value => handleChangeCalculationParams({ targetAmount: value })}
       />
       <Spacing size={16} />
       <PriceTextField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         value={monthlyPayment}
-        onChange={value => updateCalculationParams({ monthlyPayment: value })}
+        onChange={value => handleChangeCalculationParams({ monthlyPayment: value })}
       />
       <Spacing size={16} />
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={term}
-        onChange={value => updateCalculationParams({ term: value })}
+        onChange={value => handleChangeCalculationParams({ term: value })}
       >
         {TERM_OPTIONS.map(option => (
           <SelectBottomSheet.Option key={option.value} value={option.value}>

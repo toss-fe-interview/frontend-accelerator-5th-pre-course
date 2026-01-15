@@ -12,6 +12,9 @@ export const NavigationTab = ({ tabs }: { tabs: NavigationTabItem[] }) => {
   if (tabs.length === 0) {
     return null;
   }
+
+  const selectedTabContent = tabs.find(tab => tab.value === selectedTab)?.renderContent();
+
   return (
     <div>
       <Tab onChange={value => setSelectedTab(value)}>
@@ -21,7 +24,7 @@ export const NavigationTab = ({ tabs }: { tabs: NavigationTabItem[] }) => {
           </Tab.Item>
         ))}
       </Tab>
-      {tabs.find(tab => tab.value === selectedTab)?.renderContent() ?? null}
+      {selectedTabContent}
     </div>
   );
 };
