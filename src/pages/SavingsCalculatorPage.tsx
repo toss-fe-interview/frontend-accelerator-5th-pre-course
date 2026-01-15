@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { formatNumberToKo } from 'utils/formatting';
 import { parseFormattedNumber } from 'utils/parse';
+import { filterSavingsProducts } from 'utils/savings-filter';
 
 export function SavingsCalculatorPage() {
   const { savingsProducts } = useSavingsProducts();
@@ -17,24 +18,19 @@ export function SavingsCalculatorPage() {
   const [monthlyPayment, setMonthlyPayment] = useState<number>();
   const [availableTerms, setAvailableTerms] = useState<number>();
 
+  const hasAllFilterValues = monthlyPayment !== undefined && availableTerms !== undefined && targetAmount !== undefined;
+
   const filteredProducts = useMemo(() => {
-    return savingsProducts.filter(product => {
-      const isValidMonthly =
-        monthlyPayment !== undefined &&
-        monthlyPayment > product.minMonthlyAmount &&
-        monthlyPayment < product.maxMonthlyAmount;
+    if (!hasAllFilterValues) {
+      return [];
+    }
 
-      const isValidTerm = product.availableTerms === availableTerms;
-
-      const isValidTargetAmount =
-        monthlyPayment !== undefined &&
-        availableTerms !== undefined &&
-        targetAmount !== undefined &&
-        monthlyPayment * availableTerms > targetAmount;
-
-      return isValidMonthly && isValidTerm && isValidTargetAmount;
+    return filterSavingsProducts(savingsProducts, {
+      monthlyPayment,
+      availableTerms,
+      targetAmount,
     });
-  }, [savingsProducts, monthlyPayment, availableTerms, targetAmount]);
+  }, [savingsProducts, monthlyPayment, availableTerms, targetAmount, hasAllFilterValues]);
 
   return (
     <>
@@ -80,11 +76,7 @@ export function SavingsCalculatorPage() {
 
       {tabValue === 'products' && (
         <SavingsProductsList
-          products={
-            monthlyPayment !== undefined && availableTerms !== undefined && targetAmount !== undefined
-              ? filteredProducts
-              : savingsProducts
-          }
+          products={hasAllFilterValues ? filteredProducts : savingsProducts}
           selectedProduct={selectedSavingsProduct && selectedSavingsProduct}
           setSelectedProduct={setSelectedSavingsProduct}
         />
