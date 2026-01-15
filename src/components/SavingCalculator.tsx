@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Border, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import CalculationResult from './CalculationResult';
 import ProductList from './ProductList';
 import { ProductItem } from 'types/products';
 import { CalculatorForm } from 'types/calculate';
+import { getNumericStringOnly } from 'utils/number';
 
 type Tabs = 'products' | 'results';
+
+function getFilterProductsByInputValue(products: ProductItem[], userInput: CalculatorForm) {
+  if (products.length === 0) {
+    return [];
+  }
+
+  return products
+    .filter(product => product.minMonthlyAmount < Number(userInput.monthlyPayment))
+    .filter(product => product.maxMonthlyAmount > Number(userInput.monthlyPayment))
+    .filter(product => product.availableTerms === userInput.savingPeriod);
+}
 
 interface SavingCalculatorProps {
   products: ProductItem[];
@@ -29,13 +41,11 @@ export default function SavingCalculator({ products, onProductSelect }: SavingCa
     setCalculatingData(prev => ({ ...prev, [key]: value }));
   }
 
-  // 필터로직 개선
-  function filteredProductsByInputs(products: ProductItem[]) {
-    return products
-      .filter(product => product.minMonthlyAmount > Number(calculatingData.monthlyPayment))
-      .filter(item => item.maxMonthlyAmount < Number(calculatingData.monthlyPayment))
-      .filter(item => item.availableTerms === calculatingData.savingPeriod);
-  }
+  const filteredProducts = useMemo(
+    () => getFilterProductsByInputValue(products, calculatingData),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [products, calculatingData.monthlyPayment, calculatingData.targetAmount, calculatingData.savingPeriod]
+  );
 
   return (
     <>
@@ -45,7 +55,7 @@ export default function SavingCalculator({ products, onProductSelect }: SavingCa
         suffix="원"
         value={Number(calculatingData.targetAmount).toLocaleString()}
         onChange={event => {
-          const numericValue = event.target.value.replace(/[^0-9]/g, '');
+          const numericValue = getNumericStringOnly(event.target.value);
           handleChangeField('targetAmount', numericValue);
         }}
       />
@@ -57,7 +67,7 @@ export default function SavingCalculator({ products, onProductSelect }: SavingCa
         suffix="원"
         value={Number(calculatingData.monthlyPayment).toLocaleString()}
         onChange={event => {
-          const numericValue = event.target.value.replace(/[^0-9]/g, '');
+          const numericValue = getNumericStringOnly(event.target.value);
           handleChangeField('monthlyPayment', numericValue);
         }}
       />
@@ -94,7 +104,7 @@ export default function SavingCalculator({ products, onProductSelect }: SavingCa
 
       {tab === 'products' ? (
         // 입력된 값이 없으면 일반 products를 노출 | 필터된 프로덕트 노출
-        <ProductList products={filteredProductsByInputs(products)} onClickProduct={onProductSelect} />
+        <ProductList products={filteredProducts} onClickProduct={onProductSelect} />
       ) : (
         <CalculationResult products={products} userInput={calculatingData} onClickProduct={onProductSelect} />
       )}

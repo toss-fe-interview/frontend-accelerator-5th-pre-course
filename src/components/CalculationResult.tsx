@@ -1,8 +1,28 @@
 import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
-import { roundToThousand } from 'utils';
 import { type ProductItem } from 'types/products';
 import { CalculatorForm } from 'types/calculate';
 import Product from './ProductItem';
+import { roundToThousand } from 'utils/number';
+
+function savingCalculator(userInput: CalculatorForm, targetProduct?: ProductItem) {
+  if (!targetProduct) {
+    return;
+  }
+  return {
+    // 최종 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
+    getExpectedReturnAmount() {
+      return Number(userInput.monthlyPayment) * userInput.savingPeriod * (1 + targetProduct.annualRate * 0.5);
+    },
+    // 목표 금액과의 차이 = 목표 금액 - 예상 수익 금액
+    getTargetGapAmount() {
+      return Number(userInput.targetAmount) - this.getExpectedReturnAmount();
+    },
+    // 월 납입액 = 목표 금액 ÷ (저축 기간 * (1 + 연이자율 * 0.5))
+    getRecommendedMonthlyContribution() {
+      return Number(userInput.targetAmount) / (userInput.savingPeriod * (1 + targetProduct.annualRate * 0.5));
+    },
+  };
+}
 
 interface CalculationResultProps {
   // 필터된 데이터 총 연 이자율 소팅후 2개만
@@ -15,18 +35,15 @@ export default function CalculationResult({ products, userInput, onClickProduct 
   // 1. isSelected을 찾아서, 그 정보와 formData를 계산해서 표출시켜줌.
 
   const selectedProduct = products.find(product => product.isSelected);
+  const caculator = savingCalculator(userInput, selectedProduct);
 
-  // TODO: 리액트와는 상관없는 비즈니스 로직임. 별도 추출이 필요.
   // 예상 수익 금액
-  const expectedReturnAmount =
-    Number(userInput.monthlyPayment) * userInput.savingPeriod * (1 + (selectedProduct?.annualRate || 0) * 0.5);
+  const expectedReturnAmount = caculator?.getExpectedReturnAmount() ?? 0;
   // 목표 금액과의 차이
-  const targetGapAmount = Number(userInput.targetAmount) - expectedReturnAmount;
+  const targetGapAmount = caculator?.getTargetGapAmount() ?? 0;
   // 추천 월 납입 금액
-  const recommendedMonthlyContribution =
-    Number(userInput.targetAmount) / (userInput.savingPeriod * (1 + (selectedProduct?.annualRate || 0) * 0.5));
+  const recommendedMonthlyContribution = caculator?.getRecommendedMonthlyContribution() ?? 0;
 
-  // 2. selected :true가 아무것도 없다면 => 상품 선택 해주세요.
   return (
     <>
       <Spacing size={8} />
