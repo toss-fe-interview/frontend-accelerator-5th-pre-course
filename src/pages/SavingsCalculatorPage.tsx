@@ -1,20 +1,10 @@
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import {
-  Assets,
-  Border,
-  colors,
-  http,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { Assets, Border, colors, http, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { URLS } from 'consts';
+import { KRWInput } from 'components/pages/KRWInput';
+import { NumberSelect } from 'components/pages/NumberSelect';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
@@ -78,58 +68,23 @@ export function SavingsCalculatorPage() {
   const recommendedMonthlyPayment = Math.round(rawRecommendedMonthlyPayment / 1000) * 1000;
 
   return (
-    <>
+    <FormProvider {...methods}>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      <Controller
-        name="targetAmount"
-        control={methods.control}
-        render={({ field }) => (
-          <TextField
-            label="목표 금액"
-            placeholder="목표 금액을 입력하세요"
-            suffix="원"
-            value={field.value ? field.value.toLocaleString('ko-KR') : ''}
-            onChange={e => {
-              const value = e.target.value.replace(/,/g, '');
-              if (value === '' || /^\d+$/.test(value)) {
-                field.onChange(value === '' ? null : Number(value));
-              }
-            }}
-          />
-        )}
-      />
+      <KRWInput name="targetAmount" label="목표 금액" placeholder="목표 금액을 입력하세요" />
       <Spacing size={16} />
-      <Controller
-        name="monthlyAmount"
-        control={methods.control}
-        render={({ field }) => (
-          <TextField
-            label="월 납입액"
-            placeholder="희망 월 납입액을 입력하세요"
-            suffix="원"
-            value={field.value ? field.value.toLocaleString('ko-KR') : ''}
-            onChange={e => {
-              const value = e.target.value.replace(/,/g, '');
-              if (value === '' || /^\d+$/.test(value)) {
-                field.onChange(value === '' ? null : Number(value));
-              }
-            }}
-          />
-        )}
-      />
+      <KRWInput name="monthlyAmount" label="월 납입액" placeholder="희망 월 납입액을 입력하세요" />
       <Spacing size={16} />
-      <Controller
+      <NumberSelect
         name="term"
-        control={methods.control}
-        render={({ field }) => (
-          <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" {...field}>
-            <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-          </SelectBottomSheet>
-        )}
+        label="저축 기간"
+        placeholder="저축 기간을 선택해주세요"
+        options={[
+          { value: 6, label: '6개월' },
+          { value: 12, label: '12개월' },
+          { value: 24, label: '24개월' },
+        ]}
       />
 
       <Spacing size={24} />
@@ -245,6 +200,6 @@ export function SavingsCalculatorPage() {
           <Spacing size={40} />
         </>
       )}
-    </>
+    </FormProvider>
   );
 }
