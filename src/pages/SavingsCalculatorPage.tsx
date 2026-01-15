@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Assets,
   Border,
@@ -11,18 +12,65 @@ import {
   TextField,
 } from 'tosslib';
 
+// constants/regex
+const CHECK_AMOUNT_REGEX = /^[0-9]*$/;
+
+// utils/format
+const fomarKRAmount = (amount: number) => {
+  if (!amount) {
+    return '';
+  }
+  return amount.toLocaleString('ko-KR');
+};
+
 export function SavingsCalculatorPage() {
+  const [targetAmount, setTargetAmount] = useState('');
+  const [monthlyAmount, setMonthlyAmount] = useState('');
+  const [savingPeriod, setSavingPeriod] = useState(12);
+
+  console.log(targetAmount, monthlyAmount, savingPeriod);
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={fomarKRAmount(Number(targetAmount))}
+        onChange={e => {
+          const value = e.target.value.slice(0, 13);
+          const result = value.replace(/,/g, '');
+          if (CHECK_AMOUNT_REGEX.test(result)) {
+            setTargetAmount(result ?? '');
+          }
+        }}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={fomarKRAmount(Number(monthlyAmount))}
+        onChange={e => {
+          const value = e.target.value.slice(0, 13);
+          const result = value.replace(/,/g, '');
+          if (CHECK_AMOUNT_REGEX.test(result)) {
+            console.log(result);
+            setMonthlyAmount(result);
+          }
+        }}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={savingPeriod}
+        onChange={setSavingPeriod}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
