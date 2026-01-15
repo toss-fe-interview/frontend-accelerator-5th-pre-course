@@ -107,7 +107,7 @@ export function SavingsCalculatorPage() {
             }}
           />
         ))}
-      {tab === 'result' && Boolean(selectedSavingsProductId) && (
+      {tab === 'result' && selectedSavingsProduct && (
         <>
           <Spacing size={8} />
 
@@ -161,7 +161,7 @@ export function SavingsCalculatorPage() {
           />
         </>
       )}
-      {tab === 'result' && !selectedSavingsProductId && (
+      {tab === 'result' && !selectedSavingsProduct && (
         <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
       )}
       {tab === 'result' && recommendedSavingsProducts?.length > 0 && (
@@ -188,9 +188,6 @@ export function SavingsCalculatorPage() {
                 />
               }
               right={product.id === selectedSavingsProductId && <Assets.Icon name="icon-check-circle-green" />}
-              onClick={() => {
-                setSelectedSavingsProductId(product.id);
-              }}
             />
           ))}
 
