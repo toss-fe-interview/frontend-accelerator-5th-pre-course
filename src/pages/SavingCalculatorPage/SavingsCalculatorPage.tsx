@@ -19,7 +19,10 @@ export function SavingsCalculatorPage() {
   const { data: savingsProducts = [] } = useQuery({
     queryKey: ['savings-products'],
     queryFn: () => http.get<SavingProduct[]>('/api/savings-products'),
-    select: data => data.filter(product => isSuitableSavingProduct(product, monthlyPayment, term)),
+    select: data =>
+      data
+        .filter(product => isSuitableSavingProduct(product, monthlyPayment, term))
+        .sort((a, b) => b.annualRate - a.annualRate),
   });
 
   return (
