@@ -1,27 +1,27 @@
 import { useState } from 'react';
-import { ProductItem } from './ProductContainer';
+import { ProductItem } from './ProductsContainer';
 import { Border, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import CalculationResult from './CalculationResult';
 import ProductList from './ProductList';
 
 type Tabs = 'products' | 'results';
-export type FormDataType = {
+export type CalculatorForm = {
   targetAmount: string;
-  monthlPayment: string;
+  monthlyPayment: string;
   // 6, 12, 24
   savingPeriod: number;
 };
 
-interface CalculatorProps {
+interface SavingCalculatorProps {
   products: ProductItem[];
-  selectProduct: (id: string) => void;
+  onProductSelect: (id: string) => void;
 }
 
-export default function Calculator({ products, selectProduct }: CalculatorProps) {
+export default function SavingCalculator({ products, onProductSelect }: SavingCalculatorProps) {
   const [tab, setTab] = useState<Tabs>('products');
-  const [formData, setFormData] = useState<FormDataType>({
+  const [calculatingData, setCalculatingData] = useState<CalculatorForm>({
     targetAmount: '',
-    monthlPayment: '',
+    monthlyPayment: '',
     savingPeriod: 12,
   });
 
@@ -30,16 +30,16 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
   }
 
   // 필드에 맞는 값을 업데이트
-  function handleChangeField<K extends keyof FormDataType>(key: K, value: FormDataType[K]) {
-    setFormData(prev => ({ ...prev, [key]: value }));
+  function handleChangeField<K extends keyof CalculatorForm>(key: K, value: CalculatorForm[K]) {
+    setCalculatingData(prev => ({ ...prev, [key]: value }));
   }
 
   // 필터로직 개선
-  function filterProdcuts(products: ProductItem[]) {
+  function filteredProductsByInputs(products: ProductItem[]) {
     return products
-      .filter(product => product.minMonthlyAmount > Number(formData.monthlPayment))
-      .filter(item => item.maxMonthlyAmount < Number(formData.monthlPayment))
-      .filter(item => item.availableTerms === formData.savingPeriod);
+      .filter(product => product.minMonthlyAmount > Number(calculatingData.monthlyPayment))
+      .filter(item => item.maxMonthlyAmount < Number(calculatingData.monthlyPayment))
+      .filter(item => item.availableTerms === calculatingData.savingPeriod);
   }
 
   return (
@@ -48,9 +48,9 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={Number(formData.targetAmount).toLocaleString()}
-        onChange={e => {
-          const numericValue = e.target.value.replace(/[^0-9]/g, '');
+        value={Number(calculatingData.targetAmount).toLocaleString()}
+        onChange={event => {
+          const numericValue = event.target.value.replace(/[^0-9]/g, '');
           handleChangeField('targetAmount', numericValue);
         }}
       />
@@ -60,17 +60,17 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={Number(formData.monthlPayment).toLocaleString()}
-        onChange={e => {
-          const numericValue = e.target.value.replace(/[^0-9]/g, '');
-          handleChangeField('monthlPayment', numericValue);
+        value={Number(calculatingData.monthlyPayment).toLocaleString()}
+        onChange={event => {
+          const numericValue = event.target.value.replace(/[^0-9]/g, '');
+          handleChangeField('monthlyPayment', numericValue);
         }}
       />
       <Spacing size={16} />
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
-        value={formData.savingPeriod}
+        value={calculatingData.savingPeriod}
         onChange={period => {
           handleChangeField('savingPeriod', period);
         }}
@@ -99,9 +99,9 @@ export default function Calculator({ products, selectProduct }: CalculatorProps)
 
       {tab === 'products' ? (
         // 입력된 값이 없으면 일반 products를 노출 | 필터된 프로덕트 노출
-        <ProductList products={filterProdcuts(products)} handleClickProduct={selectProduct} />
+        <ProductList products={filteredProductsByInputs(products)} onClickProduct={onProductSelect} />
       ) : (
-        <CalculationResult products={products} data={formData} handleClickProduct={selectProduct} />
+        <CalculationResult products={products} userInput={calculatingData} onClickProduct={onProductSelect} />
       )}
     </>
   );

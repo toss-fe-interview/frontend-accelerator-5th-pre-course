@@ -1,6 +1,6 @@
 import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
-import { ProductItem } from './ProductContainer';
-import { FormDataType } from './Calculator';
+import { ProductItem } from './ProductsContainer';
+import { CalculatorForm } from './SavingCalculator';
 
 function roundToThousand(value: number) {
   // +1, -1
@@ -11,21 +11,22 @@ function roundToThousand(value: number) {
 interface CalculationResultProps {
   // 필터된 데이터 총 연 이자율 소팅후 2개만
   products: ProductItem[];
-  data: FormDataType;
-  handleClickProduct: (id: string) => void;
+  userInput: CalculatorForm;
+  onClickProduct: (id: string) => void;
 }
 
-export default function CalculationResult({ products, data, handleClickProduct }: CalculationResultProps) {
+export default function CalculationResult({ products, userInput, onClickProduct }: CalculationResultProps) {
   // 1. isSelected을 찾아서, 그 정보와 formData를 계산해서 표출시켜줌.
 
   const selectedProduct = products.find(product => product.isSelected);
-
-  const predictionPrice =
-    Number(data.monthlPayment) * data.savingPeriod * (1 + (selectedProduct?.annualRate || 0) * 0.5);
-  const differencial = Number(data.targetAmount) - predictionPrice;
-
-  const recommendMonthlyPayment =
-    Number(data.targetAmount) / (data.savingPeriod * (1 + (selectedProduct?.annualRate || 0) * 0.5));
+  // 예상 수익 금액
+  const expectedReturnAmount =
+    Number(userInput.monthlyPayment) * userInput.savingPeriod * (1 + (selectedProduct?.annualRate || 0) * 0.5);
+  // 목표 금액과의 차이
+  const targetGapAmount = Number(userInput.targetAmount) - expectedReturnAmount;
+  // 추천 월 납입 금액
+  const recommendedMonthlyContribution =
+    Number(userInput.targetAmount) / (userInput.savingPeriod * (1 + (selectedProduct?.annualRate || 0) * 0.5));
 
   // 2. selected :true가 아무것도 없다면 => 상품 선택 해주세요.
   return (
@@ -39,7 +40,7 @@ export default function CalculationResult({ products, data, handleClickProduct }
                 type="2RowTypeA"
                 top="예상 수익 금액"
                 topProps={{ color: colors.grey600 }}
-                bottom={`${roundToThousand(predictionPrice).toLocaleString()}원`}
+                bottom={`${roundToThousand(expectedReturnAmount).toLocaleString()}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -50,7 +51,7 @@ export default function CalculationResult({ products, data, handleClickProduct }
                 type="2RowTypeA"
                 top="목표 금액과의 차이"
                 topProps={{ color: colors.grey600 }}
-                bottom={`${roundToThousand(differencial).toLocaleString()}원`}
+                bottom={`${roundToThousand(targetGapAmount).toLocaleString()}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -61,7 +62,7 @@ export default function CalculationResult({ products, data, handleClickProduct }
                 type="2RowTypeA"
                 top="추천 월 납입 금액"
                 topProps={{ color: colors.grey600 }}
-                bottom={`${roundToThousand(recommendMonthlyPayment).toLocaleString()}원`}
+                bottom={`${roundToThousand(recommendedMonthlyContribution).toLocaleString()}원`}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -95,7 +96,7 @@ export default function CalculationResult({ products, data, handleClickProduct }
           }
           right={product.isSelected && <Assets.Icon name="icon-check-circle-green" />}
           onClick={() => {
-            handleClickProduct(product.id);
+            onClickProduct(product.id);
           }}
         />
       ))}

@@ -59,3 +59,15 @@ yarn dev
 ## 추상화
 
 - 컴포넌트 레벨로 분리 (추상화 레벨이 맞춰져 있는지?)
+
+## 리팩토링 시작
+
+유지 보수 개선 - 1 (네이밍)
+
+- 변수명 함수명 모두 개선 (최소한의 리소스로 맥락 파악을 쉽게 할 수 있음.)
+  - Calculator => 이름이 너무 일반적이라 계산기 역할만 하는 것으로 오해 가능. SavingsCalculator로 개선. 페이지의 이름을 따라감.
+  - FormDataType => file객체의 formData와 헷 갈릴수 있음. 계산에 필요한 form의 의미에 가깝도록 CalculatorForm로 개선.
+  - 유저 인풋에 따라 필터된 상품들 => filteredProductsByInputs
+  - 예상 수익 금액 => expectedReturnAmount
+  - 목표 금액과의 차이 => targetGapAmount
+  - 추천 월 납입 금액 => recommendedMonthlyContribution

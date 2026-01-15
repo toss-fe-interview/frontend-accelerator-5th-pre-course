@@ -1,4 +1,4 @@
-import ProductContainer from 'components/ProductContainer';
+import ProductsContainer from 'components/ProductsContainer';
 import { Suspense } from 'react';
 import { NavigationBar, Spacing } from 'tosslib';
 
@@ -10,7 +10,7 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
       {/* TODO. 에러 바운더리 추가해야함. */}
       <Suspense fallback={<></>}>
-        <ProductContainer />
+        <ProductsContainer />
       </Suspense>
     </>
   );

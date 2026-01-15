@@ -1,13 +1,13 @@
 import { Assets, colors, ListRow } from 'tosslib';
-import { ProductItem } from './ProductContainer';
+import { ProductItem } from './ProductsContainer';
 
 interface ProductListProps {
   // 필터된 products
   products: ProductItem[];
-  handleClickProduct: (id: string) => void;
+  onClickProduct: (id: string) => void;
 }
 
-export default function ProductList({ products, handleClickProduct }: ProductListProps) {
+export default function ProductList({ products, onClickProduct }: ProductListProps) {
   // 선택 기능.
   // 렌더링
   return (
@@ -28,7 +28,7 @@ export default function ProductList({ products, handleClickProduct }: ProductLis
           }
           right={product.isSelected && <Assets.Icon name="icon-check-circle-green" />}
           onClick={() => {
-            handleClickProduct(product.id);
+            onClickProduct(product.id);
           }}
         />
       ))}
