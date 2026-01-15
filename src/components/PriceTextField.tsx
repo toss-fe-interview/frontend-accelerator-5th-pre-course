@@ -1,5 +1,5 @@
 import { TextField } from 'tosslib';
-import { priceFormatterToString, priceParserToNumber } from 'utils/priceFormatter';
+import { priceFormatterToLocaleString, priceParserToNumber } from 'utils/priceFormatter';
 
 interface PriceTextFieldProps {
   value: number;
@@ -13,7 +13,7 @@ export const PriceTextField = ({ value, onChange, label, placeholder }: PriceTex
       label={label}
       placeholder={placeholder}
       suffix="원"
-      value={priceFormatterToString(value)}
+      value={priceFormatterToLocaleString(value)}
       onChange={e => onChange(priceParserToNumber(e.target.value))}
     />
   );

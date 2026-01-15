@@ -1,6 +1,6 @@
 import { SavingProduct } from 'models/SavingProduct';
 import { colors, ListRow } from 'tosslib';
-import { priceFormatterToString } from 'utils/priceFormatter';
+import { priceFormatterToLocaleString } from 'utils/priceFormatter';
 import { roundToUnit } from 'utils/math';
 import { SavingCalculationParams } from '../hooks/useSavingCalculationParams';
 
@@ -23,7 +23,7 @@ export const CalculationResult = ({ selectedSavingProduct, calculationParams }: 
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${priceFormatterToString(expectedProfit)}원`}
+            bottom={`${priceFormatterToLocaleString(expectedProfit)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -34,7 +34,7 @@ export const CalculationResult = ({ selectedSavingProduct, calculationParams }: 
             type="2RowTypeA"
             top="목표 금액과의 차이"
             topProps={{ color: colors.grey600 }}
-            bottom={`${priceFormatterToString(diffFromTargetAmount)}원`}
+            bottom={`${priceFormatterToLocaleString(diffFromTargetAmount)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -45,7 +45,7 @@ export const CalculationResult = ({ selectedSavingProduct, calculationParams }: 
             type="2RowTypeA"
             top="추천 월 납입 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${priceFormatterToString(recommendedMonthlyPayment)}원`}
+            bottom={`${priceFormatterToLocaleString(recommendedMonthlyPayment)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }

@@ -1,6 +1,6 @@
 import { SavingProduct } from 'models/SavingProduct';
 import { Assets, colors, ListRow } from 'tosslib';
-import { priceFormatterToString } from 'utils/priceFormatter';
+import { priceFormatterToLocaleString } from 'utils/priceFormatter';
 
 export const SavingProductList = ({
   savingsProducts,
@@ -29,7 +29,7 @@ export const SavingProductList = ({
                 topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                 middle={`연 이자율: ${product.annualRate}%`}
                 middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${priceFormatterToString(product.minMonthlyAmount)}원 ~ ${priceFormatterToString(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                bottom={`${priceFormatterToLocaleString(product.minMonthlyAmount)}원 ~ ${priceFormatterToLocaleString(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
