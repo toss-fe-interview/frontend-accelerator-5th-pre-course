@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Assets,
   Border,
@@ -37,28 +37,54 @@ const fomarKRAmount = (amount: number) => {
   return amount.toLocaleString('ko-KR');
 };
 
+// utils/math
+const roundingNumber = (num: number) => {
+  if (num >= 1000) {
+    const rounded = Math.round(num / 1000);
+    return rounded * 1000;
+  }
+};
+
 export function SavingsCalculatorPage() {
+  // fields
   const [targetAmount, setTargetAmount] = useState('');
   const [monthlyAmount, setMonthlyAmount] = useState('');
   const [savingTerms, setSavingTerms] = useState(12);
+
+  // tabs
   const [selectedTab, setSelectedTab] = useState<ProductTabs>('products');
+
+  // products
   const [savingProducts, setSavingProducts] = useState<SavingsProduct[]>([]);
-  const [selectedSavingProduct, setSelectedSavingProduct] = useState('');
+  const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
 
-  console.log(targetAmount, monthlyAmount, savingTerms);
+  // results
+  // 어차피 렌더링 될때 계산하도록
+  // 최종 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
+  const expectedProfit = Number(monthlyAmount) * savingTerms * (1 + (selectedSavingProduct?.annualRate ?? 0) * 0.5);
+  // 목표 금액과의 차이 = 목표 금액 - 예상 수익 금액
+  const diffAmount = Number(targetAmount ?? 0) - expectedProfit;
+  // 월 납입액 = 목표 금액 ÷ (저축 기간 * (1 + 연이자율 * 0.5))  1,000원 단위로 반올림
+  const recommendMonthlyPayment = roundingNumber(
+    Number(targetAmount ?? 0) / (savingTerms * (1 + (selectedSavingProduct?.annualRate ?? 0 * 0.5)))
+  );
 
-  const fetchSavingsProduct = async () => {
-    try {
-      const response = await http.get<SavingsProduct[]>('/api/savings-products');
-      setSavingProducts(response);
-    } catch (e) {
-      if (isHttpError(e)) {
-        console.log(e.message);
+  console.log(selectedSavingProduct);
+
+  useEffect(() => {
+    const fetchSavingsProduct = async () => {
+      try {
+        const response = await http.get<SavingsProduct[]>('/api/savings-products');
+        setSavingProducts(response);
+      } catch (e) {
+        if (isHttpError(e)) {
+          console.log(e.message);
+        }
       }
-    }
-  };
+    };
 
-  fetchSavingsProduct();
+    fetchSavingsProduct();
+  }, []);
 
   return (
     <>
@@ -141,8 +167,8 @@ export function SavingsCalculatorPage() {
                     bottomProps={{ fontSize: 13, color: colors.grey600 }}
                   />
                 }
-                right={selectedSavingProduct === id && <Assets.Icon name="icon-check-circle-green" />}
-                onClick={() => setSelectedSavingProduct(id)}
+                right={selectedSavingProduct?.id === id && <Assets.Icon name="icon-check-circle-green" />}
+                onClick={() => setSelectedSavingProduct(product)}
               />
             );
           })}
@@ -157,7 +183,7 @@ export function SavingsCalculatorPage() {
                     type="2RowTypeA"
                     top="예상 수익 금액"
                     topProps={{ color: colors.grey600 }}
-                    bottom={`1,000,000원`}
+                    bottom={`${expectedProfit.toLocaleString('ko-KR')}원`}
                     bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                   />
                 }
@@ -168,7 +194,7 @@ export function SavingsCalculatorPage() {
                     type="2RowTypeA"
                     top="목표 금액과의 차이"
                     topProps={{ color: colors.grey600 }}
-                    bottom={`-500,000원`}
+                    bottom={`${diffAmount.toLocaleString('ko-KR')}원`}
                     bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                   />
                 }
@@ -179,7 +205,7 @@ export function SavingsCalculatorPage() {
                     type="2RowTypeA"
                     top="추천 월 납입 금액"
                     topProps={{ color: colors.grey600 }}
-                    bottom={`100,000원`}
+                    bottom={`${(recommendMonthlyPayment ?? 0).toLocaleString('ko-KR')}원`}
                     bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                   />
                 }
