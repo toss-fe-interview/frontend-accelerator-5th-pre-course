@@ -7,11 +7,10 @@ import SavingsProductList from 'features/savings/components/SavingsProductList';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
-import { formatNumberWithComma } from 'features/savings/utils/format/number';
 import { parseNumberInput } from 'features/savings/utils/parse/number';
 import { filterSavings } from 'features/savings/utils/product/savings';
 import { ChangeEvent, useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [savingsValues, setSavingsValues] = useState<SavingsValues>({
@@ -22,6 +21,11 @@ export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<SavingsTabs>('products');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const { data: savingsProducts } = useSuspenseSavingsProducts();
+  const filteredSavingsProducts = filterSavings(
+    savingsProducts,
+    savingsValues.monthlyPaymentAmount,
+    savingsValues.savingsPeriod
+  );
 
   const changeSelectedProduct = (newValue: string) => {
     setSelectedProductId(newValue);
@@ -98,11 +102,7 @@ export function SavingsCalculatorPage() {
         <Suspense fallback={<SuspenseFallback />}>
           {selectedTab === 'products' ? (
             <SavingsProductList
-              savingsProducts={filterSavings(
-                savingsProducts,
-                savingsValues.monthlyPaymentAmount,
-                savingsValues.savingsPeriod
-              )}
+              savingsProducts={filteredSavingsProducts}
               selectedProductId={selectedProductId}
               changeSelectedProduct={changeSelectedProduct}
               clickable
@@ -110,11 +110,7 @@ export function SavingsCalculatorPage() {
           ) : (
             <CalculationResult
               savingsValues={savingsValues}
-              savingsProducts={filterSavings(
-                savingsProducts,
-                savingsValues.monthlyPaymentAmount,
-                savingsValues.savingsPeriod
-              )}
+              savingsProducts={filteredSavingsProducts}
               selectedProductId={selectedProductId}
             />
           )}
