@@ -1,3 +1,4 @@
+import { AsyncValue } from 'shared/model';
 import { SavingsProduct } from '../model';
 
 export const extractNumbers = (value: string) => {
@@ -8,7 +9,7 @@ export const formatNumberWithCommas = (value: string) => {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-export const getRecommendedSavingsProducts = (savingsProduct: SavingsProduct[] | undefined) => {
+export const getRecommendedSavingsProducts = (savingsProduct: AsyncValue<SavingsProduct[]>) => {
   if (!savingsProduct) {
     return [];
   }
@@ -17,7 +18,7 @@ export const getRecommendedSavingsProducts = (savingsProduct: SavingsProduct[] |
 };
 
 export const getSelectedSavingsProduct = (
-  savingsProduct: SavingsProduct[] | undefined,
+  savingsProduct: AsyncValue<SavingsProduct[]>,
   selectedSavingsProductId: string
 ) => {
   if (!savingsProduct) {
@@ -32,7 +33,7 @@ export const getAvailableSavingsProducts = ({
   monthlyDeposit,
   savingDuration,
 }: {
-  products: SavingsProduct[] | undefined;
+  products: AsyncValue<SavingsProduct[]>;
   monthlyDeposit: string;
   savingDuration: number;
 }) => {
