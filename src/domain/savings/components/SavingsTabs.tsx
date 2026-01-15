@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, ListRow, Tab } from 'tosslib';
+import { Border, Button, ListHeader, ListRow, Spacing, Tab } from 'tosslib';
 import { arrayIncludes } from '@shared/utils';
 import { SuspenseBoundary, SwitchCase, Delay } from '@shared/ui';
 import { calcSavingResult } from '@savings/utils';
@@ -61,8 +61,14 @@ export const SavingsTabs = (props: SavingsTabsProps) => {
 };
 
 const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: string }) => {
-  const { data: savingsProducts } = useSavingsProducts({ filterParams: savingsForm });
+  const { data: savingsProducts } = useSavingsProducts({
+    filterParams: {
+      monthlySaving: Number(savingsForm.monthlySaving),
+      savingPeriod: savingsForm.savingPeriod,
+    },
+  });
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct>();
+  const recommendedProducts = [...savingsProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   const handleClickProduct = (sp: SavingsProduct) => {
     setSelectedProduct(sp);
@@ -81,11 +87,31 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
           />
         )),
         results: (
-          <CalculationResult
-            result={calcSavingResult({ savingsForm, selectedProduct })}
-            recommendedProducts={[...savingsProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2)}
-            selectedProduct={selectedProduct}
-          />
+          <>
+            <Spacing size={8} />
+            <CalculationResult
+              result={calcSavingResult({ savingsForm, selectedProduct })}
+              selectedProduct={selectedProduct}
+            />
+            <Spacing size={8} />
+            <Border height={16} />
+            <Spacing size={8} />
+            <ListHeader
+              title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+            />
+            <Spacing size={12} />
+            {recommendedProducts.map(rp => {
+              return (
+                <ProductListItem
+                  key={rp.id}
+                  savingsProduct={rp}
+                  onClick={handleClickProduct}
+                  selected={rp.id === selectedProduct?.id}
+                />
+              );
+            })}
+            <Spacing size={40} />
+          </>
         ),
       }}
     />

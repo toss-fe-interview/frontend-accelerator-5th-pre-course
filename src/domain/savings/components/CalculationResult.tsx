@@ -1,18 +1,15 @@
-import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { colors, ListRow } from 'tosslib';
 import { commaizeNumber, roundToUnit } from '@shared/utils';
-import { ProductListItem } from './ProductListItem';
 import type { SavingsProduct } from '@savings/apis/type';
 import type { SavingsResult } from '@savings/utils/calcSavingsResult';
 
 type CalculationResultProps = {
   result: SavingsResult;
-  recommendedProducts: SavingsProduct[];
   selectedProduct?: SavingsProduct;
-  onClickProduct?(savingsProduct: SavingsProduct): void;
 };
 
 export const CalculationResult = (props: CalculationResultProps) => {
-  const { result, recommendedProducts, selectedProduct, onClickProduct } = props;
+  const { result, selectedProduct } = props;
   const { expectedReturn, differanceFromGoal, recommendedMonthlySaving } = result;
 
   if (!selectedProduct) {
@@ -21,7 +18,6 @@ export const CalculationResult = (props: CalculationResultProps) => {
 
   return (
     <>
-      <Spacing size={8} />
       <ListRow
         contents={
           <ListRow.Texts
@@ -55,26 +51,6 @@ export const CalculationResult = (props: CalculationResultProps) => {
           />
         }
       />
-
-      <Spacing size={8} />
-      <Border height={16} />
-      <Spacing size={8} />
-
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-
-      {recommendedProducts.map(rp => {
-        return (
-          <ProductListItem
-            key={rp.id}
-            savingsProduct={rp}
-            onClick={onClickProduct}
-            selected={rp.id === selectedProduct?.id}
-          />
-        );
-      })}
-
-      <Spacing size={40} />
     </>
   );
 };
