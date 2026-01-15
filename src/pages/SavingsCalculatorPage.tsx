@@ -1,5 +1,5 @@
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
-import { Border, http, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, http, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { URLS } from 'consts';
@@ -7,22 +7,12 @@ import { KRWInput } from 'components/KRWInput';
 import { NumberSelect } from 'components/NumberSelect';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { AmountDisplay } from 'components/AmountDisplay';
+import { TAB_STATE, Tabs } from 'components/Tabs';
 
 type CalculatorForm = {
   monthlyAmount: number | null;
   targetAmount: number | null;
   term: number;
-};
-
-const TAB_STATE = {
-  PRODUCTS: 'products',
-  RESULTS: 'results',
-} as const;
-
-type TabType = (typeof TAB_STATE)[keyof typeof TAB_STATE];
-
-const isTabType = (value: string): value is TabType => {
-  return Object.values(TAB_STATE).includes(value as TabType);
 };
 
 export type SavingProduct = {
@@ -36,8 +26,6 @@ export type SavingProduct = {
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingProduct | null>(null);
-  const [tabState, setTabState] = useState<TabType>(TAB_STATE.PRODUCTS);
-
   const { data: savingProducts } = useQuery({
     queryKey: [URLS.SAVINGS_PRODUCTS],
     queryFn: () => http.get<SavingProduct[]>(URLS.SAVINGS_PRODUCTS),
@@ -93,52 +81,18 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab
-        onChange={value => {
-          if (isTabType(value)) {
-            setTabState(value);
-          }
-        }}
+      <Tabs
+        trigger={[
+          <Tabs.Item key={TAB_STATE.PRODUCTS} value={TAB_STATE.PRODUCTS}>
+            적금 상품
+          </Tabs.Item>,
+          <Tabs.Item key={TAB_STATE.RESULTS} value={TAB_STATE.RESULTS}>
+            계산 결과
+          </Tabs.Item>,
+        ]}
       >
-        <Tab.Item value={TAB_STATE.PRODUCTS} selected={tabState === TAB_STATE.PRODUCTS}>
-          적금 상품
-        </Tab.Item>
-        <Tab.Item value={TAB_STATE.RESULTS} selected={tabState === TAB_STATE.RESULTS}>
-          계산 결과
-        </Tab.Item>
-      </Tab>
-
-      {tabState === TAB_STATE.PRODUCTS &&
-        filteredProducts.map(product => (
-          <SavingsProductItem
-            product={product}
-            key={product.id}
-            checked={selectedProduct?.id === product.id}
-            onClick={() => setSelectedProduct(product)}
-          />
-        ))}
-
-      {tabState === TAB_STATE.RESULTS && (
-        <>
-          <Spacing size={8} />
-          {selectedProduct ? (
-            <>
-              <AmountDisplay title="예상 수익 금액" value={expectedIncome} />
-              <AmountDisplay title="목표 금액과의 차이" value={targetDiff} />
-              <AmountDisplay title="추천 월 납입 금액" value={recommendedMonthlyPayment} />
-            </>
-          ) : (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-          )}
-
-          <Spacing size={8} />
-          <Border height={16} />
-          <Spacing size={8} />
-
-          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-          <Spacing size={12} />
-
-          {recommendProductList?.map(product => (
+        <Tabs.Panel value={TAB_STATE.PRODUCTS}>
+          {filteredProducts.map(product => (
             <SavingsProductItem
               product={product}
               key={product.id}
@@ -146,9 +100,42 @@ export function SavingsCalculatorPage() {
               onClick={() => setSelectedProduct(product)}
             />
           ))}
-          <Spacing size={40} />
-        </>
-      )}
+        </Tabs.Panel>
+
+        <Tabs.Panel value={TAB_STATE.RESULTS}>
+          <>
+            <Spacing size={8} />
+            {selectedProduct ? (
+              <>
+                <AmountDisplay title="예상 수익 금액" value={expectedIncome} />
+                <AmountDisplay title="목표 금액과의 차이" value={targetDiff} />
+                <AmountDisplay title="추천 월 납입 금액" value={recommendedMonthlyPayment} />
+              </>
+            ) : (
+              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+            )}
+
+            <Spacing size={8} />
+            <Border height={16} />
+            <Spacing size={8} />
+
+            <ListHeader
+              title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+            />
+            <Spacing size={12} />
+
+            {recommendProductList?.map(product => (
+              <SavingsProductItem
+                product={product}
+                key={product.id}
+                checked={selectedProduct?.id === product.id}
+                onClick={() => setSelectedProduct(product)}
+              />
+            ))}
+            <Spacing size={40} />
+          </>
+        </Tabs.Panel>
+      </Tabs>
     </FormProvider>
   );
 }
