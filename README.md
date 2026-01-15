@@ -95,3 +95,20 @@ yarn dev
     - 각 계산 함수들은 서로 연관이 있고, 실제 특정 값이 특정 계산에 사용되기 때문에 객체로 묶어 관리합니다.
     - 컴포넌트 내부에서 계산 로직은 알 필요가 없기때문에 `추상화된 메서드`를 사용하여 계산값을 얻을수 있다.
   - getFilterProductsByInputValue : products와 userInput을 바탕으로 products를 필터하여 return 합니다.
+
+유지 보수 개선 - 5 (컴포넌트 구조 조정 및 props 개선)
+
+- ProductsContainer 컴포넌트 삭제
+  - 데이터 페칭과 상태 관리만 담당하던 중간 레이어 컴포넌트 제거
+  - 불필요한 컴포넌트 depth 감소 (SavingsCalculatorPage → ProductsContainer → SavingCalculator에서 SavingsCalculatorPage → SavingCalculator로 단순화)
+
+- useProducts 커스텀훅 생성
+  - ProductsContainer의 로직(데이터 페칭, 상태 관리, handleSelectItem)을 커스텀훅으로 추출
+  - SavingCalculator에서 직접 훅을 호출하여 products와 handleSelectItem을 사용
+  - props drilling 제거: products, onProductSelect props가 불필요해짐
+
+- CalculationResult에 render props 패턴 적용
+  - onClickProduct props 대신 render props로 변경
+  - 추천 상품 목록의 렌더링 방식을 외부에서 정의할 수 있도록 유연성 확보
+  - 기존: CalculationResult 내부에서 ProductItem을 직접 렌더링
+  - 개선: render props로 ProductList 컴포넌트 재사용, ListHeader도 외부에서 정의

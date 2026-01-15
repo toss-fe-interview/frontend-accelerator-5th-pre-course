@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Border, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, SelectBottomSheet, Spacing, Tab, TextField, ListHeader } from 'tosslib';
 import CalculationResult from './CalculationResult';
 import ProductList from './ProductList';
 import { ProductItem } from 'types/products';
 import { CalculatorForm } from 'types/calculate';
 import { getNumericStringOnly } from 'utils/number';
+import useProducts from 'hooks/useProducts';
 
 type Tabs = 'products' | 'results';
 
@@ -19,12 +20,8 @@ function getFilterProductsByInputValue(products: ProductItem[], userInput: Calcu
     .filter(product => product.availableTerms === userInput.savingPeriod);
 }
 
-interface SavingCalculatorProps {
-  products: ProductItem[];
-  onProductSelect: (id: string) => void;
-}
-
-export default function SavingCalculator({ products, onProductSelect }: SavingCalculatorProps) {
+export default function SavingCalculator() {
+  const { products, handleSelectItem } = useProducts();
   const [tab, setTab] = useState<Tabs>('products');
   const [calculatingData, setCalculatingData] = useState<CalculatorForm>({
     targetAmount: '',
@@ -103,10 +100,21 @@ export default function SavingCalculator({ products, onProductSelect }: SavingCa
       </Tab>
 
       {tab === 'products' ? (
-        // 입력된 값이 없으면 일반 products를 노출 | 필터된 프로덕트 노출
-        <ProductList products={filteredProducts} onClickProduct={onProductSelect} />
+        <ProductList products={filteredProducts} onClickProduct={handleSelectItem} />
       ) : (
-        <CalculationResult products={products} userInput={calculatingData} onClickProduct={onProductSelect} />
+        <CalculationResult
+          products={filteredProducts}
+          userInput={calculatingData}
+          render={recommendedProducts => (
+            <>
+              <ListHeader
+                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+              />
+              <Spacing size={12} />
+              <ProductList products={recommendedProducts} onClickProduct={handleSelectItem} />
+            </>
+          )}
+        />
       )}
     </>
   );

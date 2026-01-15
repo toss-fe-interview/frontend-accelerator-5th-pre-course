@@ -1,7 +1,6 @@
-import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { Border, colors, ListRow, Spacing } from 'tosslib';
 import { type ProductItem } from 'types/products';
 import { CalculatorForm } from 'types/calculate';
-import Product from './ProductItem';
 import { roundToThousand } from 'utils/number';
 
 function savingCalculator(userInput: CalculatorForm, targetProduct?: ProductItem) {
@@ -34,18 +33,20 @@ function savingCalculator(userInput: CalculatorForm, targetProduct?: ProductItem
   };
 }
 
-interface CalculationResultProps {
-  // 필터된 데이터 총 연 이자율 소팅후 2개만
-  products: ProductItem[];
-  userInput: CalculatorForm;
-  onClickProduct: (id: string) => void;
+function getRecommendProducts(products: ProductItem[]) {
+  return products.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 }
 
-export default function CalculationResult({ products, userInput, onClickProduct }: CalculationResultProps) {
-  // 1. isSelected을 찾아서, 그 정보와 formData를 계산해서 표출시켜줌.
+interface CalculationResultProps {
+  products: ProductItem[];
+  userInput: CalculatorForm;
+  render: (products: ProductItem[]) => JSX.Element;
+}
 
+export default function CalculationResult({ products, userInput, render }: CalculationResultProps) {
   const selectedProduct = products.find(product => product.isSelected);
   const caculator = savingCalculator(userInput, selectedProduct);
+  const recommendedProducts = getRecommendProducts(products);
 
   // 예상 수익 금액
   const expectedReturnAmount = caculator.getExpectedReturnAmount();
@@ -101,20 +102,7 @@ export default function CalculationResult({ products, userInput, onClickProduct 
       <Border height={16} />
       <Spacing size={8} />
 
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-      {/* 사용자가 입력한 조건에 맞는 적금 상품 중 연 이자율이 가장 높은 2개의 상품을 출력해주세요. */}
-
-      {products.map(product => (
-        <button
-          key={product.id}
-          onClick={() => {
-            onClickProduct(product.id);
-          }}
-        >
-          <Product product={product} isActive={product.isSelected} />
-        </button>
-      ))}
+      {render(recommendedProducts)}
 
       <Spacing size={40} />
     </>

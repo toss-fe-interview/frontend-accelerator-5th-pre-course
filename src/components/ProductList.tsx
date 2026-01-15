@@ -2,7 +2,6 @@ import { ProductItem } from 'types/products';
 import Product from './ProductItem';
 
 interface ProductListProps {
-  // 필터된 products
   products: ProductItem[];
   onClickProduct: (id: string) => void;
 }
