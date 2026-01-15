@@ -1,7 +1,6 @@
 import { Spacing, Border, ListHeader, ListRow } from 'tosslib';
 import SavingsProductList from './SavingsProductList';
 import { SavingsProduct } from '../schemas/savingsProduct';
-import useRecommendedSavingsProducts from '../hooks/useRecommendedSavingsProducts';
 import { SavingsValues } from '../types/savingsValues';
 import SavingsResult from './SavingsResult';
 import {
@@ -9,6 +8,7 @@ import {
   calculateDifferenceWithTargetAmount,
   calculateRecommendedMonthlyPayment,
 } from '../utils/calculation/savings';
+import { recommendSavings } from '../utils/product/savings';
 
 interface CalculationResultProps {
   savingsValues: SavingsValues;
@@ -21,8 +21,6 @@ export default function CalculationResult({
   savingsProducts,
   selectedProductId,
 }: CalculationResultProps) {
-  const recommendedSavingsProducts = useRecommendedSavingsProducts(savingsProducts);
-
   const selectedProduct = savingsProducts.find(product => product.id === selectedProductId);
   const isProductNotSelected = !selectedProductId || !selectedProduct;
 
@@ -61,7 +59,7 @@ export default function CalculationResult({
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
-      <SavingsProductList savingsProducts={recommendedSavingsProducts} selectedProductId={selectedProductId} />
+      <SavingsProductList savingsProducts={recommendSavings(savingsProducts)} selectedProductId={selectedProductId} />
 
       <Spacing size={40} />
     </>
