@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import SavingsProductList from 'components/SavingsProductList';
+import { useSavingProducts } from 'hooks/useSavingsProducts';
 import {
   Assets,
   Border,
@@ -14,6 +16,22 @@ import {
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  const { data, isLoading, isError } = useSavingProducts();
+
+  const renderProductList = () => {
+    if (isLoading) {
+      return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중입니다..." />} />;
+    }
+    if (isError) {
+      return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중에 오류가 발생했습니다." />} />;
+    }
+    if (!data) {
+      return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품 데이터가 없습니다." />} />;
+    }
+    return <SavingsProductList products={data} selectedProductId={selectedProductId} onProductSelect={setSelectedProductId} />;
+  };
 
   return (
     <>
@@ -43,7 +61,7 @@ export function SavingsCalculatorPage() {
           계산 결과
         </Tab.Item>
       </Tab>
-      {selectedTab === 'productList' ? <div>적금 상품 목록</div> : <div>계산 결과 내용</div>}
+      {selectedTab === 'productList' ? renderProductList() : <div>계산 결과 내용</div>}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
