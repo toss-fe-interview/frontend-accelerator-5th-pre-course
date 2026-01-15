@@ -1,7 +1,8 @@
 import { type SavingsProduct, useSavingsProducts } from 'api/savings-products';
 import { CalculationResult } from 'components/CalculationResult';
 import { View } from 'components/CommonView';
-import { FilterForm } from 'components/FilterForm';
+import { MoneyInputField } from 'components/controls/MoneyInputField';
+import { TermSelectBottomSheet } from 'components/controls/TermSelectBottomSheet';
 import { SavingsProductList } from 'components/SavingsProductList';
 import { SavingsRecommendation } from 'components/SavingsRecommendation';
 import { useMemo, useState } from 'react';
@@ -17,7 +18,7 @@ type TabType = (typeof TAB)[keyof typeof TAB];
 
 export function SavingsCalculatorPage() {
   const { savingsProducts, isLoading, isError } = useSavingsProducts();
-  // 적금 계산기
+  // 인풋 칸
   const [targetAmount, setTargetAmount] = useState<number | undefined>(undefined);
   const [monthlyAmount, setMonthlyAmount] = useState<number | undefined>(undefined);
   const [term, setTerm] = useState<number>(12);
@@ -47,15 +48,12 @@ export function SavingsCalculatorPage() {
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      {/* 필터 폼 */}
-      <FilterForm
-        targetAmount={targetAmount}
-        monthlyAmount={monthlyAmount}
-        term={term}
-        onTargetAmountChange={setTargetAmount}
-        onMonthlyAmountChange={setMonthlyAmount}
-        onTermChange={setTerm}
-      />
+      {/* 인풋 칸 */}
+      <MoneyInputField label="목표 금액" value={targetAmount} onValueChange={setTargetAmount} />
+      <Spacing size={16} />
+      <MoneyInputField label="월 납입액" value={monthlyAmount} onValueChange={setMonthlyAmount} />
+      <Spacing size={16} />
+      <TermSelectBottomSheet label="저축 기간" value={term} onValueChange={setTerm} />
 
       <Spacing size={24} />
       <Border height={16} />
