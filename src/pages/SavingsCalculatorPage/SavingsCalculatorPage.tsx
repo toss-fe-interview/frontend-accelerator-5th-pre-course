@@ -1,11 +1,12 @@
-import { Border, NavigationBar, Spacing } from 'tosslib';
+import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import { SavingsProduct } from './types/types';
 import { useState } from 'react';
 import { SavingsInputForm } from './components/form/SavingsInputForm';
-import { SavingsProductTabView } from './components/tab/SavingsProductTabView';
 import { useSavingsProducts } from './hooks/useSavingsProducts';
 import { useFilteredSavingsProducts } from './hooks/useFilteredSavingsProducts';
 import { useRecommendedProducts } from './hooks/useRecommendedProducts';
+import { SavingsProductList } from './components/tab/SavingsProductList';
+import { SavingsCalculationResult } from './components/tab/SavingsCalculationResult';
 
 export function SavingsCalculatorPage() {
   const [savingsInput, setSavingsInput] = useState({
@@ -25,7 +26,6 @@ export function SavingsCalculatorPage() {
   };
 
   const handleSelectSavingsProduct = (product: SavingsProduct) => {
-    //TODO : 하나임을 보장받을 수 있는 로직
     setSelectedSavingsProduct(product);
   };
 
@@ -45,15 +45,30 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <SavingsProductTabView
-        savingsProducts={filteredSavingsProducts}
-        selectedSavingsProduct={selectedSavingsProduct}
-        handleSelectSavingsProduct={handleSelectSavingsProduct}
-        savingsProductTab={savingsProductTab}
-        handleSelectSavingsProductTab={handleSelectSavingsProductTab}
-        savingsInput={savingsInput}
-        recommendedProducts={recommendedProducts}
-      />
+      <Tab onChange={value => handleSelectSavingsProductTab(value as 'products' | 'results')}>
+        <Tab.Item value="products" selected={savingsProductTab === 'products'}>
+          적금 상품
+        </Tab.Item>
+        <Tab.Item value="results" selected={savingsProductTab === 'results'}>
+          계산 결과
+        </Tab.Item>
+      </Tab>
+
+      {savingsProductTab === 'products' && (
+        <SavingsProductList
+          savingsProducts={savingsProducts}
+          selectedSavingsProduct={selectedSavingsProduct}
+          handleSelectSavingsProduct={handleSelectSavingsProduct}
+        />
+      )}
+
+      {savingsProductTab === 'results' && (
+        <SavingsCalculationResult
+          selectedSavingsProduct={selectedSavingsProduct}
+          savingsInput={savingsInput}
+          recommendedProducts={recommendedProducts}
+        />
+      )}
     </>
   );
 }
