@@ -6,7 +6,6 @@ import {
   Border,
   colors,
   http,
-  ListHeader,
   ListRow,
   NavigationBar,
   SelectBottomSheet,
@@ -20,6 +19,8 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number>(1000000);
   const [monthlyPayment, setMonthlyPayment] = useState<number>(50000);
   const [term, setTerm] = useState<number>(12);
+
+  const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingProduct | null>(null);
 
   const { data: savingsProducts } = useQuery({
     queryKey: ['savings-products'],
@@ -73,23 +74,27 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {savingsProducts?.map(product => (
-        <ListRow
-          key={product.id}
-          contents={
-            <ListRow.Texts
-              type="3RowTypeA"
-              top={product.name}
-              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-              middle={`연 이자율: ${product.annualRate}%`}
-              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-              bottom={`${priceFormatterToString(product.minMonthlyAmount)}원 ~ ${priceFormatterToString(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-            />
-          }
-          onClick={() => {}}
-        />
-      ))}
+      {savingsProducts?.map(product => {
+        const isSelected = selectedSavingProduct?.id === product.id;
+        return (
+          <ListRow
+            key={product.id}
+            contents={
+              <ListRow.Texts
+                type="3RowTypeA"
+                top={product.name}
+                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                middle={`연 이자율: ${product.annualRate}%`}
+                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                bottom={`${priceFormatterToString(product.minMonthlyAmount)}원 ~ ${priceFormatterToString(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+              />
+            }
+            right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+            onClick={() => setSelectedSavingProduct(product)}
+          />
+        );
+      })}
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
