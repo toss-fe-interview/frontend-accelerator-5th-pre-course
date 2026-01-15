@@ -4,7 +4,7 @@ interface SavingsProduct {
   annualRate: number;
   minMonthlyAmount: number;
   maxMonthlyAmount: number;
-  availableTerm: number;
+  availableTerms: number;
 }
 
 export type { SavingsProduct };
