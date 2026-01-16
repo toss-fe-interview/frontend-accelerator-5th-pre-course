@@ -36,6 +36,8 @@ export function SavingsCalculatorPage() {
 
   const selectedSavingsProduct = savingsProducts?.find(product => product.id === selectedProductId);
 
+  const hasFilteredProducts = filteredSavingsProducts && filteredSavingsProducts.length > 0;
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -60,7 +62,7 @@ export function SavingsCalculatorPage() {
 
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
         <>
-          {filteredSavingsProducts && filteredSavingsProducts.length > 0 ? (
+          {hasFilteredProducts ? (
             filteredSavingsProducts.map(product => {
               const selected = selectedProductId === product.id;
               return (
