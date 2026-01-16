@@ -6,3 +6,5 @@ export interface SavingsFilterForm {
   monthlyPayment: number | null;
   term: SavingsCalculatorTerm;
 }
+
+export type SavingsFilter = Omit<SavingsFilterForm, 'targetAmount'>;
