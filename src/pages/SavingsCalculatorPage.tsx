@@ -13,7 +13,7 @@ import { useSavingsCondition } from 'features/savings-calculator/model/useSaving
 import { AmountInput } from 'features/savings-calculator/ui/input/AmountInput';
 import { SavingsTermSelect } from 'features/savings-calculator/ui/input/SavingsTermSelect';
 import { RecommendedProductSection } from 'features/savings-calculator/ui/recommendation/RecommendedProductSection';
-import { CalculationResultItem } from 'features/savings-calculator/ui/result/CalculationResultItem';
+import { CalculationResultAmount } from 'features/savings-calculator/ui/result/CalculationResultAmount';
 import { CalculationResultSection } from 'features/savings-calculator/ui/result/CalculationResultSection';
 
 export function SavingsCalculatorPage() {
@@ -99,9 +99,11 @@ export function SavingsCalculatorPage() {
           >
             {({ finalAmount, differenceAmount, recommendedMonthlyAmount }) => (
               <>
-                <CalculationResultItem label="예상 수익 금액" amount={finalAmount} />
-                <CalculationResultItem label="목표 금액과의 차이" amount={differenceAmount} />
-                <CalculationResultItem label="추천 월 납입 금액" amount={recommendedMonthlyAmount} />
+                <ListRow contents={<CalculationResultAmount label="예상 수익 금액" amount={finalAmount} />} />
+                <ListRow contents={<CalculationResultAmount label="목표 금액과의 차이" amount={differenceAmount} />} />
+                <ListRow
+                  contents={<CalculationResultAmount label="추천 월 납입 금액" amount={recommendedMonthlyAmount} />}
+                />
               </>
             )}
           </CalculationResultSection>
