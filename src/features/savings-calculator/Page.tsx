@@ -29,12 +29,6 @@ export default function SavingsCalculatorPage() {
   const recommendedProducts = filteredProducts.sort(byHighestAnnualRate).slice(0, 2);
   const selectedProduct = products.find(product => product.id === selectedProductId);
 
-  const handleTabChange = (tab: string) => {
-    if (isValidTabKey(tab)) {
-      setCurrentTab(tab);
-    }
-  };
-
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -51,7 +45,7 @@ export default function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={handleTabChange}>
+      <Tab onChange={tab => (isValidTabKey(tab) ? setCurrentTab(tab) : undefined)}>
         {Object.entries(TABS_CONFIG).map(([tab, label]) => (
           <Tab.Item key={tab} value={tab} selected={currentTab === tab}>
             {label}
