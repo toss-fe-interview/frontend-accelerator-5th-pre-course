@@ -1,40 +1,23 @@
 import { formatCurrency } from 'shared/utils/format';
-import { Assets, colors, ListRow } from 'tosslib';
+import { colors, ListRow } from 'tosslib';
+import { SavingsProductType } from 'shared/types/api/savings';
 
 interface SavingsProductProps {
-  name: string;
-  annualRate: number;
-  minMonthlyAmount: number;
-  maxMonthlyAmount: number;
-  availableTerms: number;
-  selected?: boolean;
-  onSelect?: () => void;
+  product: SavingsProductType;
 }
 
-export default function SavingsProduct({
-  name,
-  annualRate,
-  minMonthlyAmount,
-  maxMonthlyAmount,
-  availableTerms,
-  selected = false,
-  onSelect,
-}: SavingsProductProps) {
+export default function SavingsProduct({ product }: SavingsProductProps) {
+  const { name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms } = product;
+
   return (
-    <ListRow
-      contents={
-        <ListRow.Texts
-          type="3RowTypeA"
-          top={name}
-          topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-          middle={`연 이자율: ${annualRate}%`}
-          middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-          bottom={`${formatCurrency(minMonthlyAmount)}원 ~ ${formatCurrency(maxMonthlyAmount)}원 | ${availableTerms}개월`}
-          bottomProps={{ fontSize: 13, color: colors.grey600 }}
-        />
-      }
-      right={selected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-      onClick={onSelect}
+    <ListRow.Texts
+      type="3RowTypeA"
+      top={name}
+      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+      middle={`연 이자율: ${annualRate}%`}
+      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+      bottom={`${formatCurrency(minMonthlyAmount)}원 ~ ${formatCurrency(maxMonthlyAmount)}원 | ${availableTerms}개월`}
+      bottomProps={{ fontSize: 13, color: colors.grey600 }}
     />
   );
 }
