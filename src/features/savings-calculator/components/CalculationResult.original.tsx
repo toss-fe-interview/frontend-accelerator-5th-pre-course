@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
-import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
+import { Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import type { SavingsFormState, SavingsProduct } from 'shared/types';
+import { formatNumber } from 'shared/utils';
+import { SavingsProductListItem } from './SavingsProductListItem';
 
 const SIMPLE_INTEREST_COEFFICIENT = 0.5;
 const ROUNDING_UNIT = 1000;
@@ -20,12 +22,6 @@ export function CalculationResult({
 }: CalculationResultProps) {
   const { goalAmount, monthlyAmount, term } = formState;
 
-  // 숫자 포맷팅 함수 (formatNumber 인라인)
-  const formatNumber = (num: number): string => {
-    return num.toLocaleString('ko-KR');
-  };
-
-  // 계산 로직
   const calculationResult = useMemo(() => {
     if (selectedProduct === null) {
       return null;
@@ -53,7 +49,6 @@ export function CalculationResult({
     <>
       <Spacing size={8} />
 
-      {/* 예상 수익 금액 */}
       <ListRow
         contents={
           <ListRow.Texts
@@ -65,8 +60,6 @@ export function CalculationResult({
           />
         }
       />
-
-      {/* 목표 금액과의 차이 */}
       <ListRow
         contents={
           <ListRow.Texts
@@ -79,7 +72,6 @@ export function CalculationResult({
         }
       />
 
-      {/* 추천 월 납입 금액 */}
       <ListRow
         contents={
           <ListRow.Texts
@@ -99,28 +91,9 @@ export function CalculationResult({
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
       <Spacing size={12} />
 
-      {/* 추천 상품 목록 (SavingsProductListItem 인라인) */}
-      {recommendedProducts.map(product => {
-        const isSelected = selectedProductId === product.id;
-
-        return (
-          <ListRow
-            key={product.id}
-            contents={
-              <ListRow.Texts
-                type="3RowTypeA"
-                top={product.name}
-                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                middle={`연 이자율: ${product.annualRate}%`}
-                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                bottomProps={{ fontSize: 13, color: colors.grey600 }}
-              />
-            }
-            right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-          />
-        );
-      })}
+      {recommendedProducts.map(product => (
+        <SavingsProductListItem key={product.id} product={product} isSelected={selectedProductId === product.id} />
+      ))}
 
       <Spacing size={40} />
     </>
