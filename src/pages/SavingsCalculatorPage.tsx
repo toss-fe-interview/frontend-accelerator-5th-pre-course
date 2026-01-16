@@ -8,9 +8,9 @@ import {
   getSelectedSavingsProduct,
 } from 'entities/savings/lib';
 import { SavingsTab } from 'entities/savings/model';
-import { CalculationResultItem, SavingsProductItem } from 'entities/savings/ui';
+import { CalculationResults, Placeholder, SavingsProductItem } from 'entities/savings/ui';
 import { useState } from 'react';
-import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<SavingsTab>('products');
@@ -88,7 +88,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
       {tab === 'products' &&
-        availableSavingsProducts?.map(product => (
+        availableSavingsProducts.map(product => (
           <SavingsProductItem
             key={product.id}
             product={product}
@@ -100,39 +100,41 @@ export function SavingsCalculatorPage() {
         ))}
       {tab === 'results' && (
         <>
+          <Spacing size={8} />
           {selectedSavingsProduct ? (
-            <>
-              <Spacing size={8} />
-              <CalculationResultItem
-                label="예상 수익 금액"
-                value={`${(
-                  Number(monthlyDeposit) *
-                  selectedSavingsProduct.availableTerms *
-                  (1 + selectedSavingsProduct.annualRate * 0.5)
-                ).toLocaleString()}원`}
-              />
-              <CalculationResultItem
-                label="목표 금액과의 차이"
-                value={`${formatNumberWithCommas(
-                  Number(targetAmount) -
+            <CalculationResults
+              results={[
+                {
+                  label: '예상 수익 금액',
+                  value: `${formatNumberWithCommas(
                     Number(monthlyDeposit) *
                       selectedSavingsProduct.availableTerms *
                       (1 + selectedSavingsProduct.annualRate * 0.5)
-                )}원`}
-              />
-              <CalculationResultItem
-                label="추천 월 납입 금액"
-                value={`${formatNumberWithCommas(
-                  Math.round(
-                    Number(targetAmount) /
-                      (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) /
-                      1000
-                  ) * 1000
-                )}원`}
-              />
-            </>
+                  )}원`,
+                },
+                {
+                  label: '목표 금액과의 차이',
+                  value: `${formatNumberWithCommas(
+                    Number(targetAmount) -
+                      Number(monthlyDeposit) *
+                        selectedSavingsProduct.availableTerms *
+                        (1 + selectedSavingsProduct.annualRate * 0.5)
+                  )}원`,
+                },
+                {
+                  label: '추천 월 납입 금액',
+                  value: `${formatNumberWithCommas(
+                    Math.round(
+                      Number(targetAmount) /
+                        (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) /
+                        1000
+                    ) * 1000
+                  )}원`,
+                },
+              ]}
+            />
           ) : (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+            <Placeholder message="상품을 선택해주세요." />
           )}
           {recommendedSavingsProducts.length > 0 && (
             <>
