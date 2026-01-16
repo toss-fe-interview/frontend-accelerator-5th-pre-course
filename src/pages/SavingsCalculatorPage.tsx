@@ -8,19 +8,9 @@ import {
   getSelectedSavingsProduct,
 } from 'entities/savings/lib';
 import { SavingsTab } from 'entities/savings/model';
+import { CalculationResultItem, SavingsProductItem } from 'entities/savings/ui';
 import { useState } from 'react';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<SavingsTab>('products');
@@ -99,20 +89,10 @@ export function SavingsCalculatorPage() {
       </Tab>
       {tab === 'products' &&
         availableSavingsProducts?.map(product => (
-          <ListRow
+          <SavingsProductItem
             key={product.id}
-            contents={
-              <ListRow.Texts
-                type="3RowTypeA"
-                top={product.name}
-                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                middle={`연 이자율: ${product.annualRate}%`}
-                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`}
-                bottomProps={{ fontSize: 13, color: colors.grey600 }}
-              />
-            }
-            right={product.id === selectedSavingsProductId && <Assets.Icon name="icon-check-circle-green" />}
+            product={product}
+            checked={product.id === selectedSavingsProductId}
             onClick={() => {
               setSelectedSavingsProductId(product.id);
             }}
@@ -123,53 +103,32 @@ export function SavingsCalculatorPage() {
           {selectedSavingsProduct && (
             <>
               <Spacing size={8} />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="예상 수익 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${(
-                      Number(monthlyDeposit) *
+              <CalculationResultItem
+                label="예상 수익 금액"
+                value={`${(
+                  Number(monthlyDeposit) *
+                  selectedSavingsProduct.availableTerms *
+                  (1 + selectedSavingsProduct.annualRate * 0.5)
+                ).toLocaleString()}원`}
+              />
+              <CalculationResultItem
+                label="목표 금액과의 차이"
+                value={`${formatNumberWithCommas(
+                  Number(targetAmount) -
+                    Number(monthlyDeposit) *
                       selectedSavingsProduct.availableTerms *
                       (1 + selectedSavingsProduct.annualRate * 0.5)
-                    ).toLocaleString()}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                  />
-                }
+                )}원`}
               />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="목표 금액과의 차이"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${(
-                      Number(targetAmount) -
-                      Number(monthlyDeposit) *
-                        selectedSavingsProduct.availableTerms *
-                        (1 + selectedSavingsProduct.annualRate * 0.5)
-                    ).toLocaleString()}`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                  />
-                }
-              />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="추천 월 납입 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${(
-                      Math.round(
-                        Number(targetAmount) /
-                          (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) /
-                          1000
-                      ) * 1000
-                    ).toLocaleString()}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                  />
-                }
+              <CalculationResultItem
+                label="추천 월 납입 금액"
+                value={`${formatNumberWithCommas(
+                  Math.round(
+                    Number(targetAmount) /
+                      (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) /
+                      1000
+                  ) * 1000
+                )}원`}
               />
             </>
           )}
@@ -186,20 +145,10 @@ export function SavingsCalculatorPage() {
               />
               <Spacing size={12} />
               {recommendedSavingsProducts.map(product => (
-                <ListRow
+                <SavingsProductItem
                   key={product.id}
-                  contents={
-                    <ListRow.Texts
-                      type="3RowTypeA"
-                      top={product.name}
-                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                      middle={`연 이자율: ${product.annualRate}%`}
-                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                      bottom={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`}
-                      bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                    />
-                  }
-                  right={product.id === selectedSavingsProductId && <Assets.Icon name="icon-check-circle-green" />}
+                  product={product}
+                  checked={product.id === selectedSavingsProductId}
                 />
               ))}
               <Spacing size={40} />

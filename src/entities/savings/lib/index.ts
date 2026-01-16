@@ -7,7 +7,11 @@ export const extractNumbers = (value: string) => {
   return value.replace(NON_DIGIT_REGEX, '');
 };
 
-export const formatNumberWithCommas = (value: string) => {
+export const formatNumberWithCommas = (value: string | number) => {
+  if (typeof value === 'number') {
+    return String(value).replace(THOUSANDS_SEPARATOR_REGEX, ',');
+  }
+
   return value.replace(THOUSANDS_SEPARATOR_REGEX, ',');
 };
 
