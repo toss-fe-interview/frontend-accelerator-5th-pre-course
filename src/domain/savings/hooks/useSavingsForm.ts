@@ -24,28 +24,27 @@ const initialForm: SavingsForm = {
 export const useSavingsForm = () => {
   const [savingsForm, setSavingsForm] = useState<SavingsForm>(initialForm);
 
-  const handleChangeGoalAmount = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+  const createHandler = useCallback(<K extends keyof SavingsForm>(key: K, ...funcs: Array<(arg: any) => any>) => {
+    return (initialValue: any) => {
+      const value = funcs.reduce((acc, func) => func(acc), initialValue);
 
-    setSavingsForm(prev => ({ ...prev, [SAVINGS_FORM.GOAL_AMOUNT]: value }));
-  }, []);
+      if (value === undefined) {
+        return;
+      }
 
-  const handleChangeMonthlySaving = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-
-    setSavingsForm(prev => ({ ...prev, [SAVINGS_FORM.MONTHLY_SAVING]: value }));
-  }, []);
-
-  const handleChangeSavingPeriod = useCallback((value: 6 | 12 | 24) => {
-    setSavingsForm(prev => ({ ...prev, [SAVINGS_FORM.SAVING_PERIOD]: value }));
+      setSavingsForm(prev => ({ ...prev, [key]: value }));
+    };
   }, []);
 
   return {
     savingsForm,
     handleChanges: {
-      [SAVINGS_FORM.GOAL_AMOUNT]: handleChangeGoalAmount,
-      [SAVINGS_FORM.MONTHLY_SAVING]: handleChangeMonthlySaving,
-      [SAVINGS_FORM.SAVING_PERIOD]: handleChangeSavingPeriod,
+      [SAVINGS_FORM.GOAL_AMOUNT]: createHandler(SAVINGS_FORM.GOAL_AMOUNT, parseEventValue, mustNumber),
+      [SAVINGS_FORM.MONTHLY_SAVING]: createHandler(SAVINGS_FORM.MONTHLY_SAVING, parseEventValue, mustNumber),
+      [SAVINGS_FORM.SAVING_PERIOD]: createHandler(SAVINGS_FORM.SAVING_PERIOD),
     },
   };
 };
+
+const parseEventValue = (e: ChangeEvent<HTMLInputElement>) => e.target.value;
+const mustNumber = (v: string) => (/^\d*$/.test(v) ? v : undefined);
