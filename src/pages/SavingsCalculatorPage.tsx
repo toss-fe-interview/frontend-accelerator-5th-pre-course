@@ -4,8 +4,10 @@ import { SavingsProduct } from 'api/product';
 import { SavingsProductList } from 'components/SavingsProductList';
 import { CalculationResult } from 'components/CalculationResult';
 
+type Tab = 'products' | 'results';
+
 const useTab = () => {
-  const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
+  const [selectedTab, setSelectedTab] = useState<Tab>('products');
   return [selectedTab, setSelectedTab] as const;
 };
 
@@ -69,9 +71,7 @@ export function SavingsCalculatorPage() {
 
       <Tab
         onChange={value => {
-          if (value === 'products' || value === 'results') {
-            setSelectedTab(value);
-          }
+          setSelectedTab(value as Tab);
         }}
       >
         <Tab.Item value="products" selected={selectedTab === 'products'}>
