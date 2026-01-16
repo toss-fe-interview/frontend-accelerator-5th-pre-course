@@ -16,11 +16,6 @@ import { formatTextFieldValue } from 'utils/formatTextFieldValue';
 import { sanitizeAmount } from 'utils/sanitizeAmount';
 import { validateAmount } from 'utils/validateAmount';
 
-/**
- * 개선할 부분
- * 1. form 관리를 단순한 object 형태보다는 더 효율적으로 관리할 수 있도록 개발하면 좋을 것 같습니다.
- * 2. state를 필요한 영역으로 내릴 수 있습니다.
- */
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
   const [formState, setFormState] = useState<SavingsCalculatorFormState>({
