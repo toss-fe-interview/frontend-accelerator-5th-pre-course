@@ -1,4 +1,4 @@
-import type { SavingsProduct } from 'api/savings-products';
+import { type SavingsProduct } from 'api/savings-products';
 import { colors, ListRow } from 'tosslib';
 import { addComma } from 'utils/add-comma';
 import {
@@ -6,18 +6,11 @@ import {
   calculateRecommendedMonthlyAmount,
   calculateTargetDifference,
 } from 'utils/savings-calculator';
-import { MessageText } from './MessageText';
 
-interface CalculationResultProps {
-  targetAmount?: number;
-  monthlyAmount?: number;
+export interface UserInputs {
+  monthlyAmount: number | undefined;
   term: number;
-  selectedSavingsProduct: SavingsProduct | null;
-}
-
-interface CalculationResultItemProps {
-  label: string;
-  value: number;
+  targetAmount: number | undefined;
 }
 
 /*
@@ -30,7 +23,22 @@ const roundToWon = (value: number, precision: number) => {
   return Math.round(value / multiplier) * multiplier;
 };
 
-const CalculationResultItem = ({ label, value }: CalculationResultItemProps) => {
+/**
+ * 예상 수익 금액 컴포넌트
+ */
+interface ExpectedProfitProps extends UserInputs {
+  label: string;
+  selectedSavingsProduct: SavingsProduct | null;
+}
+
+export const ExpectedProfit = ({ label, monthlyAmount, term, selectedSavingsProduct }: ExpectedProfitProps) => {
+  if (!monthlyAmount || !selectedSavingsProduct) {
+    return null;
+  }
+
+  const expectedProfit = calculateExpectedProfit(monthlyAmount, term, selectedSavingsProduct.annualRate);
+  const expectedProfitToWon = roundToWon(expectedProfit, 0);
+
   return (
     <ListRow
       contents={
@@ -38,7 +46,7 @@ const CalculationResultItem = ({ label, value }: CalculationResultItemProps) => 
           type="2RowTypeA"
           top={label}
           topProps={{ color: colors.grey600 }}
-          bottom={`${addComma(value)}원`}
+          bottom={`${addComma(expectedProfitToWon)}원`}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }
@@ -46,39 +54,86 @@ const CalculationResultItem = ({ label, value }: CalculationResultItemProps) => 
   );
 };
 
-export const CalculationResult = ({
+/**
+ * 예상 수익 금액 컴포넌트
+ */
+interface TargetDifferenceProps extends UserInputs {
+  label: string;
+  selectedSavingsProduct: SavingsProduct | null;
+}
+
+export const TargetDifference = ({
+  label,
   targetAmount,
   monthlyAmount,
   term,
   selectedSavingsProduct,
-}: CalculationResultProps) => {
-  // 적금 상품 선택 안한 경우
-  const isNoSavingsProductSelected = !selectedSavingsProduct;
-  // 목표금액, 월 납입액 없는 경우
-  const isNoAmountInput = !(monthlyAmount && targetAmount);
-
-  if (isNoSavingsProductSelected) {
-    return <MessageText message="상품을 선택해주세요." />;
+}: TargetDifferenceProps) => {
+  if (!targetAmount || !monthlyAmount || !selectedSavingsProduct) {
+    return null;
   }
 
-  if (isNoAmountInput) {
-    return <MessageText message="적금 계산기를 완료해주세요." />;
-  }
-
-  // 계산
-  const expectedProfit = calculateExpectedProfit(monthlyAmount, term, selectedSavingsProduct?.annualRate);
+  const expectedProfit = calculateExpectedProfit(monthlyAmount, term, selectedSavingsProduct.annualRate);
   const targetDifference = calculateTargetDifference(targetAmount, expectedProfit);
+  const targetDifferenceToWon = roundToWon(targetDifference, 0);
+
+  return (
+    <ListRow
+      contents={
+        <ListRow.Texts
+          type="2RowTypeA"
+          top={label}
+          topProps={{ color: colors.grey600 }}
+          bottom={`${addComma(targetDifferenceToWon)}원`}
+          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+        />
+      }
+    />
+  );
+};
+
+/**
+ * 예상 수익 금액 컴포넌트
+ */
+interface RecommendedMonthlyAmountProps extends UserInputs {
+  label: string;
+  selectedSavingsProduct: SavingsProduct | null;
+}
+
+export const RecommendedMonthlyAmount = ({
+  label,
+  targetAmount,
+  term,
+  selectedSavingsProduct,
+}: RecommendedMonthlyAmountProps) => {
+  if (!targetAmount || !selectedSavingsProduct) {
+    return null;
+  }
+
   const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(
     targetAmount,
     term,
-    selectedSavingsProduct?.annualRate
+    selectedSavingsProduct.annualRate
   );
+  const recommendedMonthlyAmountToThousandWon = roundToWon(recommendedMonthlyAmount, 3);
 
   return (
-    <>
-      <CalculationResultItem label="예상 수익 금액" value={roundToWon(expectedProfit, 0)} />
-      <CalculationResultItem label="목표 금액과의 차이" value={roundToWon(targetDifference, 0)} />
-      <CalculationResultItem label="추천 월 납입 금액" value={roundToWon(recommendedMonthlyAmount, 3)} />
-    </>
+    <ListRow
+      contents={
+        <ListRow.Texts
+          type="2RowTypeA"
+          top={label}
+          topProps={{ color: colors.grey600 }}
+          bottom={`${addComma(recommendedMonthlyAmountToThousandWon)}원`}
+          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+        />
+      }
+    />
   );
+};
+
+export const CalculationResult = {
+  ExpectedProfit: ExpectedProfit,
+  TargetDifference: TargetDifference,
+  RecommendedMonthlyAmount: RecommendedMonthlyAmount,
 };

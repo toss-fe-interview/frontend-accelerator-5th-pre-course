@@ -20,6 +20,9 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | undefined>(undefined);
   const [monthlyAmount, setMonthlyAmount] = useState<number | undefined>(undefined);
   const [term, setTerm] = useState<number>(12);
+  // 사용자 입력값
+  const userInputs = useMemo(() => ({ monthlyAmount, term, targetAmount }), [monthlyAmount, term, targetAmount]);
+
   // 선택한 적금 상품
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   // 탭
@@ -114,10 +117,19 @@ export function SavingsCalculatorPage() {
         <>
           <Spacing size={8} />
 
-          <CalculationResult
-            targetAmount={targetAmount}
-            monthlyAmount={monthlyAmount}
-            term={term}
+          <CalculationResult.ExpectedProfit
+            {...userInputs}
+            label="예상 수익 금액"
+            selectedSavingsProduct={selectedSavingsProduct}
+          />
+          <CalculationResult.TargetDifference
+            {...userInputs}
+            label="목표 금액과의 차이"
+            selectedSavingsProduct={selectedSavingsProduct}
+          />
+          <CalculationResult.RecommendedMonthlyAmount
+            {...userInputs}
+            label="추천 월 납입 금액"
             selectedSavingsProduct={selectedSavingsProduct}
           />
 
