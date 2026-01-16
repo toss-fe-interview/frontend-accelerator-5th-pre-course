@@ -92,8 +92,9 @@ export function SavingsCalculatorPage() {
 
           <CalculationResultSection
             product={selectedProduct ?? null}
-            investment={{ monthlyAmount: condition.monthlyAmount, term: condition.term }}
-            goal={{ targetAmount: condition.targetAmount }}
+            targetAmount={condition.targetAmount}
+            monthlyAmount={condition.monthlyAmount}
+            term={condition.term}
             emptyFallback={<EmptyListItem message="상품을 선택해주세요." />}
           >
             {({ finalAmount, differenceAmount, recommendedMonthlyAmount }) => (

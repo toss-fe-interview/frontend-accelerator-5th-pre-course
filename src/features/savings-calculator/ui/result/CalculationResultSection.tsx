@@ -16,16 +16,18 @@ interface CalculationResult {
 
 interface CalculationResultSectionProps {
   product: SavingsProduct | null;
-  investment: { monthlyAmount: number; term: number };
-  goal: { targetAmount: number };
+  targetAmount: number;
+  monthlyAmount: number;
+  term: number;
   emptyFallback: ReactNode;
   children: (result: CalculationResult) => ReactNode;
 }
 
 export function CalculationResultSection({
   product,
-  investment,
-  goal,
+  targetAmount,
+  monthlyAmount,
+  term,
   emptyFallback,
   children,
 }: CalculationResultSectionProps) {
@@ -33,8 +35,6 @@ export function CalculationResultSection({
     return <>{emptyFallback}</>;
   }
 
-  const { monthlyAmount, term } = investment;
-  const { targetAmount } = goal;
   const { annualRate } = product;
 
   const finalAmount = calculateFinalAmount({
