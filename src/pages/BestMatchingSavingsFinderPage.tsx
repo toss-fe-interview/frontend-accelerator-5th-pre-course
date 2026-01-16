@@ -147,13 +147,7 @@ export function BestMatchingSavingsFinderPage() {
                 key={product.id}
                 product={product}
                 isSelected={isSelected}
-                onClick={() => {
-                  if (isSelected) {
-                    setSelectedSavingsProduct(null);
-                  } else {
-                    setSelectedSavingsProduct(product);
-                  }
-                }}
+                onClick={() => setSelectedSavingsProduct(isSelected ? null : product)}
               />
             );
           })}
