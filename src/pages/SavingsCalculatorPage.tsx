@@ -20,15 +20,9 @@ export function SavingsCalculatorPage() {
 
   const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
 
-  const filteredSavingsProducts = savingsProducts?.filter(product => {
-    const monthly = monthlyPayment;
-
-    if (monthly === 0) {
-      return true;
-    }
-
-    return monthly >= product.minMonthlyAmount && monthly <= product.maxMonthlyAmount;
-  });
+  const filteredSavingsProducts = savingsProducts?.filter(
+    product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
+  );
 
   const baseProducts = filteredSavingsProducts?.length ? filteredSavingsProducts : savingsProducts;
   const recommendedProducts = [...(baseProducts ?? [])].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
