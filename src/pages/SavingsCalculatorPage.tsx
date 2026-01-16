@@ -2,10 +2,22 @@ import { useSavingsProductsQuery } from 'entities/savings/api';
 import { SAVINGS_DURATIONS } from 'entities/savings/config/constant';
 import { formatNumberWithCommas, parseDigitsOnly } from 'entities/savings/lib';
 import { SavingsTab } from 'entities/savings/model';
-import { CalculationResultItem, Placeholder, SavingsProductItem } from 'entities/savings/ui';
+import { CalculationResult, Message, SavingsProduct } from 'entities/savings/ui';
 import { useState } from 'react';
 import { isBetween, sortBy, takeFromHead } from 'shared/lib';
-import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import {
+  Assets,
+  Border,
+  ListHeader,
+  ListRow,
+  NavigationBar,
+  SelectBottomSheet,
+  Spacing,
+  Tab,
+  TextField,
+} from 'tosslib';
+
+const CheckCircleGreen = () => <Assets.Icon name="icon-check-circle-green" />;
 
 export function SavingsCalculatorPage() {
   const [tab, setTab] = useState<SavingsTab>('products');
@@ -31,7 +43,11 @@ export function SavingsCalculatorPage() {
     });
 
   const recommendedSavingsProducts = (() => {
-    const sortedByDesc = sortBy(availableSavingsProducts, product => product.annualRate, 'desc');
+    const sortedByDesc = sortBy(
+      selectedSavingsProductId ? availableSavingsProducts : (savingsProductsQuery.data ?? []),
+      product => product.annualRate,
+      'desc'
+    );
     return takeFromHead(sortedByDesc, 2);
   })();
 
@@ -97,10 +113,10 @@ export function SavingsCalculatorPage() {
         availableSavingsProducts.map(product => {
           const isSelected = product.id === selectedSavingsProductId;
           return (
-            <SavingsProductItem
+            <ListRow
               key={product.id}
-              product={product}
-              checked={isSelected}
+              contents={<SavingsProduct key={product.id} product={product} />}
+              right={isSelected && <CheckCircleGreen />}
               onClick={() => {
                 setSelectedSavingsProductId(product.id);
               }}
@@ -112,36 +128,48 @@ export function SavingsCalculatorPage() {
           <Spacing size={8} />
           {selectedSavingsProduct ? (
             <>
-              <CalculationResultItem
-                label="예상 수익 금액"
-                value={`${(
-                  Number(monthlyDeposit) *
-                  selectedSavingsProduct.availableTerms *
-                  (1 + selectedSavingsProduct.annualRate * 0.5)
-                ).toLocaleString()}원`}
+              <ListRow
+                contents={
+                  <CalculationResult
+                    label="예상 수익 금액"
+                    value={`${(
+                      Number(monthlyDeposit) *
+                      selectedSavingsProduct.availableTerms *
+                      (1 + selectedSavingsProduct.annualRate * 0.5)
+                    ).toLocaleString()}원`}
+                  />
+                }
               />
-              <CalculationResultItem
-                label="목표 금액과의 차이"
-                value={`${(
-                  Number(targetAmount) -
-                  Number(monthlyDeposit) *
-                    selectedSavingsProduct.availableTerms *
-                    (1 + selectedSavingsProduct.annualRate * 0.5)
-                ).toLocaleString()}원`}
+              <ListRow
+                contents={
+                  <CalculationResult
+                    label="목표 금액과의 차이"
+                    value={`${(
+                      Number(targetAmount) -
+                      Number(monthlyDeposit) *
+                        selectedSavingsProduct.availableTerms *
+                        (1 + selectedSavingsProduct.annualRate * 0.5)
+                    ).toLocaleString()}원`}
+                  />
+                }
               />
-              <CalculationResultItem
-                label="추천 월 납입 금액"
-                value={`${(
-                  Math.round(
-                    Number(targetAmount) /
-                      (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) /
-                      1000
-                  ) * 1000
-                ).toLocaleString()}원`}
+              <ListRow
+                contents={
+                  <CalculationResult
+                    label="추천 월 납입 금액"
+                    value={`${(
+                      Math.round(
+                        Number(targetAmount) /
+                          (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) /
+                          1000
+                      ) * 1000
+                    ).toLocaleString()}원`}
+                  />
+                }
               />
             </>
           ) : (
-            <Placeholder message="상품을 선택해주세요." />
+            <ListRow contents={<Message value="상품을 선택해주세요." />} />
           )}
           {recommendedSavingsProducts.length > 0 && (
             <>
@@ -154,7 +182,13 @@ export function SavingsCalculatorPage() {
               <Spacing size={12} />
               {recommendedSavingsProducts.map(product => {
                 const isSelected = product.id === selectedSavingsProductId;
-                return <SavingsProductItem key={product.id} product={product} checked={isSelected} />;
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={<SavingsProduct key={product.id} product={product} />}
+                    right={isSelected && <CheckCircleGreen />}
+                  />
+                );
               })}
               <Spacing size={40} />
             </>

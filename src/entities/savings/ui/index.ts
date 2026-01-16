@@ -1,5 +1,6 @@
-import SavingsProductItem from './SavingsProductItem';
-import CalculationResultItem from './CalculationResultItem';
+import SavingsProduct from './SavingsProductInfo';
+import CalculationResult from './CalculationResult';
 import Placeholder from './Placeholder';
+import Message from './Message';
 
-export { SavingsProductItem, CalculationResultItem, Placeholder };
+export { SavingsProduct, CalculationResult, Message };
