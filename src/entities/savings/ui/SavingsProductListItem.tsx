@@ -1,7 +1,8 @@
 import { Assets, colors, ListRow } from 'tosslib';
 
-import { SavingsProduct } from 'types/SavingsProduct.type';
-import { formatAmount } from 'utils/formatAmount';
+import { SavingsProduct } from 'entities/savings/model/types';
+
+import { formatAmount } from 'shared/lib/formatAmount';
 
 interface SavingsProductListItemProps {
   savingsProduct: SavingsProduct;

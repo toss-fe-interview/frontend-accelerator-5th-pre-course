@@ -1,6 +1,6 @@
 import { colors, ListRow } from 'tosslib';
 
-import { formatAmount } from 'utils/formatAmount';
+import { formatAmount } from 'shared/lib/formatAmount';
 
 interface CalculationResultProps {
   label: string;

@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
 
-import { SavingsProduct } from 'types/SavingsProduct.type';
+import { SavingsProduct } from 'entities/savings/model/types';
+
 import {
   calculateDifferenceAmount,
   calculateFinalAmount,
   calculateRecommendedMonthlyAmount,
-} from 'utils/calculationUtil';
+} from 'features/savings-calculator/lib/calculationUtil';
 
 interface CalculationResult {
   finalAmount: number;

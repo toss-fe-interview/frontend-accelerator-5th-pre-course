@@ -1,5 +1,6 @@
 import { http } from 'tosslib';
-import { SavingsProduct } from 'types/SavingsProduct.type';
+
+import { SavingsProduct } from 'entities/savings/model/types';
 
 // GET /api/savings-products
 export const getSavingsProducts = () => http.get<SavingsProduct[]>('/api/savings-products');

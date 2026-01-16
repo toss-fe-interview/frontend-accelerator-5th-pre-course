@@ -1,9 +1,9 @@
 import { ChangeEvent } from 'react';
 import { TextField } from 'tosslib';
 
-import { formatTextFieldValue } from 'utils/formatTextFieldValue';
-import { sanitizeAmount } from 'utils/sanitizeAmount';
-import { validateAmount } from 'utils/validateAmount';
+import { formatTextFieldValue } from 'shared/lib/formatTextFieldValue';
+import { sanitizeAmount } from 'shared/lib/sanitizeAmount';
+import { validateAmount } from 'shared/lib/validateAmount';
 
 interface AmountInputProps {
   label: string;

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
+import { SavingsProduct } from 'entities/savings/model/types';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
-import { SavingsProduct } from 'types/SavingsProduct.type';
 
 interface RecommendedProductSectionProps {
   candidateProducts: SavingsProduct[];

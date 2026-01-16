@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
+
+import { useSavingsProducts } from 'entities/savings/model/useSavingsProducts';
 import { SavingsProductListItem } from 'entities/savings/ui/SavingsProductListItem';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
-import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
-import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
-import { filterSavingsProduct } from 'utils/filterSavingsProduct';
 
+import { filterSavingsProduct } from 'features/savings-calculator/lib/filterSavingsProduct';
+import { SavingsCalculatorFormState } from 'features/savings-calculator/model/types';
 import { AmountInput } from 'features/savings-calculator/ui/AmountInput';
 import { CalculationResultItem } from 'features/savings-calculator/ui/CalculationResultItem';
 import { CalculationResultSection } from 'features/savings-calculator/ui/CalculationResultSection';

@@ -1,5 +1,6 @@
-import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
-import { SavingsProduct } from 'types/SavingsProduct.type';
+import { SavingsProduct } from 'entities/savings/model/types';
+
+import { SavingsCalculatorFormState } from 'features/savings-calculator/model/types';
 
 export const filterSavingsProduct = (args: {
   savingsProduct: SavingsProduct;
