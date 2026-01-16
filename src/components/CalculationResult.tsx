@@ -2,7 +2,11 @@ import { SavingsInput, SavingsProduct } from 'type';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { Border, colors, ListRow, Spacing, ListHeader } from 'tosslib';
 import { formatMoney } from 'utils/money';
-import { useMemo } from 'react';
+import {
+  calculateExpectedAmount,
+  calculateGoalDifference,
+  calculateRecommendedMonthlyAmount,
+} from 'utils/savingsCalculator';
 
 interface CalculationResultProps {
   selectedSavingsProduct: SavingsProduct | null;
@@ -15,64 +19,58 @@ export function CalculationResult(props: CalculationResultProps) {
 
   const topRecommendedProducts = [...filteredSavingsProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
-  const calculateSavingsResult = useMemo(() => {
-    if (!selectedSavingsProduct) {
-      return null;
-    }
+  if (!selectedSavingsProduct) {
+    return (
+      <div>
+        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+      </div>
+    );
+  }
 
-    const monthlyAmount = Number(savingsInput.monthlyAmount);
-    const term = savingsInput.term;
-    const goalAmount = Number(savingsInput.goalAmount);
-    const annualRate = selectedSavingsProduct.annualRate / 100;
+  const monthlyAmount = Number(savingsInput.monthlyAmount);
+  const term = savingsInput.term;
+  const goalAmount = Number(savingsInput.goalAmount);
+  const annualRate = selectedSavingsProduct.annualRate / 100;
 
-    const expectedAmount = monthlyAmount * term * (1 + annualRate * 0.5);
-    const difference = goalAmount - expectedAmount;
-    const recommendedMonthlyAmount = Math.round(goalAmount / (term * (1 + annualRate * 0.5)) / 1000) * 1000;
-
-    return { expectedAmount, difference, recommendedMonthlyAmount };
-  }, [selectedSavingsProduct, savingsInput]);
+  const expectedAmount = calculateExpectedAmount(monthlyAmount, term, annualRate);
+  const difference = calculateGoalDifference(goalAmount, expectedAmount);
+  const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(goalAmount, term, annualRate);
 
   return (
     <div>
-      {calculateSavingsResult ? (
-        <>
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="예상 수익 금액"
-                topProps={{ color: colors.grey600 }}
-                bottom={`${formatMoney(Math.round(calculateSavingsResult.expectedAmount))}원`}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
+      <ListRow
+        contents={
+          <ListRow.Texts
+            type="2RowTypeA"
+            top="예상 수익 금액"
+            topProps={{ color: colors.grey600 }}
+            bottom={`${formatMoney(Math.round(expectedAmount))}원`}
+            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="목표 금액과의 차이"
-                topProps={{ color: colors.grey600 }}
-                bottom={`${calculateSavingsResult.difference >= 0 ? '+' : ''}${formatMoney(Math.round(calculateSavingsResult.difference))}원`}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
+        }
+      />
+      <ListRow
+        contents={
+          <ListRow.Texts
+            type="2RowTypeA"
+            top="목표 금액과의 차이"
+            topProps={{ color: colors.grey600 }}
+            bottom={`${difference >= 0 ? '+' : ''}${formatMoney(Math.round(difference))}원`}
+            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="추천 월 납입 금액"
-                topProps={{ color: colors.grey600 }}
-                bottom={`${formatMoney(calculateSavingsResult.recommendedMonthlyAmount)}원`}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
+        }
+      />
+      <ListRow
+        contents={
+          <ListRow.Texts
+            type="2RowTypeA"
+            top="추천 월 납입 금액"
+            topProps={{ color: colors.grey600 }}
+            bottom={`${formatMoney(recommendedMonthlyAmount)}원`}
+            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
-        </>
-      ) : (
-        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-      )}
+        }
+      />
 
       <Spacing size={8} />
       <Border height={16} />
