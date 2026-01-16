@@ -83,11 +83,11 @@ export function SavingsCalculatorPage() {
           case 'products':
             return savingsProducts
               .filter(product => {
-                return (
-                  product.minMonthlyAmount < monthlyPayment &&
-                  product.maxMonthlyAmount > monthlyPayment &&
-                  product.availableTerms === savingPeriod
-                );
+                const isAboveMinPayment = product.minMonthlyAmount < monthlyPayment;
+                const isBelowMaxPayment = product.maxMonthlyAmount > monthlyPayment;
+                const matchesSavingPeriod = product.availableTerms === savingPeriod;
+
+                return isAboveMinPayment && isBelowMaxPayment && matchesSavingPeriod;
               })
               .map(product => {
                 const isSelected = selectedSavingsProduct?.id === product.id;
