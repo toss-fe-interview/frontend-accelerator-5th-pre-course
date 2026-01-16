@@ -14,4 +14,3 @@ export function PageStatus({ title, message }: PageStatusProps) {
     </>
   );
 }
-

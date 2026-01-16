@@ -21,4 +21,3 @@ export function CurrencyInput({ label, field, value, onChange }: CurrencyInputPr
     </>
   );
 }
-

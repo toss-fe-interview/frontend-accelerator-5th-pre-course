@@ -23,4 +23,3 @@ export function TermSelect({ label, value, onChange }: TermSelectProps) {
     </>
   );
 }
-

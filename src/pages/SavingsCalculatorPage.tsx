@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
-import { useCalculationResult } from 'hooks/useCalculationResult';
+import { useFilteredProducts } from 'hooks/useFilteredProducts';
+import { useSavingsGoalEstimate } from 'hooks/useSavingsGoalEstimate';
 import { ProductList, CalculationResultSection } from 'components/savings';
 import { PageStatus } from 'components/common/PageStatus';
 import { CurrencyInput } from 'components/common/CurrencyInput';
@@ -34,18 +35,14 @@ export function SavingsCalculatorPage() {
     setValues(prev => ({ ...prev, ...partial }));
   };
 
-  const depositAmount = Number(values.monthlyDeposit.replace(/,/g, '')) || 0;
-  const filteredProducts = products.filter(product => {
-    const termMatch = product.availableTerms === values.term;
-    const depositMatch =
-      depositAmount === 0 || (depositAmount > product.minMonthlyAmount && depositAmount < product.maxMonthlyAmount);
-    return termMatch && depositMatch;
+  const { filteredProducts, selectedProduct, recommendedProducts } = useFilteredProducts({
+    products,
+    monthlyDeposit: values.monthlyDeposit,
+    term: values.term,
+    selectedProductId,
   });
 
-  const selectedProduct = products.find(product => product.id === selectedProductId) ?? null;
-  const recommendedProducts = [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-
-  const calculationResult = useCalculationResult({
+  const goalEstimate = useSavingsGoalEstimate({
     selectedProduct,
     monthlyDeposit: values.monthlyDeposit,
     targetAmount: values.targetAmount,
@@ -92,7 +89,7 @@ export function SavingsCalculatorPage() {
 
       {activeTab === TAB_VALUES.RESULTS && (
         <>
-          <CalculationResultSection result={calculationResult} />
+          <CalculationResultSection estimate={goalEstimate} />
 
           <Spacing size={8} />
           <Border height={16} />
