@@ -10,8 +10,8 @@ import { savingsProductsQuery } from 'apis/savingsProduct';
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery());
   const [savingsInput, setSavingsInput] = useState<SavingsInput>({
-    goalAmount: '',
-    monthlyAmount: '',
+    goalAmount: 0,
+    monthlyAmount: 0,
     term: 0,
   });
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
@@ -21,19 +21,18 @@ export function SavingsCalculatorPage() {
   const filteredSavingsProducts = useMemo(() => {
     const filteredByMonthlyAmount = savingsProducts.filter(product => {
       return (
-        product.minMonthlyAmount <= Number(savingsInput?.monthlyAmount) &&
-        product.maxMonthlyAmount >= Number(savingsInput?.monthlyAmount)
+        product.minMonthlyAmount <= savingsInput.monthlyAmount && product.maxMonthlyAmount >= savingsInput.monthlyAmount
       );
     });
 
     const filteredByTerm = filteredByMonthlyAmount.filter(product => {
-      return product.availableTerms === savingsInput?.term;
+      return product.availableTerms === savingsInput.term;
     });
 
     return filteredByTerm;
   }, [savingsProducts, savingsInput]);
 
-  const hasValidInput = savingsInput?.term && savingsInput?.monthlyAmount;
+  const hasValidInput = savingsInput.term && savingsInput.monthlyAmount;
 
   return (
     <>

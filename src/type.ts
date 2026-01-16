@@ -8,7 +8,7 @@ export interface SavingsProduct {
 }
 
 export interface SavingsInput {
-  goalAmount: string;
-  monthlyAmount: string;
+  goalAmount: number;
+  monthlyAmount: number;
   term: number;
 }

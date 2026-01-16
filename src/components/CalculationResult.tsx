@@ -27,9 +27,9 @@ export function CalculationResult(props: CalculationResultProps) {
     );
   }
 
-  const monthlyAmount = Number(savingsInput.monthlyAmount);
+  const monthlyAmount = savingsInput.monthlyAmount;
   const term = savingsInput.term;
-  const goalAmount = Number(savingsInput.goalAmount);
+  const goalAmount = savingsInput.goalAmount;
   const annualRate = selectedSavingsProduct.annualRate / 100;
 
   const expectedAmount = calculateExpectedAmount(monthlyAmount, term, annualRate);

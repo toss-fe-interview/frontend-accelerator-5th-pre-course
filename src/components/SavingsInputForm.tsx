@@ -15,16 +15,20 @@ export function SavingsInputForm(props: SavingsInputFormProps) {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={formatMoney(Number(savingsInput.goalAmount))}
-        onChange={value => setSavingsInput({ ...savingsInput, goalAmount: parseMoney(value.target.value) })}
+        value={formatMoney(savingsInput.goalAmount)}
+        onChange={value =>
+          setSavingsInput({ ...savingsInput, goalAmount: Number(parseMoney(value.target.value)) || 0 })
+        }
       />
       <Spacing size={16} />
       <TextField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={formatMoney(Number(savingsInput.monthlyAmount))}
-        onChange={value => setSavingsInput({ ...savingsInput, monthlyAmount: parseMoney(value.target.value) })}
+        value={formatMoney(savingsInput.monthlyAmount)}
+        onChange={value =>
+          setSavingsInput({ ...savingsInput, monthlyAmount: Number(parseMoney(value.target.value)) || 0 })
+        }
       />
       <Spacing size={16} />
       <SelectBottomSheet
