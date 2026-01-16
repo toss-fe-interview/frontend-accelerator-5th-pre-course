@@ -11,7 +11,7 @@ export const useSavingCalculationParams = () => {
   const [calculationParams, setCalculationParams] = useState<SavingCalculationParams>(initialCalculationParams);
 
   const updateCalculationParams = (params: Partial<SavingCalculationParams>) => {
-    setCalculationParams({ ...calculationParams, ...params });
+    setCalculationParams(prev => ({ ...prev, ...params }));
   };
 
   return { calculationParams, updateCalculationParams };
