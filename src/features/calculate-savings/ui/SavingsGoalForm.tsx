@@ -24,13 +24,10 @@ const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
     mode: 'onChange',
   });
 
-  const targetAmount = watch('targetAmount');
-  const monthlyAmount = watch('monthlyAmount');
-  const term = watch('term');
-
   useEffect(() => {
-    onChange?.({ targetAmount, monthlyAmount, term });
-  }, [targetAmount, monthlyAmount, term, onChange]);
+    const subscription = watch(data => onChange?.(data as SavingsGoalFormData));
+    return () => subscription.unsubscribe();
+  }, [watch, onChange]);
 
   return (
     <>
