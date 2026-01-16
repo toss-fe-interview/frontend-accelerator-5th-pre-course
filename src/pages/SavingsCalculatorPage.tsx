@@ -1,7 +1,7 @@
 import { AmountInput } from 'components/AmountInput';
 import { ExpectedIncome } from 'components/ExpectedIncome';
-import { GetFilteredProducts } from 'components/GetFilteredProuducts';
-import { GetRecommendedProducts } from 'components/GetRecommendedProuducts';
+import { GetFilteredProducts } from 'components/GetFilteredProducts';
+import { GetRecommendedProducts } from 'components/GetRecommendedProducts';
 import { RecommendedMonthlyPayment } from 'components/RecommendedMonthlyPayment';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { SavingsTermSelect } from 'components/SavingsTermSelect';
