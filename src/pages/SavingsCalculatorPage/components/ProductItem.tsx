@@ -9,8 +9,8 @@ interface ProductItemProps {
 }
 
 export function ProductItem({ product, selectedProduct, onSelectProduct }: ProductItemProps) {
-  const 적금_한줄_요약 = `${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`;
   const isSelected = selectedProduct?.id === product.id;
+  const 납입조건 = `${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`;
 
   return (
     <ListRow
@@ -22,7 +22,7 @@ export function ProductItem({ product, selectedProduct, onSelectProduct }: Produ
           topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
           middle={`연 이자율: ${product.annualRate}%`}
           middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-          bottom={적금_한줄_요약}
+          bottom={납입조건}
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
