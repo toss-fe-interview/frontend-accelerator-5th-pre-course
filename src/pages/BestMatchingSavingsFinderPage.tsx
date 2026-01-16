@@ -28,12 +28,6 @@ type SavingsProduct = {
   availableTerms: number;
 };
 
-type CalculationResult = {
-  expectedProfit: number;
-  targetAmountDifference: number;
-  recommendedMonthlyAmount: number;
-};
-
 type SelectedTabData = 'productList' | 'calculationResult';
 
 export function BestMatchingSavingsFinderPage() {
