@@ -1,10 +1,12 @@
-import { AmountDisplay } from 'components/AmountDisplay';
 import { AmountInput } from 'components/AmountInput';
+import { ExpectedIncome } from 'components/ExpectedIncome';
 import { GetFilteredProducts } from 'components/GetFilteredProuducts';
 import { GetRecommendedProducts } from 'components/GetRecommendedProuducts';
+import { RecommendedMonthlyPayment } from 'components/RecommendedMonthlyPayment';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { SavingsTermSelect } from 'components/SavingsTermSelect';
 import { TAB_STATE, Tabs } from 'components/Tabs';
+import { TargetAmountDiff } from 'components/TargetAmountDiff';
 import { SavingProduct } from 'queries/types';
 import { Suspense, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -26,12 +28,6 @@ export function SavingsCalculatorPage() {
     },
   });
   const { monthlyAmount, term, targetAmount } = methods.watch();
-
-  const expectedIncome = (monthlyAmount ?? 0) * (term ?? 0) * (1 + (selectedProduct?.annualRate ?? 0) * 0.01 * 0.5);
-  const targetDiff = (targetAmount ?? 0) - expectedIncome;
-  const rawRecommendedMonthlyPayment =
-    ((targetAmount ?? 0) / (term ?? 0)) * (1 + (selectedProduct?.annualRate ?? 0) * 0.01 * 0.5);
-  const recommendedMonthlyPayment = Math.round(rawRecommendedMonthlyPayment / 1000) * 1000;
 
   return (
     <FormProvider {...methods}>
@@ -100,9 +96,9 @@ export function SavingsCalculatorPage() {
             <Spacing size={8} />
             {selectedProduct ? (
               <>
-                <AmountDisplay title="예상 수익 금액" value={expectedIncome} />
-                <AmountDisplay title="목표 금액과의 차이" value={targetDiff} />
-                <AmountDisplay title="추천 월 납입 금액" value={recommendedMonthlyPayment} />
+                <ExpectedIncome title="예상 수익 금액" product={selectedProduct} />
+                <TargetAmountDiff title="목표 금액과의 차이" product={selectedProduct} />
+                <RecommendedMonthlyPayment title="추천 월 납입 금액" product={selectedProduct} />
               </>
             ) : (
               <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
