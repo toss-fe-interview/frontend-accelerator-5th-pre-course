@@ -1,17 +1,19 @@
 import { SavingsProductType } from 'shared/types/api/savings';
 
-import { Assets, colors, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import TabScreen from 'shared/components/layout/TabScreen';
 import { useState } from 'react';
-import CalculationResult from 'domains/savingsCalculator/containers/CalculationResult';
+
 import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
 import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
 import TermField from 'domains/savingsCalculator/components/form/TermField';
 import SavingsQuery from 'shared/query/saving';
 import { useQuery } from '@tanstack/react-query';
 
-import { formatCurrency } from 'shared/utils/format';
 import { rangeIn } from 'domains/savingsCalculator/utils/filter';
+import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
+import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
+import CalculationResult from 'domains/savingsCalculator/components/CalculationResult';
 
 export function SavingsCalculatorPage() {
   /** refactor : useSavingsInputs 훅 제거하기
@@ -86,17 +88,7 @@ export function SavingsCalculatorPage() {
                   return (
                     <ListRow
                       key={product.id}
-                      contents={
-                        <ListRow.Texts
-                          type="3RowTypeA"
-                          top={product.name}
-                          topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                          middle={`연 이자율: ${product.annualRate}%`}
-                          middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                          bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                          bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                        />
-                      }
+                      contents={<SavingsProduct product={product} />}
                       right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                       onClick={() => setSelectedProduct(product)}
                     />
@@ -110,14 +102,66 @@ export function SavingsCalculatorPage() {
           value: 'results',
           label: '계산 결과',
           contents: (
-            <CalculationResult
-              userInputs={{
-                targetAmount,
-                monthlyPayment,
-                term,
-              }}
-              selectedProduct={selectedProduct}
-            />
+            <>
+              <Spacing size={8} />
+
+              {!selectedProduct ? (
+                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+              ) : (
+                <>
+                  <ListRow
+                    contents={
+                      <CalculationResult
+                        label="예상 수익 금액"
+                        value={monthlyPayment * term * toMultiplier(selectedProduct.annualRate)}
+                      />
+                    }
+                  />
+                  <ListRow
+                    contents={
+                      <CalculationResult
+                        label="목표 금액과의 차이"
+                        value={targetAmount - monthlyPayment * term * toMultiplier(selectedProduct.annualRate)}
+                      />
+                    }
+                  />
+                  <ListRow
+                    contents={
+                      <CalculationResult
+                        label="추천 월 납입 금액"
+                        value={round1000(targetAmount / (term * toMultiplier(selectedProduct.annualRate)))}
+                      />
+                    }
+                  />
+                </>
+              )}
+
+              <Spacing size={8} />
+              <Border height={16} />
+              <Spacing size={8} />
+
+              <ListHeader
+                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+              />
+              <Spacing size={12} />
+
+              {hasNoMatchingProducts ? (
+                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
+              ) : (
+                matchingProducts.slice(0, 2).map(product => {
+                  const isSelected = selectedProduct?.id === product.id;
+
+                  return (
+                    <ListRow
+                      key={product.id}
+                      contents={<SavingsProduct product={product} />}
+                      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                      onClick={() => setSelectedProduct(product)}
+                    />
+                  );
+                })
+              )}
+            </>
           ),
         },
       ]}
