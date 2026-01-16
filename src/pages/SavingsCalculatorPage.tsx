@@ -92,11 +92,18 @@ export function SavingsCalculatorPage() {
             <ListRow
               key={product.id}
               contents={
-                <SavingProduct
-                  name={product.name}
-                  interestRate={`${product.annualRate}`}
-                  depositRange={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원`}
-                  termMonths={`${product.availableTerms}`}
+                <ListRow.Texts
+                  type="3RowTypeA"
+                  top={product.name}
+                  topProps={{
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: colors.grey900,
+                  }}
+                  middle={`연 이자율: ${product.annualRate}%`}
+                  middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                  bottom={`${product.availableTerms}개월`}
+                  bottomProps={{ fontSize: 13, color: colors.grey600 }}
                 />
               }
               right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
@@ -120,17 +127,26 @@ export function SavingsCalculatorPage() {
           <Divider spacing={8} />
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
+
           {getTopRateProducts(products, 2).map(product => {
             const isSelected = selectedProductId === product.id;
             return (
               <ListRow
                 key={product.id}
                 contents={
-                  <SavingProduct
-                    name={product.name}
-                    interestRate={`${product.annualRate}`}
-                    depositRange={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원`}
-                    termMonths={`${product.availableTerms}`}
+                  // props를 해석하는 것이 오히려 손해다. SavingProduct는 어떻게 사용되는거지? Props는? 생각을 많이하게 만든다.
+                  <ListRow.Texts
+                    type="3RowTypeA"
+                    top={product.name}
+                    topProps={{
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                      color: colors.grey900,
+                    }}
+                    middle={`연 이자율: ${product.annualRate}%`}
+                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                    bottom={`${product.minMonthlyAmount.toLocaleString()} | ${product.maxMonthlyAmount.toLocaleString()}개월`}
+                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
                   />
                 }
                 right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
@@ -165,28 +181,3 @@ function CalculationResultItem({ name, price, unit }: CalculationResultItemProps
     />
   );
 }
-
-type Props = {
-  name: string;
-  interestRate: string; // 이자율
-  depositRange: string; // 적금납입가능액수
-  termMonths: string; // 적금납입기간
-};
-
-const SavingProduct = ({ name, interestRate, depositRange, termMonths }: Props) => {
-  return (
-    <ListRow.Texts
-      type="3RowTypeA"
-      top={name}
-      topProps={{
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: colors.grey900,
-      }}
-      middle={`연 이자율: ${interestRate}%`}
-      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-      bottom={`${depositRange} | ${termMonths}개월`}
-      bottomProps={{ fontSize: 13, color: colors.grey600 }}
-    />
-  );
-};
