@@ -1,35 +1,41 @@
 {
-  "name": "toss-savings-calculator",
-  "private": true,
-  "packageManager": "yarn@4.6.0",
-  "scripts": {
-    "dev": "vite"
-  },
-  "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-router-dom": "^7.1.1",
-    "tosslib": "file:./tosslib.tgz"
-  },
-  "devDependencies": {
-    "@hono/vite-dev-server": "^0.18.0",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@typescript-eslint/eslint-plugin": "^8.18.2",
-    "@typescript-eslint/parser": "^8.18.2",
-    "@vitejs/plugin-react-swc": "^3.7.2",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^8.10.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.37.3",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "hono": "^4.6.16",
-    "prettier": "^3.4.2",
-    "typescript": "~5.7.2",
-    "vite": "^6.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
-  }
+	"name": "toss-savings-calculator",
+	"private": true,
+	"scripts": {
+		"dev": "vite"
+	},
+	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.0",
+		"@suspensive/react": "^3.18.0",
+		"@suspensive/react-query": "^3.18.0",
+		"@tanstack/react-query": "^5.90.17",
+		"es-toolkit": "^1.43.0",
+		"ky": "^1.14.2",
+		"react": "^18",
+		"react-dom": "^18",
+		"react-router-dom": "^7.1.1",
+		"tosslib": "file:./tosslib.tgz",
+		"zod": "^4.3.5"
+	},
+	"devDependencies": {
+		"@hono/vite-dev-server": "^0.18.0",
+		"@types/react": "^18",
+		"@types/react-dom": "^18",
+		"@typescript-eslint/eslint-plugin": "^8.18.2",
+		"@typescript-eslint/parser": "^8.18.2",
+		"@vitejs/plugin-react-swc": "^3.7.2",
+		"eslint": "^8.57.1",
+		"eslint-config-prettier": "^8.10.0",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-prettier": "^5.2.1",
+		"eslint-plugin-react": "^7.37.3",
+		"eslint-plugin-react-hooks": "^5.1.0",
+		"hono": "^4.6.16",
+		"prettier": "^3.4.2",
+		"typescript": "~5.7.2",
+		"vite": "^6.0.6",
+		"vite-tsconfig-paths": "^5.1.4"
+	},
+	"packageManager": "yarn@4.12.0"
 }
