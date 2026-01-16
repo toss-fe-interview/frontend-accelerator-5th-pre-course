@@ -1,5 +1,4 @@
-import { NumberInput } from 'shared/components/NumberInput';
-import { Spacing } from 'tosslib';
+import { Spacing, TextField } from 'tosslib';
 
 type AmountInputSectionProps = {
   targetAmount: number;
@@ -16,20 +15,21 @@ export const AmountInputSection = ({
 }: AmountInputSectionProps) => {
   return (
     <>
-      <NumberInput
+      <TextField
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={targetAmount}
-        onChange={setTargetAmount}
+        value={String(targetAmount)}
+        onChange={e => setTargetAmount(Number(e.target.value))}
       />
       <Spacing size={16} />
-      <NumberInput
+
+      <TextField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={monthlyPayment}
-        onChange={setMonthlyPayment}
+        value={String(monthlyPayment)}
+        onChange={e => setMonthlyPayment(Number(e.target.value))}
       />
     </>
   );
