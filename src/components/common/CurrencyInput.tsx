@@ -1,4 +1,5 @@
 import { Spacing, TextField } from 'tosslib';
+import { extractDigits } from 'utils/number';
 
 interface CurrencyInputProps {
   label: string;
@@ -16,7 +17,7 @@ export function CurrencyInput({ label, field, value, onChange }: CurrencyInputPr
         placeholder={`${label}을 입력하세요`}
         suffix="원"
         value={value}
-        onChange={e => onChange({ [field]: e.target.value.replace(/[^0-9]/g, '') })}
+        onChange={e => onChange({ [field]: extractDigits(e.target.value) })}
       />
     </>
   );

@@ -1,4 +1,5 @@
 import { SavingsProduct } from './queries/types';
+import { parseFormattedAmount } from 'utils/number';
 
 interface SavingsProductOptionsParams {
   products: SavingsProduct[];
@@ -13,17 +14,13 @@ export function useSavingsProductOptions({
   term,
   selectedProductId,
 }: SavingsProductOptionsParams) {
-  const depositAmount = parseAmount(monthlyDeposit);
+  const depositAmount = parseFormattedAmount(monthlyDeposit);
 
   const availableProducts = filterByUserCriteria(products, term, depositAmount);
   const selectedProduct = findById(products, selectedProductId);
   const recommendedProducts = getTopByInterestRate(availableProducts, 2);
 
   return { availableProducts, selectedProduct, recommendedProducts };
-}
-
-function parseAmount(value: string): number {
-  return Number(value.replace(/,/g, '')) || 0;
 }
 
 function filterByUserCriteria(products: SavingsProduct[], term: number, depositAmount: number): SavingsProduct[] {

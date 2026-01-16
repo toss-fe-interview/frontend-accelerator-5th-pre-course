@@ -1,4 +1,5 @@
 import { SavingsProduct } from './queries/types';
+import { parseFormattedAmount } from 'utils/number';
 
 interface SavingsGoalParams {
   selectedProduct: SavingsProduct | null;
@@ -20,8 +21,8 @@ export function useSavingsGoalEstimate(params: SavingsGoalParams): SavingsGoalEs
     return null;
   }
 
-  const deposit = parseAmount(monthlyDeposit);
-  const target = parseAmount(targetAmount);
+  const deposit = parseFormattedAmount(monthlyDeposit);
+  const target = parseFormattedAmount(targetAmount);
   const annualRate = selectedProduct.annualRate / 100;
 
   const expectedAmount = getExpectedSavingsAmount(deposit, term, annualRate);
@@ -31,10 +32,6 @@ export function useSavingsGoalEstimate(params: SavingsGoalParams): SavingsGoalEs
     gapFromTarget: getGapFromTarget(target, expectedAmount),
     suggestedDeposit: getSuggestedMonthlyDeposit(target, term, annualRate),
   };
-}
-
-function parseAmount(value: string): number {
-  return Number(value.replace(/,/g, '')) || 0;
 }
 
 function getExpectedSavingsAmount(deposit: number, term: number, annualRate: number): number {
