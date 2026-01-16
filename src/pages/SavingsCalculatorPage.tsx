@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
 
-import { SavingsProductListItem } from 'entities/savings/ui/SavingsProductListItem';
+import { SavingsProductInfo } from 'entities/savings/ui/SavingsProductInfo';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
 import { useAvailableProducts } from 'features/savings-calculator/model/useAvailableProducts';
@@ -70,14 +70,17 @@ export function SavingsCalculatorPage() {
           emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
         >
           {products =>
-            products.map(product => (
-              <SavingsProductListItem
-                key={product.id}
-                savingsProduct={product}
-                isSelected={selectedProduct?.id === product.id}
-                onSelectSavingsProduct={() => handleSelectProduct(product.id)}
-              />
-            ))
+            products.map(product => {
+              const isSelected = selectedProduct?.id === product.id;
+              return (
+                <ListRow
+                  key={product.id}
+                  contents={<SavingsProductInfo product={product} />}
+                  right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
+                  onClick={() => handleSelectProduct(isSelected ? null : product)}
+                />
+              );
+            })
           }
         </SavingsProductListSection>
       )}
@@ -113,14 +116,17 @@ export function SavingsCalculatorPage() {
             emptyFallback={<EmptyListItem message="적합한 추천 상품이 없습니다." />}
           >
             {recommendedProducts =>
-              recommendedProducts.map(product => (
-                <SavingsProductListItem
-                  key={product.id}
-                  savingsProduct={product}
-                  isSelected={selectedProduct?.id === product.id}
-                  onSelectSavingsProduct={() => handleSelectProduct(product.id)}
-                />
-              ))
+              recommendedProducts.map(product => {
+                const isSelected = selectedProduct?.id === product.id;
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={<SavingsProductInfo product={product} />}
+                    right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
+                    onClick={() => handleSelectProduct(isSelected ? null : product)}
+                  />
+                );
+              })
             }
           </RecommendedProductSection>
 
