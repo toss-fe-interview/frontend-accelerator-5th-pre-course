@@ -3,12 +3,13 @@ import { useTab } from 'shared/hooks/useTab';
 import { Border, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
-import { useSavingsProducts } from 'features/savings/hooks/useSavingsProducts';
 import { AmountInputSection } from 'features/savings/components/AmountInputSection';
 import { TermsSelectBottomSheet } from 'features/savings/components/TermsSelectBottomSheet';
 import { SavingsProductList } from 'features/savings/components/SavingsProductList';
 import { CalculationResultList } from 'features/savings/components/CalculationResultList';
 import { RecommendedProductList } from 'features/savings/components/RecommendedProductList';
+import { savingsProductQuery } from 'features/savings/apis/queries';
+import { useQuery } from '@tanstack/react-query';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -17,7 +18,20 @@ export function SavingsCalculatorPage() {
   const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
   const [terms, setTerms] = useState<string>('');
 
-  const { filteredSavingsProducts, recommendedProducts, savingsProducts } = useSavingsProducts(monthlyPayment);
+  const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
+
+  const filteredSavingsProducts = savingsProducts?.filter(product => {
+    const monthly = monthlyPayment;
+
+    if (monthly === 0) {
+      return true;
+    }
+
+    return monthly >= product.minMonthlyAmount && monthly <= product.maxMonthlyAmount;
+  });
+
+  const baseProducts = filteredSavingsProducts?.length ? filteredSavingsProducts : savingsProducts;
+  const recommendedProducts = [...(baseProducts ?? [])].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   const selectedSavingsProduct = savingsProducts?.find(product => product.id === selectedProductId);
 
