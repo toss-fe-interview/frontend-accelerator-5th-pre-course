@@ -1,14 +1,32 @@
+import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
+import CalculationResult from 'features/calculate-savings/ui/CalculationResult';
 import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
-import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
+import { getRecommendedProducts } from 'features/recommend-products/model/filter';
+import RecommendedProducts from 'features/recommend-products/ui/RecommendedProducts';
+import { useSavingsProducts } from 'features/savings-product/api/useSavingsProducts';
+import { byMonthlyAmount, byTerm } from 'features/savings-product/model/filters';
+import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { DEFAULT_TERM_MONTHS, RECOMMENDED_PRODUCTS_COUNT, TAB_VALUES, TabValue } from './model/constants';
 import { useSavingsCalculator } from './model/useSavingsCalculator';
-import { DEFAULT_TERM_MONTHS, TAB_VALUES, TabValue } from './model/constants';
-import ProductsTab from './ui/ProductsTab';
-import ResultTab from './ui/ResultTab';
-import { useFilteredProducts } from './model/useFilteredProducts';
 
 export function SavingsCalculatorPage() {
   const { activeTab, selectedProduct, filter, updateFilter, selectProduct, changeTab } = useSavingsCalculator();
-  const { products, recommendedProducts, isLoading, error } = useFilteredProducts(filter);
+  const { data: allProducts = [], isLoading, error } = useSavingsProducts();
+
+  if (isLoading) {
+    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="불러오는 중입니다..." />} />;
+  }
+
+  if (error) {
+    return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="오류가 발생했습니다." />} />;
+  }
+
+  const products = allProducts.filter(byMonthlyAmount(filter.monthlyAmount)).filter(byTerm(filter.term));
+
+  const recommendedProducts =
+    filter.monthlyAmount > 0 && filter.term
+      ? getRecommendedProducts(allProducts, filter.monthlyAmount, filter.term).slice(0, RECOMMENDED_PRODUCTS_COUNT)
+      : [];
 
   return (
     <>
@@ -31,25 +49,26 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {activeTab === TAB_VALUES.PRODUCTS && (
-        <ProductsTab
-          products={products}
-          selectedProduct={selectedProduct}
-          onSelectProduct={selectProduct}
-          isLoading={isLoading}
-          error={error}
-        />
-      )}
+      {activeTab === TAB_VALUES.PRODUCTS &&
+        products.map(product => (
+          <SavingsProductItem
+            key={product.id}
+            product={product}
+            selected={selectedProduct?.id === product.id}
+            onClick={() => selectProduct(product)}
+          />
+        ))}
+
       {activeTab === TAB_VALUES.RESULTS && (
-        <ResultTab
-          selectedProduct={selectedProduct}
-          targetAmount={filter.targetAmount}
-          monthlyAmount={filter.monthlyAmount}
-          term={filter.term}
-          recommendedProducts={recommendedProducts}
-          isLoading={isLoading}
-          error={error}
-        />
+        <>
+          <CalculationResult
+            selectedProduct={selectedProduct}
+            targetAmount={filter.targetAmount}
+            monthlyAmount={filter.monthlyAmount}
+            term={filter.term}
+          />
+          <RecommendedProducts selectedProduct={selectedProduct} products={recommendedProducts} />
+        </>
       )}
     </>
   );

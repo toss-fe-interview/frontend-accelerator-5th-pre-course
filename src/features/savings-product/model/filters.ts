@@ -1,31 +1,9 @@
 import { SavingsProduct } from 'entities/savings-product/model/types';
 
-interface SavingsProductFilter {
-  minAnnualRate?: number;
-  maxAnnualRate?: number;
-  monthlyAmount?: number;
-  term?: number;
-}
+export const byMonthlyAmount = (amount: number) => (product: SavingsProduct) =>
+  product.minMonthlyAmount <= amount && product.maxMonthlyAmount >= amount;
 
-function filterSavingsProducts(products: SavingsProduct[], filter: SavingsProductFilter): SavingsProduct[] {
-  return products.filter(product => {
-    if (filter.minAnnualRate !== undefined && product.annualRate < filter.minAnnualRate) {
-      return false;
-    }
-    if (filter.maxAnnualRate !== undefined && product.annualRate > filter.maxAnnualRate) {
-      return false;
-    }
-    if (filter.monthlyAmount !== undefined) {
-      if (product.minMonthlyAmount > filter.monthlyAmount || product.maxMonthlyAmount < filter.monthlyAmount) {
-        return false;
-      }
-    }
-    if (filter.term !== undefined && product.availableTerms !== filter.term) {
-      return false;
-    }
-    return true;
-  });
-}
+export const byTerm = (term: number) => (product: SavingsProduct) => product.availableTerms === term;
 
-export type { SavingsProductFilter };
-export { filterSavingsProducts };
+export const byAnnualRateRange = (min?: number, max?: number) => (product: SavingsProduct) =>
+  (min === undefined || product.annualRate >= min) && (max === undefined || product.annualRate <= max);
