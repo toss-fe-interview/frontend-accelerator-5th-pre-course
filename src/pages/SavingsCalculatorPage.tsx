@@ -1,6 +1,6 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, TextField } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
 import { CalculationResultList } from 'features/savings/components/CalculationResultList';
@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
 import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
 import { Select } from 'shared/components/Select';
+import { NumberInput } from 'shared/components/NumberInput';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -42,20 +43,20 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField
+      <NumberInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={targetAmount}
-        onChange={e => setTargetAmount(e.target.value.replace(/[^0-9]/g, ''))}
+        onChange={setTargetAmount}
       />
       <Spacing size={16} />
-      <TextField
+      <NumberInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={monthlyPayment}
-        onChange={e => setMonthlyPayment(e.target.value.replace(/[^0-9]/g, ''))}
+        onChange={setMonthlyPayment}
       />
       <Spacing size={16} />
 
