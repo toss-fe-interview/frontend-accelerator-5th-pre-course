@@ -1,4 +1,4 @@
-import { SavingsProduct } from 'features/savings/schemas/savingsProduct';
+import { SavingsProduct } from 'features/savings/types/savingsProduct';
 
 export const filterSavings = (
   savingsProducts: SavingsProduct[],
