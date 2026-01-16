@@ -141,11 +141,11 @@ export function SavingsCalculatorPage() {
           {(() => {
             return savingsProducts
               .filter(product => {
-                return (
-                  product.minMonthlyAmount < monthlyPayment &&
-                  product.maxMonthlyAmount > monthlyPayment &&
-                  product.availableTerms === savingPeriod
-                );
+                const isAboveMinPayment = product.minMonthlyAmount < monthlyPayment;
+                const isBelowMaxPayment = product.maxMonthlyAmount > monthlyPayment;
+                const matchesSavingPeriod = product.availableTerms === savingPeriod;
+
+                return isAboveMinPayment && isBelowMaxPayment && matchesSavingPeriod;
               })
               .sort((a, b) => b.annualRate - a.annualRate)
               .slice(0, 2)
