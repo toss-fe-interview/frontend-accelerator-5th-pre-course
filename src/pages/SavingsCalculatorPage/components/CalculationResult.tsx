@@ -10,7 +10,7 @@ type CalculationResultData = {
 export type SavingsCalculation =
   | { type: 'productUnselected' }
   | { type: 'requiredInputEmpty' }
-  | { type: 'success'; amounts: CalculationResultData };
+  | { type: 'success'; result: CalculationResultData };
 
 interface Props {
   selectedProduct: SavingsProduct | null;
@@ -35,7 +35,7 @@ export function CalculationResult({ selectedProduct, filter, children }: Props) 
 
   return children({
     type: 'success',
-    amounts: { expectedAmount, difference, recommendedMonthlyPayment },
+    result: { expectedAmount, difference, recommendedMonthlyPayment },
   });
 }
 
