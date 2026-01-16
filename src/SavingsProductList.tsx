@@ -17,11 +17,11 @@ export default function SavingsProductList({ filters, onSelect, selectedSavingsP
   const { data } = useSavingsProductListQuery();
 
   const filteredProducts = data?.filter(product => {
-    const isMonthlyPayment =
+    const isMonthlyPaymentInRange =
       product.minMonthlyAmount < filters.monthlyPayment && product.maxMonthlyAmount > filters.monthlyPayment;
-    const isTerm = product.availableTerms === filters.term;
+    const isTermMatched = product.availableTerms === filters.term;
 
-    return isMonthlyPayment && isTerm;
+    return isMonthlyPaymentInRange && isTermMatched;
   });
 
   return (

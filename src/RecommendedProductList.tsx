@@ -16,11 +16,11 @@ export default function RecommendedProductList({ selectedSavingsProduct, filters
   const { data } = useSavingsProductListQuery();
 
   const filteredProducts = data?.filter(product => {
-    const isMonthlyPayment =
+    const isMonthlyPaymentInRange =
       product.minMonthlyAmount < filters.monthlyPayment && product.maxMonthlyAmount > filters.monthlyPayment;
-    const isTerm = product.availableTerms === filters.term;
+    const isTermMatched = product.availableTerms === filters.term;
 
-    return isMonthlyPayment && isTerm;
+    return isMonthlyPaymentInRange && isTermMatched;
   });
 
   const recommendedProducts = filteredProducts?.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
