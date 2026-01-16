@@ -1,8 +1,7 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
-import { SavingsProductTab } from 'features/savings/components/Tab';
 import { CalculationResultList } from 'features/savings/components/CalculationResultList';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
@@ -76,7 +75,14 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <SavingsProductTab tab={tab} handleTabChange={handleTabChange} />
+      <Tab onChange={handleTabChange}>
+        <Tab.Item value={SAVINGS_PRODUCT_TABS.PRODUCTS} selected={tab === SAVINGS_PRODUCT_TABS.PRODUCTS}>
+          적금 상품
+        </Tab.Item>
+        <Tab.Item value={SAVINGS_PRODUCT_TABS.RESULTS} selected={tab === SAVINGS_PRODUCT_TABS.RESULTS}>
+          계산 결과
+        </Tab.Item>
+      </Tab>
 
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
         <>
