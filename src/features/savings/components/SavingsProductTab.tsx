@@ -81,6 +81,18 @@ function SavingsTabContent({
 
   const hasFilteredProducts = filteredSavingsProducts.length > 0;
 
+  const expectedAmount = calculateExpectedAmount({
+    annualRate: selectedSavingsProduct?.annualRate ?? 0,
+    monthlyPayment: monthlyPayment ?? 0,
+    terms: terms ?? 0,
+  });
+  const differenceAmount = targetAmount ? targetAmount - expectedAmount : 0;
+  const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment({
+    targetAmount: targetAmount ?? 0,
+    annualRate: selectedSavingsProduct?.annualRate ?? 0,
+    terms: terms ?? 0,
+  });
+
   return (
     <>
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
@@ -117,33 +129,9 @@ function SavingsTabContent({
         <>
           {selectedSavingsProduct ? (
             <>
-              <SavingsResultItem
-                label="예상 수익 금액"
-                amount={calculateExpectedAmount({
-                  annualRate: selectedSavingsProduct.annualRate,
-                  monthlyPayment: monthlyPayment ?? 0,
-                  terms: terms ?? 0,
-                })}
-              />
-              <SavingsResultItem
-                label="목표 금액과의 차이"
-                amount={
-                  (targetAmount ?? 0) -
-                  calculateExpectedAmount({
-                    annualRate: selectedSavingsProduct.annualRate,
-                    monthlyPayment: monthlyPayment ?? 0,
-                    terms: terms ?? 0,
-                  })
-                }
-              />
-              <SavingsResultItem
-                label="추천 월 납입 금액"
-                amount={calculateRecommendedMonthlyPayment({
-                  targetAmount: targetAmount ?? 0,
-                  annualRate: selectedSavingsProduct.annualRate,
-                  terms: terms ?? 0,
-                })}
-              />
+              <SavingsResultItem label="예상 수익 금액" amount={expectedAmount} />
+              <SavingsResultItem label="목표 금액과의 차이" amount={differenceAmount} />
+              <SavingsResultItem label="추천 월 납입 금액" amount={recommendedMonthlyPayment} />
             </>
           ) : (
             <EmptyMessage message="상품을 선택해주세요." />
