@@ -1,4 +1,4 @@
-import useFilteredProducts from 'hooks/useFilteredProducts';
+import filterProducts from 'utils/filterProducts';
 import { useSavingsProducts } from 'hooks/useSavingsProducts';
 import { useFormContext } from 'react-hook-form';
 import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
@@ -16,7 +16,7 @@ const ResultsTab = ({ selectedProductId, setSelectedProductId }: ProductSelectio
   const savingPeriod = Number(watch('savingPeriod')) || 0;
 
   // 상품 필터링
-  const filteredProducts = useFilteredProducts(products);
+  const filteredProducts = filterProducts(products, monthlyAmount, savingPeriod);
 
   // 선택된 상품
   const selectedProduct = products?.find(item => item.id === selectedProductId);

@@ -1,13 +1,20 @@
-import useFilteredProducts from 'hooks/useFilteredProducts';
+import filterProducts from 'utils/filterProducts';
 import { useSavingsProducts } from 'hooks/useSavingsProducts';
+import { useFormContext } from 'react-hook-form';
 import { Assets, colors, ListRow } from 'tosslib';
 import { ProductSelection } from 'types/calculator';
 
 const ProductsTab = ({ selectedProductId, setSelectedProductId }: ProductSelection) => {
   // 데이터 페칭
   const { data: products, isLoading, isError } = useSavingsProducts();
+  const { watch } = useFormContext();
+
+  // 폼 값
+  const monthlyAmount = Number(watch('monthlyAmount')) || 0;
+  const savingPeriod = Number(watch('savingPeriod')) || 0;
+
   // 상품 필터링
-  const filteredProducts = useFilteredProducts(products);
+  const filteredProducts = filterProducts(products, monthlyAmount, savingPeriod);
 
   if (isLoading) {
     return <div>로딩중...</div>;
