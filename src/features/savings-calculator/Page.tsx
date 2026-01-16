@@ -7,7 +7,7 @@ import { MonthlyAmountInput, SavingTermsSelect, TargetAmountInput } from './comp
 import SavingsProductInfo from './components/SavingsProductInfo';
 import { useCalculatorParams } from './hooks/useCalculatorParams';
 import { useSelectProductParams } from './hooks/useSelectProductParams';
-import { matchesPaymentRange, matchesPeriod } from './utils/productFilters';
+import { byHighestAnnualRate, matchesPaymentRange, matchesPeriod } from './utils/productFilters';
 
 const TABS_CONFIG = {
   products: '적금 상품',
@@ -20,11 +20,12 @@ const isValidTabKey = (tab: string): tab is TabKey => tab in TABS_CONFIG;
 export default function SavingsCalculatorPage() {
   const { data: products } = useSuspenseQuery(savingsProductsQueries.listQuery());
 
-  const [currentTab, setCurrentTab] = useState<TabKey>('products');
   const { targetAmount, monthlyAmount, savingTerms, setCalculatorParams } = useCalculatorParams();
   const { selectedProductId, setSelectedProductId } = useSelectProductParams();
+  const [currentTab, setCurrentTab] = useState<TabKey>('products');
 
   const filteredProducts = products.filter(matchesPaymentRange(monthlyAmount)).filter(matchesPeriod(savingTerms));
+  const recommendedProducts = filteredProducts.sort(byHighestAnnualRate).slice(0, 2);
   const selectedProduct = products.find(product => product.id === selectedProductId);
 
   const handleTabChange = (tab: string) => {
@@ -77,7 +78,8 @@ export default function SavingsCalculatorPage() {
           case 'results':
             return (
               <>
-                <CalculationResult product={selectedProduct} />
+                <Spacing size={8} />
+                {selectedProduct ? <CalculationResult product={selectedProduct} /> : <EmptyProductSelection />}
 
                 <Spacing size={8} />
                 <Border height={16} />
@@ -87,8 +89,8 @@ export default function SavingsCalculatorPage() {
                   title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
                 />
                 <Spacing size={12} />
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map(product => {
+                {recommendedProducts.length > 0 ? (
+                  recommendedProducts.map(product => {
                     const isSelected = selectedProductId === product.id;
                     return (
                       <ListRow
@@ -119,4 +121,8 @@ function CheckedCircleIcon() {
 
 function EmptyProductList() {
   return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />;
+}
+
+function EmptyProductSelection() {
+  return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
 }
