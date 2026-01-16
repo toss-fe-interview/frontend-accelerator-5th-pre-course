@@ -7,7 +7,7 @@ import { useSavingsProducts } from 'entities/savings/model/useSavingsProducts';
 import { SavingsProductListItem } from 'entities/savings/ui/SavingsProductListItem';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
-import { filterSavingsProduct } from 'features/savings-calculator/lib/filterSavingsProduct';
+import { isAvailableProduct } from 'features/savings-calculator/lib/isAvailableProduct';
 import { SavingsCalculatorFormState } from 'features/savings-calculator/model/types';
 import { AmountInput } from 'features/savings-calculator/ui/input/AmountInput';
 import { SavingsTermSelect } from 'features/savings-calculator/ui/input/SavingsTermSelect';
@@ -25,11 +25,9 @@ export function SavingsCalculatorPage() {
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
-  const filteredSavingsProducts = savingsProducts.filter(savingsProduct =>
-    filterSavingsProduct({ savingsProduct, formState })
-  );
+  const availableProducts = savingsProducts.filter(savingsProduct => isAvailableProduct({ savingsProduct, formState }));
 
-  const selectedSavingsProduct = filteredSavingsProducts.find(
+  const selectedSavingsProduct = availableProducts.find(
     savingsProduct => savingsProduct.id === selectedSavingsProductId
   );
 
@@ -77,7 +75,7 @@ export function SavingsCalculatorPage() {
 
       {selectedTab === 'products' && (
         <SavingsProductListSection
-          products={filteredSavingsProducts}
+          products={availableProducts}
           emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
         >
           {products =>
@@ -120,7 +118,7 @@ export function SavingsCalculatorPage() {
           <Spacing size={12} />
 
           <RecommendedProductSection
-            candidateProducts={filteredSavingsProducts}
+            candidateProducts={availableProducts}
             emptyFallback={<EmptyListItem message="적합한 추천 상품이 없습니다." />}
           >
             {recommendedProducts =>

@@ -2,7 +2,7 @@ import { SavingsProduct } from 'entities/savings/model/types';
 
 import { SavingsCalculatorFormState } from 'features/savings-calculator/model/types';
 
-export const filterSavingsProduct = (args: {
+export const isAvailableProduct = (args: {
   savingsProduct: SavingsProduct;
   formState: SavingsCalculatorFormState;
 }): boolean => {
