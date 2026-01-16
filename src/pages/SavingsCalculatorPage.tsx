@@ -23,7 +23,7 @@ export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<ProductTabs>('products');
   const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
 
-  const { data: products = [] } = useQuery<SavingsProduct[], HttpError>({
+  const { data: products = [], error } = useQuery<SavingsProduct[], HttpError>({
     queryKey: ['savings-products'],
     queryFn: fetchSavingsProducts,
   });
@@ -45,7 +45,7 @@ export function SavingsCalculatorPage() {
   };
 
   const expectedProfit = calculateExpectedProfit(monthlyAmount, savingTerms, selectedSavingProduct?.annualRate ?? 0);
-  const diffAmount = Number(targetAmount ?? 0) - expectedProfit;
+  const diffAmount = targetAmount - expectedProfit;
   const recommendMonthlyPayment = calculateRecommendMonthlyPayment(
     targetAmount,
     savingTerms,
@@ -65,6 +65,9 @@ export function SavingsCalculatorPage() {
 
   const recommendedProducts = [...filteredProducts].sort((prev, curr) => curr.annualRate - prev.annualRate).slice(0, 2);
 
+  console.log(targetAmount);
+  if (error) return <div>적금 상품 데이터를 가져오는데 실패했어요.</div>;
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -75,7 +78,7 @@ export function SavingsCalculatorPage() {
           label="목표 금액"
           placeholder="목표 금액을 입력하세요"
           suffix="원"
-          value={targetAmount.toLocaleString('ko-KR')}
+          value={targetAmount.toString()}
           onChange={e => {
             const num = Number(e.target.value);
             setTargetAmount(num);
@@ -86,7 +89,7 @@ export function SavingsCalculatorPage() {
           label="월 납입액"
           placeholder="희망 월 납입액을 입력하세요"
           suffix="원"
-          value={monthlyAmount.toLocaleString('ko-KR')}
+          value={monthlyAmount.toString()}
           onChange={e => {
             const num = Number(e.target.value);
             setMonthlyAmount(num);
@@ -122,6 +125,7 @@ export function SavingsCalculatorPage() {
         <>
           {filteredProducts.map(product => {
             const description = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`;
+            const isSelected = selectedSavingProduct?.id === product.id;
 
             return (
               <ListRow
@@ -130,14 +134,15 @@ export function SavingsCalculatorPage() {
                   <ListRow.Texts
                     type="3RowTypeA"
                     top={product.name}
-                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                    middle={`연 이자율: ${product.annualRate}%`}
-                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
                     bottom={description}
+                    middle={`연 이자율: ${product.annualRate}%`}
+                    // css와 ui에 관련된 값들은 본질과 먼 느낌. HOW와 가깝다.
+                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
                     bottomProps={{ fontSize: 13, color: colors.grey600 }}
                   />
                 }
-                right={selectedSavingProduct?.id === product.id && <Assets.Icon name="icon-check-circle-green" />}
+                right={isSelected && <CheckedIcon />}
                 onClick={() => setSelectedSavingProduct(product)}
               />
             );
@@ -150,8 +155,9 @@ export function SavingsCalculatorPage() {
               <ListRow.Texts
                 type="2RowTypeA"
                 top="예상 수익 금액"
-                topProps={{ color: colors.grey600 }}
+                // HOW
                 bottom={`${expectedProfit.toLocaleString('ko-KR')}원`}
+                topProps={{ color: colors.grey600 }}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -161,8 +167,9 @@ export function SavingsCalculatorPage() {
               <ListRow.Texts
                 type="2RowTypeA"
                 top="목표 금액과의 차이"
-                topProps={{ color: colors.grey600 }}
+                // HOW
                 bottom={`${diffAmount.toLocaleString('ko-KR')}원`}
+                topProps={{ color: colors.grey600 }}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -172,8 +179,9 @@ export function SavingsCalculatorPage() {
               <ListRow.Texts
                 type="2RowTypeA"
                 top="추천 월 납입 금액"
-                topProps={{ color: colors.grey600 }}
+                // HOW
                 bottom={`${(recommendMonthlyPayment ?? 0).toLocaleString('ko-KR')}원`}
+                topProps={{ color: colors.grey600 }}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
             }
@@ -186,22 +194,25 @@ export function SavingsCalculatorPage() {
           {recommendedProducts.length > 0 ? (
             recommendedProducts.map(product => {
               const description = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`;
+              const isSelected = selectedSavingProduct?.id === product.id;
 
               return (
                 <ListRow
                   key={product.id}
                   contents={
                     <ListRow.Texts
+                      // 여기는 Text를 결정하는 큰 요소들, WHAT에 해당하지 않을까?
                       type="3RowTypeA"
                       top={product.name}
-                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                       middle={`연 이자율: ${product.annualRate}%`}
-                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
                       bottom={description}
+                      // css와 ui에 관련된 값들은 본질과 먼 느낌. HOW와 가깝다.
+                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
                       bottomProps={{ fontSize: 13, color: colors.grey600 }}
                     />
                   }
-                  right={selectedSavingProduct?.id === product.id && <Assets.Icon name="icon-check-circle-green" />}
+                  right={isSelected && <CheckedIcon />}
                   onClick={() => setSelectedSavingProduct(product)}
                 />
               );
@@ -214,3 +225,7 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
+
+const CheckedIcon = () => {
+  return <Assets.Icon name="icon-check-circle-green" />;
+};
