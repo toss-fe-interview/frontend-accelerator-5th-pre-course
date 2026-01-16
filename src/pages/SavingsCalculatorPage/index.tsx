@@ -47,15 +47,14 @@ export function SavingsCalculatorPage() {
           {({ data: allProducts }) => {
             const products =
               filter.monthlyAmount > 0
-                ? allProducts
-                    .filter(product =>
+                ? allProducts.filter(
+                    product =>
                       inRange({
                         value: filter.monthlyAmount,
                         min: product.minMonthlyAmount,
                         max: product.maxMonthlyAmount,
-                      })
-                    )
-                    .filter(product => isEqual(product.availableTerms, filter.term))
+                      }) && isEqual(product.availableTerms, filter.term)
+                  )
                 : allProducts;
 
             const recommendedProducts = selectedProduct
