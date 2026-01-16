@@ -12,6 +12,7 @@ import {
   ListHeader,
   colors,
   Assets,
+  isHttpError,
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
@@ -65,7 +66,9 @@ export function SavingsCalculatorPage() {
         const data = await fetchSavingsProducts();
         setProducts(data);
       } catch (e) {
-        console.error('Failed to fetch products:', e);
+        if (isHttpError(e)) {
+          console.error('Failed to fetch products:', e);
+        }
       }
     };
 
