@@ -2,7 +2,6 @@ import { ErrorBoundary, Suspense } from '@suspensive/react';
 import ErrorFallback from 'components/ErrorFallback';
 import SuspenseFallback from 'components/SuspenseFallback';
 import SavingsFieldInput from 'features/savings/components/SavingsFieldInput';
-import SavingsProductItem from 'features/savings/components/SavingsProductItem';
 import SavingsResult from 'features/savings/components/SavingsResult';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
@@ -16,6 +15,8 @@ import { parseNumberInput } from 'features/savings/utils/parse/number';
 import { filterSavings, recommendSavings } from 'features/savings/utils/product/savings';
 import { ChangeEvent, useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
+import ProductItem from 'features/savings/components/ProductItem';
+import { formatNumberWithComma } from 'features/savings/utils/format/number';
 
 export function SavingsCalculatorPage() {
   const [savingsValues, setSavingsValues] = useState<SavingsValues>({
@@ -132,7 +133,13 @@ export function SavingsCalculatorPage() {
               return (
                 <ListRow
                   key={savingsProduct.id}
-                  contents={<SavingsProductItem savingsProduct={savingsProduct} />}
+                  contents={
+                    <ProductItem
+                      title={savingsProduct.name}
+                      highlight={`연 이자율: ${savingsProduct.annualRate}%`}
+                      description={`${formatNumberWithComma(savingsProduct.minMonthlyAmount)}원 ~ ${formatNumberWithComma(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
+                    />
+                  }
                   right={isProductSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                   onClick={() => {
                     setSelectedProductId(savingsProduct.id);
@@ -172,7 +179,13 @@ export function SavingsCalculatorPage() {
                   return (
                     <ListRow
                       key={savingsProduct.id}
-                      contents={<SavingsProductItem savingsProduct={savingsProduct} />}
+                      contents={
+                        <ProductItem
+                          title={savingsProduct.name}
+                          highlight={`연 이자율: ${savingsProduct.annualRate}%`}
+                          description={`${formatNumberWithComma(savingsProduct.minMonthlyAmount)}원 ~ ${formatNumberWithComma(savingsProduct.maxMonthlyAmount)}원 | ${savingsProduct.availableTerms}개월`}
+                        />
+                      }
                       right={isProductSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                     />
                   );
