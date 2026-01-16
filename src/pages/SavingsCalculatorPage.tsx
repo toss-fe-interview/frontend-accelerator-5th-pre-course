@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
-import { useFilteredProducts } from 'hooks/useFilteredProducts';
+import { useSavingsProductOptions } from 'hooks/useSavingsProductOptions';
 import { useSavingsGoalEstimate } from 'hooks/useSavingsGoalEstimate';
 import { SelectableProductList, CalculationResultSection } from 'components/savings';
 import { PageStatus } from 'components/common/PageStatus';
@@ -36,7 +36,7 @@ export function SavingsCalculatorPage() {
     setValues(prev => ({ ...prev, ...partial }));
   };
 
-  const { filteredProducts, selectedProduct, recommendedProducts } = useFilteredProducts({
+  const { availableProducts, selectedProduct, recommendedProducts } = useSavingsProductOptions({
     products,
     monthlyDeposit: values.monthlyDeposit,
     term: values.term,
@@ -80,11 +80,11 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {activeTab === TAB_VALUES.PRODUCTS &&
-        (filteredProducts.length === 0 ? (
+        (availableProducts.length === 0 ? (
           <EmptyMessage message="조회 결과가 없어요" />
         ) : (
           <SelectableProductList
-            products={filteredProducts}
+            products={availableProducts}
             selectedProductId={selectedProductId}
             onProductSelect={setSelectedProductId}
           />

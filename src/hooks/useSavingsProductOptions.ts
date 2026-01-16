@@ -1,16 +1,21 @@
 import { SavingsProduct } from './queries/types';
 
-interface UseFilteredProductsParams {
+interface SavingsProductOptionsParams {
   products: SavingsProduct[];
   monthlyDeposit: string;
   term: number;
   selectedProductId: string | null;
 }
 
-export function useFilteredProducts({ products, monthlyDeposit, term, selectedProductId }: UseFilteredProductsParams) {
+export function useSavingsProductOptions({
+  products,
+  monthlyDeposit,
+  term,
+  selectedProductId,
+}: SavingsProductOptionsParams) {
   const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
 
-  const filteredProducts = products.filter(product => {
+  const availableProducts = products.filter(product => {
     const termMatch = product.availableTerms === term;
     const depositMatch =
       depositAmount === 0 || (depositAmount > product.minMonthlyAmount && depositAmount < product.maxMonthlyAmount);
@@ -18,7 +23,8 @@ export function useFilteredProducts({ products, monthlyDeposit, term, selectedPr
   });
 
   const selectedProduct = products.find(product => product.id === selectedProductId) ?? null;
-  const recommendedProducts = [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  const recommendedProducts = [...availableProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
-  return { filteredProducts, selectedProduct, recommendedProducts };
+  return { availableProducts, selectedProduct, recommendedProducts };
 }
+
