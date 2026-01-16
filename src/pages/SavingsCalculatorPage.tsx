@@ -2,14 +2,13 @@ import SavingsProductList from 'domains/savingsCalculator/containers/SavingsProd
 
 import { SavingsProductType } from 'shared/types/api/savings';
 
-import { NavigationBar } from 'tosslib';
-import SavingsInputs from 'domains/savingsCalculator/components/SavingsInputs';
-import { formatCurrency, toNumber } from 'shared/utils/format';
+import { NavigationBar, Spacing } from 'tosslib';
 import TabScreen from 'shared/components/layout/TabScreen';
 import { useState } from 'react';
 import CalculationResult from 'domains/savingsCalculator/containers/CalculationResult';
-
-type Term = 6 | 12 | 24;
+import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
+import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
+import TermField from 'domains/savingsCalculator/components/form/TermField';
 
 export function SavingsCalculatorPage() {
   /** refactor : useSavingsInputs 훅 제거하기
@@ -20,7 +19,7 @@ export function SavingsCalculatorPage() {
    * */
   const [targetAmount, setTargetAmount] = useState<number>(0);
   const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
-  const [term, setTerm] = useState<Term>(12);
+  const [term, setTerm] = useState<6 | 12 | 24>(12);
 
   const [selectedProduct, setSelectedProduct] = useState<SavingsProductType | null>(null);
 
@@ -28,17 +27,16 @@ export function SavingsCalculatorPage() {
     <TabScreen
       headers={<NavigationBar title="적금 계산기" />}
       topContents={
-        <SavingsInputs
-          targetAmountProps={{
-            value: formatCurrency(targetAmount),
-            onChange: e => setTargetAmount(toNumber(e.target.value)),
-          }}
-          monthlyPaymentProps={{
-            value: formatCurrency(monthlyPayment),
-            onChange: e => setMonthlyPayment(toNumber(e.target.value)),
-          }}
-          termProps={{ value: term, onChange: value => setTerm(value as Term) }}
-        />
+        <>
+          {/* 본질이 뭐지? 값을 "보여주기" + 값을 "변경하기" + "어떤 필드"인지 보여주기 */}
+          {/* 값을 보여줄 때, 이게 TextField인지, SelectBottomSheet 인지 알 필요가 있을까? => 이건 how 라고 생각된다 */}
+          {/* 이런 경우 본질을 더 잘 드러내기 위해 분리하면 어떨까? */}
+          <TargetAmountField label="목표 금액" value={targetAmount} onChange={value => setTargetAmount(value)} />
+          <Spacing size={16} />
+          <MonthlyAmountField label="월 납입액" value={monthlyPayment} onChange={value => setMonthlyPayment(value)} />
+          <Spacing size={16} />
+          <TermField label="저축 기간" value={term} onChange={value => setTerm(value)} />
+        </>
       }
       bottomTabs={[
         {
