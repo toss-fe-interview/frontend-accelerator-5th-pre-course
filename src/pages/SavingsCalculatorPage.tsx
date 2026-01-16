@@ -1,15 +1,10 @@
 import { useSavingsProductsQuery } from 'entities/savings/api';
 import { SAVINGS_DURATIONS } from 'entities/savings/config/constant';
-import {
-  parseDigitsOnly,
-  formatNumberWithCommas,
-  getAvailableSavingsProducts,
-  getRecommendedSavingsProducts,
-  getSelectedSavingsProduct,
-} from 'entities/savings/lib';
+import { formatNumberWithCommas, parseDigitsOnly } from 'entities/savings/lib';
 import { SavingsTab } from 'entities/savings/model';
 import { CalculationResultItem, Placeholder, SavingsProductItem } from 'entities/savings/ui';
 import { useState } from 'react';
+import { isBetween, sortBy, takeFromHead } from 'shared/lib';
 import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
 export function SavingsCalculatorPage() {
@@ -20,13 +15,30 @@ export function SavingsCalculatorPage() {
   const [savingDuration, setSavingDuration] = useState(12);
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState('');
 
-  const availableSavingsProducts = getAvailableSavingsProducts({
-    products: savingsProductsQuery.data,
-    monthlyDeposit,
-    savingDuration,
+  const availableSavingsProducts = (savingsProductsQuery.data ?? [])
+    .filter(product => {
+      const isMatchedSavingDuration = product.availableTerms === savingDuration;
+      return isMatchedSavingDuration;
+    })
+    .filter(product => {
+      const isMatchedMonthlyDeposit = isBetween({
+        value: Number(monthlyDeposit),
+        min: product.minMonthlyAmount,
+        max: product.maxMonthlyAmount,
+        inclusive: true,
+      });
+      return isMatchedMonthlyDeposit;
+    });
+
+  const recommendedSavingsProducts = (() => {
+    const sorted = sortBy(availableSavingsProducts, product => product.annualRate, 'desc');
+    return takeFromHead(sorted, 2);
+  })();
+
+  const selectedSavingsProduct = availableSavingsProducts.find(product => {
+    const isMatchedSelectedSavingsProductId = product.id === selectedSavingsProductId;
+    return isMatchedSelectedSavingsProductId;
   });
-  const recommendedSavingsProducts = getRecommendedSavingsProducts(availableSavingsProducts);
-  const selectedSavingsProduct = getSelectedSavingsProduct(availableSavingsProducts, selectedSavingsProductId);
 
   return (
     <>
