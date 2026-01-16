@@ -1,6 +1,6 @@
 import { colors, ListRow } from 'tosslib';
 import { formatNumber } from 'utils/format';
-import type { SavingsProduct } from '../api/api';
+import type { SavingsProduct } from '../api/schema';
 
 export default function ProductItem({
   product,

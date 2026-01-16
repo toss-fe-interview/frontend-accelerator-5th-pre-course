@@ -1,5 +1,5 @@
 import { Assets } from 'tosslib';
-import type { SavingsProduct } from '../api/api';
+import type { SavingsProduct } from '../api/schema';
 import ProductItem from './ProductItem';
 
 export default function ProductList({

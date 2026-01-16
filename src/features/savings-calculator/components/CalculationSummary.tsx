@@ -1,7 +1,7 @@
 import { colors, ListRow } from 'tosslib';
 import { formatNumber } from 'utils/format';
 import { roundToThousand } from 'utils/roundToThousand';
-import type { SavingsProduct } from '../api/api';
+import type { SavingsProduct } from '../api/schema';
 import { useCalculatorParams } from '../hooks/useCalculatorParams';
 
 export default function CalculationSummary({ product }: { product: SavingsProduct }) {

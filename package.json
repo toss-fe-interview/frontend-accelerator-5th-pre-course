@@ -14,7 +14,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^7.1.1",
-    "tosslib": "file:./tosslib.tgz"
+    "tosslib": "file:./tosslib.tgz",
+    "valibot": "^1.2.0"
   },
   "devDependencies": {
     "@hono/vite-dev-server": "^0.18.0",

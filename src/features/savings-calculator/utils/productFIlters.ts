@@ -1,4 +1,4 @@
-import type { SavingsProduct } from '../api/api';
+import type { SavingsProduct } from '../api/schema';
 
 export const matchesPaymentRange = (amount: number | null) => (product: SavingsProduct) => {
   return amount ? product.minMonthlyAmount <= amount && product.maxMonthlyAmount >= amount : true;
