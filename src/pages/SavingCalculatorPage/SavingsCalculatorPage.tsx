@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { isSuitableSavingProduct, SavingProduct } from 'models/SavingProduct';
 import { useState } from 'react';
-import { Border, http, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
+import { Border, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
 import { SavingProductList } from './components/SavingProductList';
 import { CalculationResult } from './components/CalculationResult';
 import { NavigationTab } from 'components/NavigationTab';
@@ -9,6 +9,7 @@ import { PriceTextField } from 'components/PriceTextField';
 import { useSavingCalculationParams } from './hooks/useSavingCalculationParams';
 import { RecommendedSavingProductList } from './components/RecommendedSavingProductList';
 import { SavingCalculationParams, TERM_OPTIONS } from 'pages/SavingCalculatorPage/types/SavingCalculationParam';
+import { savingProductsQuery } from 'apis/savingProductsApi';
 
 export function SavingsCalculatorPage() {
   const { calculationParams, updateCalculationParams } = useSavingCalculationParams();
@@ -17,8 +18,7 @@ export function SavingsCalculatorPage() {
   const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingProduct | null>(null);
 
   const { data: savingsProducts = [] } = useQuery({
-    queryKey: ['savings-products'],
-    queryFn: () => http.get<SavingProduct[]>('/api/savings-products'),
+    ...savingProductsQuery(),
     select: data =>
       data
         .filter(product => isSuitableSavingProduct(product, monthlyPayment, term))
