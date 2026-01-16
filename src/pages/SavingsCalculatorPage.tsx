@@ -1,12 +1,11 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
 import { AmountInputSection } from 'features/savings/components/AmountInputSection';
 import { TermsSelectBottomSheet } from 'features/savings/components/TermsSelectBottomSheet';
 import { CalculationResultList } from 'features/savings/components/CalculationResultList';
-import { RecommendedProductList } from 'features/savings/components/RecommendedProductList';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
@@ -101,11 +100,27 @@ export function SavingsCalculatorPage() {
           <Spacing size={8} />
           <Border height={16} />
           <Spacing size={8} />
-          <RecommendedProductList
-            products={recommendedProducts}
-            selectedProductId={selectedProductId}
-            onSelect={setSelectedProductId}
-          />
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+          {recommendedProducts.map(product => {
+            const selected = selectedProductId === product.id;
+            return (
+              <ListRow
+                key={product.id}
+                contents={
+                  <SavingProductItem
+                    name={product.name}
+                    annualRate={product.annualRate}
+                    minMonthlyAmount={product.minMonthlyAmount}
+                    maxMonthlyAmount={product.maxMonthlyAmount}
+                    availableTerms={product.availableTerms}
+                  />
+                }
+                right={selected ? <GreenCheckCircleIcon /> : undefined}
+                onClick={() => setSelectedProductId(product.id)}
+              />
+            );
+          })}
           <Spacing size={40} />
         </>
       )}
