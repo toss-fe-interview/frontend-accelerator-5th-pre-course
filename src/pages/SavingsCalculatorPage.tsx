@@ -1,6 +1,8 @@
 import ErrorBoundary from 'common/components/ErrorBoundary';
-import InputSection from 'product/components/InputSection';
+import MonthlyPaymentInput from 'product/components/MonthlyPaymentInput';
+import PriceInput from 'product/components/PriceInput';
 import ResultSection from 'product/components/ResultSection';
+import TermSelectBottomSheet from 'product/components/TermSelectBottomSheet';
 import { Suspense, useState } from 'react';
 import { Border, NavigationBar, Spacing } from 'tosslib';
 
@@ -17,43 +19,43 @@ export function SavingsCalculatorPage() {
   const [monthlyPayment, setMonthlyPayment] = useState('');
   const [term, setTerm] = useState<number | null>(null);
 
-  const handlePriceChange = (value: string) => {
-    if (!validateInputNumber(value)) {
-      return;
-    }
-
-    const formattedValue = formatValue(value);
-
-    setPrice(formattedValue);
-  };
-
-  const handleMonthlyPaymentChange = (value: string) => {
-    if (!validateInputNumber(value)) {
-      return;
-    }
-
-    const formattedValue = formatValue(value);
-
-    setMonthlyPayment(formattedValue);
-  };
-
-  const handleTermChange = (value: number) => {
-    setTerm(value);
-  };
-
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <InputSection
-        price={price}
-        monthlyPayment={monthlyPayment}
-        term={term}
-        handlePriceChange={handlePriceChange}
-        handleMonthlyPaymentChange={handleMonthlyPaymentChange}
-        handleTermChange={handleTermChange}
+      <PriceInput
+        value={price}
+        onChange={value => {
+          if (!validateInputNumber(value)) {
+            return;
+          }
+
+          const formattedValue = formatValue(value);
+
+          setPrice(formattedValue);
+        }}
+      />
+      <Spacing size={16} />
+      <MonthlyPaymentInput
+        value={monthlyPayment}
+        onChange={value => {
+          if (!validateInputNumber(value)) {
+            return;
+          }
+
+          const formattedValue = formatValue(value);
+
+          setMonthlyPayment(formattedValue);
+        }}
+      />
+      <Spacing size={16} />
+      <TermSelectBottomSheet
+        value={term}
+        onChange={value => {
+          setTerm(value);
+        }}
       />
 
       <Spacing size={24} />
