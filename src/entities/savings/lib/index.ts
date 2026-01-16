@@ -1,12 +1,14 @@
 import { AsyncValue } from 'shared/model';
 import { SavingsProduct } from '../model';
+import { sortBy, takeFromHead, isBetween } from 'shared/lib';
+import { NON_DIGIT_REGEX, THOUSANDS_SEPARATOR_REGEX } from '../config';
 
 export const extractNumbers = (value: string) => {
-  return value.replace(/[^0-9]/g, '');
+  return value.replace(NON_DIGIT_REGEX, '');
 };
 
 export const formatNumberWithCommas = (value: string) => {
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return value.replace(THOUSANDS_SEPARATOR_REGEX, ',');
 };
 
 export const getRecommendedSavingsProducts = (savingsProduct: AsyncValue<SavingsProduct[]>) => {
@@ -14,7 +16,8 @@ export const getRecommendedSavingsProducts = (savingsProduct: AsyncValue<Savings
     return [];
   }
 
-  return savingsProduct.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  const sorted = sortBy(savingsProduct, product => product.annualRate, 'desc');
+  return takeFromHead(sorted, 2);
 };
 
 export const getSelectedSavingsProduct = (
@@ -43,9 +46,12 @@ export const getAvailableSavingsProducts = ({
 
   return products
     .filter(product => product.availableTerms === savingDuration)
-    .filter(product => {
-      const isValidAmount =
-        product.minMonthlyAmount <= Number(monthlyDeposit) && Number(monthlyDeposit) <= product.maxMonthlyAmount;
-      return isValidAmount;
-    });
+    .filter(product =>
+      isBetween({
+        value: Number(monthlyDeposit),
+        min: product.minMonthlyAmount,
+        max: product.maxMonthlyAmount,
+        inclusive: true,
+      })
+    );
 };
