@@ -1,15 +1,16 @@
-import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 import { getSavingsProducts, SavingsProduct } from 'api/product';
-import { CalculationResult } from 'components/CalculationResult';
 import { CheckCircleIcon } from 'components/CheckCircleIcon';
 import { GoalAmountInput } from 'components/GoalAmountInput';
 import { MonthlyPaymentInput } from 'components/MonthlyPaymentInput';
 import { Product } from 'components/Product';
+import { ResultItem } from 'components/ResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
 import { useTabState, Tab as TabType } from 'hooks/useTabState';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { roundToThousand } from 'util/number';
 
 const productQueries = {
   all: () =>
@@ -70,45 +71,117 @@ export function SavingsCalculatorPage() {
 
       {selectedTab === 'products' &&
         (() => {
-          const filteredSavingProducts = savingsProducts.filter(product => {
-            return (
-              product.minMonthlyAmount < monthlyPayment &&
-              product.maxMonthlyAmount > monthlyPayment &&
-              product.availableTerms === savingPeriod
-            );
-          });
-
-          return filteredSavingProducts.map(product => {
-            const isSelected = selectedSavingsProduct?.id === product.id;
-            return (
-              <ListRow
-                key={product.id}
-                contents={
-                  <Product
-                    name={product.name}
-                    annualRate={product.annualRate}
-                    minMonthlyAmount={product.minMonthlyAmount}
-                    maxMonthlyAmount={product.maxMonthlyAmount}
-                    availableTerms={product.availableTerms}
-                  />
-                }
-                right={isSelected ? <CheckCircleIcon /> : null}
-                onClick={() => {
-                  setSelectedSavingsProduct(product);
-                }}
-              />
-            );
-          });
+          return savingsProducts
+            .filter(product => {
+              return (
+                product.minMonthlyAmount < monthlyPayment &&
+                product.maxMonthlyAmount > monthlyPayment &&
+                product.availableTerms === savingPeriod
+              );
+            })
+            .map(product => {
+              const isSelected = selectedSavingsProduct?.id === product.id;
+              return (
+                <ListRow
+                  key={product.id}
+                  contents={
+                    <Product
+                      name={product.name}
+                      annualRate={product.annualRate}
+                      minMonthlyAmount={product.minMonthlyAmount}
+                      maxMonthlyAmount={product.maxMonthlyAmount}
+                      availableTerms={product.availableTerms}
+                    />
+                  }
+                  right={isSelected ? <CheckCircleIcon /> : null}
+                  onClick={() => {
+                    setSelectedSavingsProduct(product);
+                  }}
+                />
+              );
+            });
         })()}
       {selectedTab === 'results' && (
-        <CalculationResult
-          targetAmount={targetAmount}
-          monthlyPayment={monthlyPayment}
-          savingPeriod={savingPeriod}
-          selectedSavingsProduct={selectedSavingsProduct}
-          onSelectProduct={setSelectedSavingsProduct}
-        />
+        <>
+          <Spacing size={8} />
+
+          {!selectedSavingsProduct ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+          ) : (
+            <>
+              <ResultItem
+                label="예상 수익 금액"
+                value={`${calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate).toLocaleString()}원`}
+              />
+              <ResultItem
+                label="목표 금액과의 차이"
+                value={`${calculateDifferenceWithTargetAmount(targetAmount, calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate)).toLocaleString()}원`}
+              />
+              <ResultItem
+                label="추천 월 납입 금액"
+                value={`${calculateRecommendedMonthlyPayment(targetAmount, savingPeriod, selectedSavingsProduct.annualRate).toLocaleString()}원`}
+              />
+            </>
+          )}
+
+          <Spacing size={8} />
+          <Border height={16} />
+          <Spacing size={8} />
+
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+
+          {(() => {
+            return savingsProducts
+              .filter(product => {
+                return (
+                  product.minMonthlyAmount < monthlyPayment &&
+                  product.maxMonthlyAmount > monthlyPayment &&
+                  product.availableTerms === savingPeriod
+                );
+              })
+              .sort((a, b) => b.annualRate - a.annualRate)
+              .slice(0, 2)
+              .map(product => {
+                const isSelected = selectedSavingsProduct?.id === product.id;
+
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={
+                      <Product
+                        name={product.name}
+                        annualRate={product.annualRate}
+                        minMonthlyAmount={product.minMonthlyAmount}
+                        maxMonthlyAmount={product.maxMonthlyAmount}
+                        availableTerms={product.availableTerms}
+                      />
+                    }
+                    right={isSelected ? <CheckCircleIcon /> : null}
+                    onClick={() => {
+                      setSelectedSavingsProduct(product);
+                    }}
+                  />
+                );
+              });
+          })()}
+
+          <Spacing size={40} />
+        </>
       )}
     </>
   );
 }
+
+const calculateExpectedProfit = (monthlyPayment: number, savingPeriod: number, annualRate: number) => {
+  return monthlyPayment * savingPeriod * (1 + annualRate * 0.5);
+};
+
+const calculateDifferenceWithTargetAmount = (targetAmount: number, expectedProfit: number) => {
+  return targetAmount - expectedProfit;
+};
+
+const calculateRecommendedMonthlyPayment = (targetAmount: number, savingPeriod: number, annualRate: number) => {
+  const recommendedAmount = targetAmount / (savingPeriod * (1 + annualRate * 0.5));
+  return roundToThousand(recommendedAmount);
+};
