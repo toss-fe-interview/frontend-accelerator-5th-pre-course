@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { SavingsProductListSection } from 'components/SavingsProductListSection';
+import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 import { SavingsProduct } from 'types/SavingsProduct.type';
 
 interface RecommendedProductSectionProps {

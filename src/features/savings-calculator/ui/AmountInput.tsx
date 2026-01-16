@@ -1,3 +1,4 @@
+import { ChangeEvent } from 'react';
 import { TextField } from 'tosslib';
 
 import { formatTextFieldValue } from 'utils/formatTextFieldValue';
@@ -13,13 +14,14 @@ interface AmountInputProps {
 }
 
 export function AmountInput({ label, placeholder, suffix, value, onChange }: AmountInputProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    if (inputValue === '') {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    if (rawValue === '') {
       onChange(0);
       return;
     }
-    const sanitizedValue = sanitizeAmount(inputValue);
+
+    const sanitizedValue = sanitizeAmount(rawValue);
     if (validateAmount(sanitizedValue)) {
       onChange(sanitizedValue);
     }

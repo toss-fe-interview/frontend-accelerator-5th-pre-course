@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 
-import { CalculationResultItem } from 'components/CalculationResultItem';
-import { CalculationResultSection } from 'components/CalculationResultSection';
-import { EmptyListItem } from 'components/common/EmptyListItem';
-import { RecommendedProductSection } from 'components/RecommendedProductSection';
-import { AmountInput } from 'components/savings-calculator/AmountInput';
-import { SavingsTermSelect } from 'components/savings-calculator/SavingsTermSelect';
-import { SavingsProductListItem } from 'components/SavingsProductListItem';
-import { SavingsProductListSection } from 'components/SavingsProductListSection';
+import { EmptyListItem } from 'shared/ui/EmptyListItem';
+import { SavingsProductListItem } from 'entities/savings/ui/SavingsProductListItem';
+import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
 import { filterSavingsProduct } from 'utils/filterSavingsProduct';
+
+import { AmountInput } from 'features/savings-calculator/ui/AmountInput';
+import { CalculationResultItem } from 'features/savings-calculator/ui/CalculationResultItem';
+import { CalculationResultSection } from 'features/savings-calculator/ui/CalculationResultSection';
+import { RecommendedProductSection } from 'features/savings-calculator/ui/RecommendedProductSection';
+import { SavingsTermSelect } from 'features/savings-calculator/ui/SavingsTermSelect';
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
