@@ -2,7 +2,7 @@ import { colors, ListRow } from 'tosslib';
 
 interface ResultItemProps {
   label: string;
-  value: string;
+  value: number;
 }
 
 export function ResultItem({ label, value }: ResultItemProps) {
@@ -13,7 +13,7 @@ export function ResultItem({ label, value }: ResultItemProps) {
           type="2RowTypeA"
           top={label}
           topProps={{ color: colors.grey600 }}
-          bottom={value}
+          bottom={`${value.toLocaleString()}원`}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }

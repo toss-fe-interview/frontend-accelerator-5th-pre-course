@@ -111,15 +111,22 @@ export function SavingsCalculatorPage() {
             <>
               <ResultItem
                 label="예상 수익 금액"
-                value={`${calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate).toLocaleString()}원`}
+                value={calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate)}
               />
               <ResultItem
                 label="목표 금액과의 차이"
-                value={`${calculateDifferenceWithTargetAmount(targetAmount, calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate)).toLocaleString()}원`}
+                value={calculateDifferenceWithTargetAmount(
+                  targetAmount,
+                  calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate)
+                )}
               />
               <ResultItem
                 label="추천 월 납입 금액"
-                value={`${calculateRecommendedMonthlyPayment(targetAmount, savingPeriod, selectedSavingsProduct.annualRate).toLocaleString()}원`}
+                value={calculateRecommendedMonthlyPayment(
+                  targetAmount,
+                  savingPeriod,
+                  selectedSavingsProduct.annualRate
+                )}
               />
             </>
           )}
