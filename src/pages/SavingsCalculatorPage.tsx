@@ -1,4 +1,4 @@
-import { type SavingsProduct, useSavingsProducts } from 'api/savings-products';
+import { type SavingsProduct, useFetchSavingProducts } from 'api/savings-products';
 import { CalculationResult } from 'components/CalculationResult';
 import { MoneyInputField } from 'components/controls/MoneyInputField';
 import { TermSelectBottomSheet } from 'components/controls/TermSelectBottomSheet';
@@ -19,7 +19,7 @@ export function SavingsCalculatorPage() {
   // 탭
   const { currentTab, handleTabChange, TAB } = useTab();
 
-  const { savingsProducts, isLoading, isError } = useSavingsProducts();
+  const { savingsProducts, isLoading, isError } = useFetchSavingProducts();
   // 적금계산기를 통한 필터링
   const filteredSavingsProducts = useMemo(() => {
     return filterSavingsProducts(savingsProducts, term, monthlyAmount);
