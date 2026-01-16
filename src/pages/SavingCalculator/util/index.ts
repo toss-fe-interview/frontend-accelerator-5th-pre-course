@@ -1,9 +1,14 @@
 import { SavingsProduct } from '../api';
-import { CalculInputs } from '../components/SavingCalculatorInput';
-import { CalculationResultData } from '../components/CalculationResult';
+import { CalculationResultData } from '../components/CalculationResultItem';
+import { CalculInputs } from '../SavingsCalculatorPage';
 
 export function formatToKRW(amount: number): string {
   return amount.toLocaleString('ko-KR');
+}
+
+export function parseNumber(value: string): number {
+  const cleanValue = value.replace(/,/g, '');
+  return cleanValue === '' ? 0 : Number(cleanValue);
 }
 
 function calculateExpectedProfit(monthlyAmount: number, term: number, annualRate: number): number {
@@ -25,27 +30,32 @@ function calculateRecommendedMonthlyAmount(targetAmount: number, term: number, a
 
 export function calculateSavingResult(
   selectedProduct: SavingsProduct | null,
-  calculInputs: CalculInputs
+  calcInputs: CalculInputs
 ): CalculationResultData | null {
   if (!selectedProduct) {
     return null;
   }
 
-  const expectedProfit = calculateExpectedProfit(
-    calculInputs.monthlyAmount,
-    calculInputs.term,
-    selectedProduct.annualRate
-  );
-  const difference = calculateDifferenceFromTarget(calculInputs.targetAmount, expectedProfit);
+  const expectedProfit = calculateExpectedProfit(calcInputs.monthlyAmount, calcInputs.term, selectedProduct.annualRate);
+  const difference = calculateDifferenceFromTarget(calcInputs.targetAmount, expectedProfit);
   const recommendedMonthly = calculateRecommendedMonthlyAmount(
-    calculInputs.targetAmount,
-    calculInputs.term,
+    calcInputs.targetAmount,
+    calcInputs.term,
     selectedProduct.annualRate
   );
 
   return {
-    expectedProfit,
-    difference,
-    recommendedMonthly,
+    expectedProfit: {
+      label: '예상 수익 금액',
+      value: expectedProfit,
+    },
+    difference: {
+      label: '목표 금액과의 차이',
+      value: difference,
+    },
+    recommendedMonthly: {
+      label: '추천 월 납입 금액',
+      value: recommendedMonthly,
+    },
   };
 }

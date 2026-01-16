@@ -1,14 +1,14 @@
 import { useDeferredValue, useState } from 'react';
-import { CalculInputs } from '../components/SavingCalculatorInput';
+import { CalculInputs } from '../SavingsCalculatorPage';
 
 export function useCalculatorInputs() {
-  const [calculInputs, setCalculInputs] = useState<CalculInputs>({
+  const [calcInputs, setCalcInputs] = useState<CalculInputs>({
     targetAmount: 0,
     monthlyAmount: 0,
     term: 0,
   });
 
-  const deferredInputs = useDeferredValue(calculInputs);
+  const deferredInputs = useDeferredValue(calcInputs);
 
-  return { calculInputs, setCalculInputs, deferredInputs };
+  return { calcInputs, setCalcInputs, deferredInputs };
 }

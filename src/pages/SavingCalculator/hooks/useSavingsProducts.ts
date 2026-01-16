@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useGetSavingsProducts } from '../api';
-import { CalculInputs } from '../components/SavingCalculatorInput';
+import { CalculInputs } from '../components/KorNumInput';
 
 export function useSavingsProducts(inputs: CalculInputs) {
   const { data: savingsProducts } = useGetSavingsProducts();
