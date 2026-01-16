@@ -2,12 +2,13 @@ import { SuspenseQuery } from '@suspensive/react-query';
 import { CalculationResult } from 'components/CalculationResult';
 import { NumberField } from 'components/NumberField';
 import { SavingsProductRecord } from 'components/SavingsProductRecord';
-import { isMonthlyAmountInRange, isTabEnum } from 'domains/savings-product';
+import { TermSelector } from 'components/TermSelector';
+import { hasMonthlyAmountInRange, hasTermMatch } from 'domains/savings-product';
 import { defaultTo } from 'es-toolkit/compat';
 import { useSavingsProductSearchParams } from 'hooks/use-savings-product-search-params';
 import { Suspense, useState } from 'react';
 import { getSavingsProductsQueryOptions } from 'remotes/savings-product';
-import { Border, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
+import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import type { SavingsProduct } from 'types';
 import { IIFE, withTypeGuard } from 'utils/fn';
 
@@ -47,19 +48,17 @@ function SavingsCalculatorPage() {
         }}
       />
       <Spacing size={16} />
-      <SelectBottomSheet
+      <TermSelector
         label="저축 기간"
         title="저축 기간을 선택해주세요"
-        value={filters.term == null ? undefined : filters.term}
-        onChange={value => {
-          updateFilters(prev => ({ ...prev, term: value }));
+        value={filters.term}
+        onSelect={value => {
+          updateFilters(prev => ({
+            ...prev,
+            term: value,
+          }));
         }}
-      >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
-
+      />
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
@@ -155,6 +154,10 @@ function filterSavingsProducts(
   }
 ) {
   return savingsProducts
-    .filter(savingsProduct => isMonthlyAmountInRange(savingsProduct, defaultTo(monthlyAmount, 0)))
-    .filter(savingsProduct => term === savingsProduct.availableTerms);
+    .filter(hasMonthlyAmountInRange(defaultTo(monthlyAmount, 0)))
+    .filter(hasTermMatch(defaultTo(term, 0)));
+}
+
+function isTabEnum(value: unknown): value is 'products' | 'results' {
+  return ['products', 'results'].some(tab => tab === value);
 }
