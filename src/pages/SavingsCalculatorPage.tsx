@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 
 import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingsProductListItem } from 'components/SavingsProductListItem';
 import { EmptyListItem } from 'components/common/EmptyListItem';
+import { AmountInput } from 'components/savings-calculator/AmountInput';
+import { SavingsTermSelect } from 'components/savings-calculator/SavingsTermSelect';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
 import {
@@ -12,9 +14,6 @@ import {
   calculateRecommendedMonthlyAmount,
 } from 'utils/calculationUtil';
 import { filterSavingsProduct } from 'utils/filterSavingsProduct';
-import { formatTextFieldValue } from 'utils/formatTextFieldValue';
-import { sanitizeAmount } from 'utils/sanitizeAmount';
-import { validateAmount } from 'utils/validateAmount';
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
@@ -44,53 +43,28 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      {/* 계산기 form 영역 */}
-      <TextField
+      <AmountInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={formatTextFieldValue(formState.targetAmount)}
-        onChange={e => {
-          const value = e.target.value;
-          if (value === '') {
-            setFormState({ ...formState, targetAmount: 0 });
-            return;
-          }
-          const targetAmount = sanitizeAmount(value);
-          if (validateAmount(targetAmount)) {
-            setFormState({ ...formState, targetAmount });
-          }
-        }}
+        value={formState.targetAmount}
+        onChange={value => setFormState({ ...formState, targetAmount: value })}
       />
       <Spacing size={16} />
-      <TextField
+      <AmountInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={formatTextFieldValue(formState.monthlyAmount)}
-        onChange={e => {
-          const value = e.target.value;
-          if (value === '') {
-            setFormState({ ...formState, monthlyAmount: 0 });
-            return;
-          }
-          const monthlyAmount = sanitizeAmount(value);
-          if (validateAmount(monthlyAmount)) {
-            setFormState({ ...formState, monthlyAmount });
-          }
-        }}
+        value={formState.monthlyAmount}
+        onChange={value => setFormState({ ...formState, monthlyAmount: value })}
       />
       <Spacing size={16} />
-      <SelectBottomSheet
+      <SavingsTermSelect
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={formState.term}
-        onChange={value => setFormState({ ...formState, term: Number(value) })}
-      >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+        onChange={value => setFormState({ ...formState, term: value })}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
