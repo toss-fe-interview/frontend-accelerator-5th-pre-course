@@ -1,12 +1,14 @@
-import { Border, ListRow, NavigationBar, Spacing, Tab, http, isHttpError } from 'tosslib';
-import { useEffect, useMemo, useState } from 'react';
+import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { useMemo, useState } from 'react';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { SavingsInputForm } from 'components/SavingsInputForm';
 import { CalculationResult } from 'components/CalculationResult';
-import { SavingsProduct, SavingsInput } from 'type';
+import { SavingsInput, SavingsProduct } from 'type';
 import { ProductList } from 'components/ProductList';
+import { savingsProductsQuery } from 'apis/savingsProduct';
 
 export function SavingsCalculatorPage() {
-  const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
+  const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery());
   const [savingsInput, setSavingsInput] = useState<SavingsInput>({
     goalAmount: '',
     monthlyAmount: '',
@@ -30,22 +32,6 @@ export function SavingsCalculatorPage() {
 
     return filteredByTerm;
   }, [savingsProducts, savingsInput]);
-
-  useEffect(() => {
-    const fetchSavingsProducts = async () => {
-      try {
-        const response = await http.get<SavingsProduct[]>('/api/savings-products');
-        setSavingsProducts(response);
-      } catch (error) {
-        if (isHttpError(error)) {
-          console.error(error.message);
-        } else {
-          console.error(error);
-        }
-      }
-    };
-    fetchSavingsProducts();
-  }, []);
 
   const hasValidInput = savingsInput?.term && savingsInput?.monthlyAmount;
 
