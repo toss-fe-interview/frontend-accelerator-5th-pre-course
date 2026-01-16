@@ -9,11 +9,11 @@ import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductLis
 
 import { filterSavingsProduct } from 'features/savings-calculator/lib/filterSavingsProduct';
 import { SavingsCalculatorFormState } from 'features/savings-calculator/model/types';
-import { AmountInput } from 'features/savings-calculator/ui/AmountInput';
-import { CalculationResultItem } from 'features/savings-calculator/ui/CalculationResultItem';
-import { CalculationResultSection } from 'features/savings-calculator/ui/CalculationResultSection';
-import { RecommendedProductSection } from 'features/savings-calculator/ui/RecommendedProductSection';
-import { SavingsTermSelect } from 'features/savings-calculator/ui/SavingsTermSelect';
+import { AmountInput } from 'features/savings-calculator/ui/input/AmountInput';
+import { SavingsTermSelect } from 'features/savings-calculator/ui/input/SavingsTermSelect';
+import { RecommendedProductSection } from 'features/savings-calculator/ui/recommendation/RecommendedProductSection';
+import { CalculationResultItem } from 'features/savings-calculator/ui/result/CalculationResultItem';
+import { CalculationResultSection } from 'features/savings-calculator/ui/result/CalculationResultSection';
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
