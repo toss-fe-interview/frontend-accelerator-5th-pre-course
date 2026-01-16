@@ -2,7 +2,7 @@ import { AsyncValue } from 'shared/model';
 import { SavingsProduct } from '../model';
 import { sortBy, takeFromHead, isBetween } from 'shared/lib';
 
-export const extractNumbers = (value: string) => {
+export const parseDigitsOnly = (value: string) => {
   const NON_DIGIT_REGEX = /[^0-9]/g;
 
   return value.replace(NON_DIGIT_REGEX, '');

@@ -1,7 +1,7 @@
 import { useSavingsProductsQuery } from 'entities/savings/api';
 import { SAVINGS_DURATIONS } from 'entities/savings/config/constant';
 import {
-  extractNumbers,
+  parseDigitsOnly,
   formatNumberWithCommas,
   getAvailableSavingsProducts,
   getRecommendedSavingsProducts,
@@ -38,7 +38,7 @@ export function SavingsCalculatorPage() {
         suffix="원"
         value={formatNumberWithCommas(targetAmount)}
         onChange={e => {
-          setTargetAmount(extractNumbers(e.target.value));
+          setTargetAmount(parseDigitsOnly(e.target.value));
         }}
       />
       <Spacing size={16} />
@@ -48,7 +48,7 @@ export function SavingsCalculatorPage() {
         suffix="원"
         value={formatNumberWithCommas(monthlyDeposit)}
         onChange={e => {
-          setMonthlyDeposit(extractNumbers(e.target.value));
+          setMonthlyDeposit(parseDigitsOnly(e.target.value));
         }}
       />
       <Spacing size={16} />
