@@ -100,7 +100,7 @@ export function SavingsCalculatorPage() {
         ))}
       {tab === 'results' && (
         <>
-          {selectedSavingsProduct && (
+          {selectedSavingsProduct ? (
             <>
               <Spacing size={8} />
               <CalculationResultItem
@@ -131,8 +131,7 @@ export function SavingsCalculatorPage() {
                 )}원`}
               />
             </>
-          )}
-          {!selectedSavingsProduct && (
+          ) : (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
           )}
           {recommendedSavingsProducts.length > 0 && (
