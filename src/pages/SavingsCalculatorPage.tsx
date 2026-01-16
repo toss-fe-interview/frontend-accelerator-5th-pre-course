@@ -1,24 +1,43 @@
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
-import { SavingsProduct } from 'api/product';
-import { SavingsProductList } from 'components/SavingsProductList';
+import { getSavingsProducts, SavingsProduct } from 'api/product';
 import { CalculationResult } from 'components/CalculationResult';
+import { CheckCircleIcon } from 'components/CheckCircleIcon';
+import { GoalAmountInput } from 'components/GoalAmountInput';
+import { MonthlyPaymentInput } from 'components/MonthlyPaymentInput';
+import { Product } from 'components/Product';
+import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
+import { useTabState, Tab as TabType } from 'hooks/useTabState';
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
 
-type Tab = 'products' | 'results';
-
-const useTab = () => {
-  const [selectedTab, setSelectedTab] = useState<Tab>('products');
-  return [selectedTab, setSelectedTab] as const;
+const productQueries = {
+  all: () =>
+    queryOptions({
+      queryKey: ['savingsProducts'],
+      queryFn: getSavingsProducts,
+    }),
 };
 
+interface SavingsFormData {
+  targetAmount: number;
+  monthlyPayment: number;
+  savingPeriod: number;
+}
+
 export function SavingsCalculatorPage() {
-  const [targetAmount, setTargetAmount] = useState(0);
-  const [monthlyPayment, setMonthlyPayment] = useState(0);
-  const [savingPeriod, setSavingPeriod] = useState(12);
-
+  const { watch, setValue } = useForm<SavingsFormData>({
+    defaultValues: {
+      targetAmount: 0,
+      monthlyPayment: 0,
+      savingPeriod: 12,
+    },
+  });
+  const { targetAmount, monthlyPayment, savingPeriod } = watch();
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
+  const { selectedTab, setSelectedTab } = useTabState();
 
-  const [selectedTab, setSelectedTab] = useTab();
+  const { data: savingsProducts } = useSuspenseQuery(productQueries.all());
 
   return (
     <>
@@ -26,44 +45,11 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField
-        label="목표 금액"
-        placeholder="목표 금액을 입력하세요"
-        suffix="원"
-        value={targetAmount.toString()}
-        onChange={e => {
-          if (isNaN(Number(e.target.value))) {
-            return;
-          }
-          setTargetAmount(Number(e.target.value));
-        }}
-      />
+      <GoalAmountInput value={targetAmount} onChange={v => setValue('targetAmount', v)} />
       <Spacing size={16} />
-      <TextField
-        label="월 납입액"
-        placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
-        value={monthlyPayment.toString()}
-        onChange={e => {
-          if (isNaN(Number(e.target.value))) {
-            return;
-          }
-          setMonthlyPayment(Number(e.target.value));
-        }}
-      />
+      <MonthlyPaymentInput value={monthlyPayment} onChange={v => setValue('monthlyPayment', v)} />
       <Spacing size={16} />
-      <SelectBottomSheet
-        label="저축 기간"
-        title="저축 기간을 선택해주세요"
-        value={savingPeriod}
-        onChange={value => {
-          setSavingPeriod(value);
-        }}
-      >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <SavingPeriodSelect value={savingPeriod} onChange={v => setValue('savingPeriod', v)} />
 
       <Spacing size={24} />
       <Border height={16} />
@@ -71,7 +57,7 @@ export function SavingsCalculatorPage() {
 
       <Tab
         onChange={value => {
-          setSelectedTab(value as Tab);
+          setSelectedTab(value as TabType);
         }}
       >
         <Tab.Item value="products" selected={selectedTab === 'products'}>
@@ -82,15 +68,38 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {selectedTab === 'products' && (
-        <SavingsProductList
-          monthlyPayment={monthlyPayment}
-          savingPeriod={savingPeriod}
-          selectedSavingsProduct={selectedSavingsProduct}
-          onSelectProduct={setSelectedSavingsProduct}
-        />
-      )}
+      {selectedTab === 'products' &&
+        (() => {
+          const filteredSavingProducts = savingsProducts.filter(product => {
+            return (
+              product.minMonthlyAmount < monthlyPayment &&
+              product.maxMonthlyAmount > monthlyPayment &&
+              product.availableTerms === savingPeriod
+            );
+          });
 
+          return filteredSavingProducts.map(product => {
+            const isSelected = selectedSavingsProduct?.id === product.id;
+            return (
+              <ListRow
+                key={product.id}
+                contents={
+                  <Product
+                    name={product.name}
+                    annualRate={product.annualRate}
+                    minMonthlyAmount={product.minMonthlyAmount}
+                    maxMonthlyAmount={product.maxMonthlyAmount}
+                    availableTerms={product.availableTerms}
+                  />
+                }
+                right={isSelected ? <CheckCircleIcon /> : null}
+                onClick={() => {
+                  setSelectedSavingsProduct(product);
+                }}
+              />
+            );
+          });
+        })()}
       {selectedTab === 'results' && (
         <CalculationResult
           targetAmount={targetAmount}
