@@ -5,7 +5,7 @@ import { SavingsProduct } from 'entities/savings/model/types';
 interface SavingsProductListSectionProps {
   products: SavingsProduct[];
   emptyFallback: ReactNode;
-  children: (items: SavingsProduct[]) => ReactNode;
+  children: (products: SavingsProduct[]) => ReactNode;
 }
 
 export function SavingsProductListSection({ products, emptyFallback, children }: SavingsProductListSectionProps) {

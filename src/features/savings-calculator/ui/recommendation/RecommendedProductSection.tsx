@@ -6,7 +6,7 @@ import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductLis
 interface RecommendedProductSectionProps {
   candidateProducts: SavingsProduct[];
   emptyFallback: ReactNode;
-  children: (recommendedItems: SavingsProduct[]) => ReactNode;
+  children: (recommendedProducts: SavingsProduct[]) => ReactNode;
 }
 
 export function RecommendedProductSection({
@@ -14,10 +14,10 @@ export function RecommendedProductSection({
   emptyFallback,
   children,
 }: RecommendedProductSectionProps) {
-  const recommendedItems = [...candidateProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  const recommendedProducts = [...candidateProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
-    <SavingsProductListSection products={recommendedItems} emptyFallback={emptyFallback}>
+    <SavingsProductListSection products={recommendedProducts} emptyFallback={emptyFallback}>
       {children}
     </SavingsProductListSection>
   );
