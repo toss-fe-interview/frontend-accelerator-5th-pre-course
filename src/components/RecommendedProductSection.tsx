@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { SavingsProductListSection } from 'components/SavingsProductListSection';
 import { SavingsProduct } from 'types/SavingsProduct.type';
 
 interface RecommendedProductSectionProps {
@@ -15,11 +16,9 @@ export function RecommendedProductSection({
 }: RecommendedProductSectionProps) {
   const recommendedItems = [...candidateProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
-  const isEmpty = recommendedItems.length === 0;
-
-  if (isEmpty) {
-    return <>{emptyFallback}</>;
-  }
-
-  return <>{children(recommendedItems)}</>;
+  return (
+    <SavingsProductListSection products={recommendedItems} emptyFallback={emptyFallback}>
+      {children}
+    </SavingsProductListSection>
+  );
 }
