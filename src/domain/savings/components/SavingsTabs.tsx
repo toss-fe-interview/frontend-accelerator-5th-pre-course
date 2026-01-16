@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Border, Button, ListHeader, ListRow, Spacing, Tab } from 'tosslib';
 import { arrayIncludes } from '@shared/utils';
 import { SuspenseBoundary, SwitchCase, Delay } from '@shared/ui';
-import { calcSavingResult } from '@savings/utils';
+import { calcDifferenceFromGoal, calcExpectedReturn, calcRecommendedMonthlySaving } from '@savings/utils';
 import { useSavingsProducts } from '@savings/hooks/queries';
 import { ProductListItem } from './ProductListItem';
 import { CalculationResult } from './CalculationResult';
@@ -61,10 +61,11 @@ export const SavingsTabs = (props: SavingsTabsProps) => {
 };
 
 const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: string }) => {
+  const { monthlySaving, savingPeriod, goalAmount } = savingsForm;
   const { data: savingsProducts } = useSavingsProducts({
     filterParams: {
-      monthlySaving: Number(savingsForm.monthlySaving),
-      savingPeriod: savingsForm.savingPeriod,
+      monthlySaving: Number(monthlySaving),
+      savingPeriod,
     },
   });
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct>();
@@ -73,6 +74,11 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
   const handleClickProduct = (sp: SavingsProduct) => {
     setSelectedProduct(sp);
   };
+
+  const annualRate = selectedProduct?.annualRate || 0;
+  const expectedReturn = calcExpectedReturn(Number(monthlySaving), savingPeriod, annualRate);
+  const differanceFromGoal = calcDifferenceFromGoal(Number(goalAmount), expectedReturn);
+  const recommendedMonthlySaving = calcRecommendedMonthlySaving(Number(goalAmount), savingPeriod, annualRate);
 
   return (
     <SwitchCase
@@ -90,7 +96,11 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
           <>
             <Spacing size={8} />
             <CalculationResult
-              result={calcSavingResult({ savingsForm, selectedProduct })}
+              result={{
+                expectedReturn,
+                differanceFromGoal,
+                recommendedMonthlySaving,
+              }}
               selectedProduct={selectedProduct}
             />
             <Spacing size={8} />

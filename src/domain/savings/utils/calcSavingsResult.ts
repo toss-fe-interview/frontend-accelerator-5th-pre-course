@@ -1,11 +1,3 @@
-import { SavingsForm } from '@savings/hooks';
-import type { SavingsProduct } from '@savings/apis/type';
-
-type CalcSavingResultProps = {
-  savingsForm: SavingsForm;
-  selectedProduct?: SavingsProduct;
-};
-
 export type SavingsResult = {
   /** 예상 수익 금액 */
   expectedReturn: number;
@@ -15,22 +7,25 @@ export type SavingsResult = {
   recommendedMonthlySaving: number;
 };
 
-export const calcSavingResult = (props: CalcSavingResultProps): SavingsResult => {
-  const { savingsForm, selectedProduct } = props;
+export const calcExpectedReturn = (
+  monthlySaving: number,
+  savingPeriod: number,
+  annualRate: number
+): SavingsResult['expectedReturn'] => {
+  return monthlySaving * savingPeriod * (1 + annualRate + 0.5);
+};
 
-  if (!selectedProduct) {
-    return { differanceFromGoal: 0, expectedReturn: 0, recommendedMonthlySaving: 0 };
-  }
-  const { goalAmount, monthlySaving, savingPeriod } = savingsForm;
-  const { annualRate } = selectedProduct;
+export const calcDifferenceFromGoal = (
+  goalAmount: number,
+  expectedReturn: number
+): SavingsResult['differanceFromGoal'] => {
+  return goalAmount - expectedReturn;
+};
 
-  const expectedReturn = Number(monthlySaving) * savingPeriod * (1 + annualRate + 0.5);
-  const differanceFromGoal = Number(goalAmount) - expectedReturn;
-  const recommendedMonthlySaving = Number(goalAmount) / (savingPeriod * (1 + annualRate + 0.5));
-
-  return {
-    expectedReturn,
-    differanceFromGoal,
-    recommendedMonthlySaving,
-  };
+export const calcRecommendedMonthlySaving = (
+  goalAmount: number,
+  savingPeriod: number,
+  annualRate: number
+): SavingsResult['recommendedMonthlySaving'] => {
+  return goalAmount / (savingPeriod * (1 + annualRate + 0.5));
 };
