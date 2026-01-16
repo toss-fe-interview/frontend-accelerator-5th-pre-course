@@ -1,6 +1,6 @@
 import { ErrorBoundary, Suspense } from '@suspensive/react';
 import ErrorFallback from 'components/ErrorFallback';
-import SuspenseFallback from 'components/SuspenseFallback';
+import Loading from 'components/Loading';
 import LabeledAmountInput from 'features/savings/components/LabeledAmountInput';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
@@ -127,7 +127,7 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       <ErrorBoundary fallback={ErrorFallback}>
-        <Suspense fallback={<SuspenseFallback />}>
+        <Suspense fallback={<Loading />}>
           {selectedTab === 'products' ? (
             filteredSavingsProducts.map(savingsProduct => {
               const isProductSelected = savingsProduct.id === selectedProductId;
