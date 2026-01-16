@@ -1,10 +1,10 @@
-import { Border, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useMemo, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { SavingsInputForm } from 'components/SavingsInputForm';
-import { CalculationResult } from 'components/CalculationResult';
+import { CalculationResults } from 'components/CalculationResults';
+import { ProductInfoTexts } from 'components/ProductInfoTexts';
 import { SavingsInput, SavingsProduct } from 'type';
-import { ProductList } from 'components/ProductList';
 import { savingsProductsQuery } from 'apis/savingsProduct';
 
 export function SavingsCalculatorPage() {
@@ -18,21 +18,21 @@ export function SavingsCalculatorPage() {
 
   const [selectTab, setSelectTab] = useState<'products' | 'results'>('products');
 
-  const filteredSavingsProducts = useMemo(() => {
-    const filteredByMonthlyAmount = savingsProducts.filter(product => {
+  const matchingProducts = useMemo(() => {
+    return savingsProducts.filter(product => {
       return (
-        product.minMonthlyAmount <= savingsInput.monthlyAmount && product.maxMonthlyAmount >= savingsInput.monthlyAmount
+        product.minMonthlyAmount <= savingsInput.monthlyAmount &&
+        product.maxMonthlyAmount >= savingsInput.monthlyAmount &&
+        product.availableTerms === savingsInput.term
       );
     });
-
-    const filteredByTerm = filteredByMonthlyAmount.filter(product => {
-      return product.availableTerms === savingsInput.term;
-    });
-
-    return filteredByTerm;
   }, [savingsProducts, savingsInput]);
 
+  const topRatedProducts = [...matchingProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+
   const hasValidInput = savingsInput.term && savingsInput.monthlyAmount;
+  const hasNoMatchingProducts = matchingProducts.length === 0;
+  const hasNoSelectedProduct = !selectedSavingsProduct;
 
   return (
     <>
@@ -59,18 +59,49 @@ export function SavingsCalculatorPage() {
       {hasValidInput ? (
         <>
           {selectTab === 'products' && (
-            <ProductList
-              filteredSavingsProducts={filteredSavingsProducts}
-              selectedSavingsProduct={selectedSavingsProduct}
-              setSelectedSavingsProduct={setSelectedSavingsProduct}
-            />
+            <>
+              {hasNoMatchingProducts ? (
+                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="입력한 조건에 맞는 상품이 없습니다." />} />
+              ) : (
+                <>
+                  {matchingProducts.map(product => {
+                    const isSelected = selectedSavingsProduct?.id === product.id;
+
+                    return (
+                      <ListRow
+                        key={product.id}
+                        contents={<ProductInfoTexts product={product} />}
+                        right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
+                        onClick={() => setSelectedSavingsProduct(product)}
+                      />
+                    );
+                  })}
+                </>
+              )}
+            </>
           )}
           {selectTab === 'results' && (
-            <CalculationResult
-              selectedSavingsProduct={selectedSavingsProduct}
-              savingsInput={savingsInput}
-              filteredSavingsProducts={filteredSavingsProducts}
-            />
+            <>
+              {hasNoSelectedProduct ? (
+                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+              ) : (
+                <>
+                  <CalculationResults selectedProduct={selectedSavingsProduct} savingsInput={savingsInput} />
+
+                  <Spacing size={8} />
+                  <Border height={16} />
+                  <Spacing size={8} />
+
+                  <ListHeader
+                    title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+                  />
+                  <Spacing size={12} />
+                  {topRatedProducts.map(product => (
+                    <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
+                  ))}
+                </>
+              )}
+            </>
           )}
         </>
       ) : (
