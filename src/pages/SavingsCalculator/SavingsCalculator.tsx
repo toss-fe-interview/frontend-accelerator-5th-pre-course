@@ -1,6 +1,6 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { conforms, filter } from 'es-toolkit/compat';
+import { flow } from 'es-toolkit/function';
 import { useState } from 'react';
-import { queries } from 'shared/api/queries';
 import { SavingsProduct } from 'shared/api/type';
 import {
   Assets,
@@ -17,9 +17,7 @@ import {
 
 type TabType = 'products' | 'results';
 
-export function SavingsCalculator() {
-  const { data: savingProducts } = useSuspenseQuery(queries.savingsProducts());
-
+export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsProduct[] }) {
   const [목표금액, set목표금액] = useState<number>(0);
   const [월납입액, set월납입액] = useState<number>(0);
   const [저축기간, set저축기간] = useState<6 | 12 | 24>(12);
@@ -27,12 +25,14 @@ export function SavingsCalculator() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
   const [selectedTab, setSelectedTab] = useState<TabType>('products');
 
-  const filteredProducts = savingProducts.filter(
-    product =>
-      product.minMonthlyAmount <= 월납입액 &&
-      product.maxMonthlyAmount >= 월납입액 &&
-      product.availableTerms === 저축기간
-  );
+  const conditions = conforms({
+    minMonthlyAmount: (min: number) => min <= 월납입액,
+    maxMonthlyAmount: (max: number) => max >= 월납입액,
+    availableTerms: (terms: number) => terms === 저축기간,
+  });
+
+  const filteredProducts = filter(savingProducts, conditions);
+  const getBestProducts = flow(sortByHighRate, takeTop2);
 
   return (
     <>
@@ -44,9 +44,7 @@ export function SavingsCalculator() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={toKRW(목표금액)}
-        onChange={e => {
-          set목표금액(amountToNumber(e.target.value));
-        }}
+        onChange={e => set목표금액(amountToNumber(e.target.value))}
       />
 
       <Spacing size={16} />
@@ -56,9 +54,7 @@ export function SavingsCalculator() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={toKRW(월납입액)}
-        onChange={e => {
-          set월납입액(amountToNumber(e.target.value));
-        }}
+        onChange={e => set월납입액(amountToNumber(e.target.value))}
       />
 
       <Spacing size={16} />
@@ -153,28 +149,25 @@ export function SavingsCalculator() {
 
           <Spacing size={12} />
 
-          {filteredProducts
-            .toSorted((a, b) => b.annualRate - a.annualRate)
-            .slice(0, 2)
-            .map(product => {
-              const isSelected = selectedProduct?.id === product.id;
-              return (
-                <ListRow
-                  key={product.id}
-                  contents={
-                    <SavingProduct
-                      name={product.name}
-                      annualRate={product.annualRate}
-                      minMonthlyAmount={product.minMonthlyAmount}
-                      maxMonthlyAmount={product.maxMonthlyAmount}
-                      availableTerms={product.availableTerms}
-                    />
-                  }
-                  right={isSelected ? <CheckCircleIcon /> : null}
-                  onClick={() => setSelectedProduct(product)}
-                />
-              );
-            })}
+          {getBestProducts(filteredProducts).map(product => {
+            const isSelected = selectedProduct?.id === product.id;
+            return (
+              <ListRow
+                key={product.id}
+                contents={
+                  <SavingProduct
+                    name={product.name}
+                    annualRate={product.annualRate}
+                    minMonthlyAmount={product.minMonthlyAmount}
+                    maxMonthlyAmount={product.maxMonthlyAmount}
+                    availableTerms={product.availableTerms}
+                  />
+                }
+                right={isSelected ? <CheckCircleIcon /> : null}
+                onClick={() => setSelectedProduct(product)}
+              />
+            );
+          })}
         </>
       )}
     </>
@@ -220,3 +213,7 @@ const toKRW = (amount: number) => amount.toLocaleString('ko-KR');
 export const amountToNumber = (value: string) => {
   return Number(value.replace(/,/g, '')) || 0;
 };
+
+const sortByHighRate = (products: SavingsProduct[]) => products.toSorted((a, b) => b.annualRate - a.annualRate);
+
+const takeTop2 = (products: SavingsProduct[]) => products.slice(0, 2);
