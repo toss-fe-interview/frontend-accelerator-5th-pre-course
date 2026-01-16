@@ -9,6 +9,7 @@ import {
 } from 'entities/savings/lib';
 import { SavingsTab } from 'entities/savings/model';
 import { CalculationResults, Placeholder, SavingsProductItem } from 'entities/savings/ui';
+import List from 'entities/savings/ui/List';
 import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 
@@ -27,6 +28,8 @@ export function SavingsCalculatorPage() {
   });
   const recommendedSavingsProducts = getRecommendedSavingsProducts(availableSavingsProducts);
   const selectedSavingsProduct = getSelectedSavingsProduct(availableSavingsProducts, selectedSavingsProductId);
+
+  const hasRecommendedSavingsProducts = recommendedSavingsProducts.length > 0;
 
   const onTargetPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTargetAmount(extractNumbers(e.target.value));
@@ -87,17 +90,20 @@ export function SavingsCalculatorPage() {
           계산 결과
         </Tab.Item>
       </Tab>
-      {tab === 'products' &&
-        availableSavingsProducts.map(product => (
-          <SavingsProductItem
-            key={product.id}
-            product={product}
-            checked={product.id === selectedSavingsProductId}
-            onClick={() => {
-              setSelectedSavingsProductId(product.id);
-            }}
-          />
-        ))}
+      {tab === 'products' && (
+        <List list={availableSavingsProducts}>
+          {product => (
+            <SavingsProductItem
+              key={product.id}
+              product={product}
+              checked={product.id === selectedSavingsProductId}
+              onClick={() => {
+                setSelectedSavingsProductId(product.id);
+              }}
+            />
+          )}
+        </List>
+      )}
       {tab === 'results' && (
         <>
           <Spacing size={8} />
@@ -136,7 +142,7 @@ export function SavingsCalculatorPage() {
           ) : (
             <Placeholder message="상품을 선택해주세요." />
           )}
-          {recommendedSavingsProducts.length > 0 && (
+          {hasRecommendedSavingsProducts && (
             <>
               <Spacing size={8} />
               <Border height={16} />
@@ -145,13 +151,15 @@ export function SavingsCalculatorPage() {
                 title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
               />
               <Spacing size={12} />
-              {recommendedSavingsProducts.map(product => (
-                <SavingsProductItem
-                  key={product.id}
-                  product={product}
-                  checked={product.id === selectedSavingsProductId}
-                />
-              ))}
+              <List list={recommendedSavingsProducts}>
+                {product => (
+                  <SavingsProductItem
+                    key={product.id}
+                    product={product}
+                    checked={product.id === selectedSavingsProductId}
+                  />
+                )}
+              </List>
               <Spacing size={40} />
             </>
           )}
