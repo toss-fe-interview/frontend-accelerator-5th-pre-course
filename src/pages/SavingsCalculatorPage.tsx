@@ -1,16 +1,18 @@
 import { fetchProducts } from 'domains/Savings/api/fetchProducts';
 import { CalculationResultItem } from 'domains/Savings/components/CalculationResultItem';
 import { Divider } from 'domains/Savings/components/Divider';
-import { ProductList } from 'domains/Savings/components/ProductList';
-import { RecommendedProduct } from 'domains/Savings/components/RecommendedProduct';
-import { SavingsNavigationBar } from 'domains/Savings/components/SavingsNavigationBar';
+import { SavingProduct } from 'domains/Savings/components/SavingProduct';
 import { SavingsTabNavigation } from 'domains/Savings/components/SavingsTabNavigation';
-import { SavingTabContent } from 'domains/Savings/components/SavingTabContent';
-import type { SavingsProduct, SavingsTabValue, SavingTabListType } from 'domains/Savings/types';
-import { calculateExpectedProfit, calculateGoalDifference, calculateRecommendedDeposit, filterSavingsProducts, getTopRateProducts } from 'domains/Savings/utils/savings';
+import type { SavingsProduct, SavingsTabValue } from 'domains/Savings/types';
+import {
+  calculateExpectedProfit,
+  calculateGoalDifference,
+  calculateRecommendedDeposit,
+  filterSavingsProducts,
+  getTopRateProducts,
+} from 'domains/Savings/utils/savings';
 import React, { useState, useEffect } from 'react';
-import { TextField, Spacing, SelectBottomSheet, ListRow } from 'tosslib';
-
+import { TextField, Spacing, SelectBottomSheet, ListRow, colors, Assets, ListHeader, NavigationBar } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   // 계산기 상태
@@ -28,13 +30,10 @@ export function SavingsCalculatorPage() {
     fetchProducts().then(setProducts);
   }, []);
 
-  const tabs: SavingTabListType = [
-    { value: 'products', name: '적금 상품' },
-    { value: 'results', name: '계산 결과' },
-  ];
-
   // 결과 계산
   const selectedProduct = products.find(p => p.id === selectedProductId);
+
+  const hasProduct = !selectedProduct;
   const annualRate = selectedProduct?.annualRate ?? 0;
   const expectedProfit = calculateExpectedProfit(Number(monthlyDeposit) || 0, savingsPeriod, annualRate);
   const goalDifference = calculateGoalDifference(Number(goalAmount) || 0, expectedProfit);
@@ -42,7 +41,8 @@ export function SavingsCalculatorPage() {
 
   return (
     <>
-      <SavingsNavigationBar title="적금 계산기" />
+      <NavigationBar title="적금 계산기" />
+      <Spacing size={16} />
       <TextField
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
@@ -60,6 +60,7 @@ export function SavingsCalculatorPage() {
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMonthlyDeposit(e.target.value)}
       />
       <Spacing size={16} />
+
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
@@ -73,49 +74,94 @@ export function SavingsCalculatorPage() {
 
       <Divider />
       <SavingsTabNavigation
-        tabs={tabs}
+        tabs={[
+          { value: 'products', name: '적금 상품' },
+          { value: 'results', name: '계산 결과' },
+        ]}
         selectedTab={selectedTab}
         onTabChange={setSelectedTab}
       />
-      <SavingTabContent
-        selectedTab={selectedTab}
-        renderProps={tab => (
-          <>
-            {tab === 'products' && (
-              <ProductList
-                list={filterSavingsProducts(products, {
-                  monthlyDeposit: Number(monthlyDeposit),
-                  period: savingsPeriod,
-                })}
-                selectedProductId={selectedProductId}
-                onClick={setSelectedProductId}
-              />
-            )}
-            {tab === 'results' && (
-              <>
-                {!selectedProductId ? (
-                  <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요" />} />
-                ) : (
-                  <>
-                    <Spacing size={8} />
-                    <CalculationResultItem name="예상 수익 금액" price={expectedProfit} />
-                    <CalculationResultItem name="목표 금액과의 차이" price={goalDifference} />
-                    <CalculationResultItem name="추천 월 납입 금액" price={recommendedDeposit} />
-                  </>
-                )}
-                <RecommendedProduct title="추천 상품 목록">
-                  <ProductList
-                    list={getTopRateProducts(products, 2)}
-                    selectedProductId={selectedProductId}
-                    onClick={setSelectedProductId}
-                    emptyMessage="추천 상품이 없습니다."
+
+      {selectedTab === 'products' &&
+        filterSavingsProducts(products, {
+          monthlyDeposit: Number(monthlyDeposit),
+          period: savingsPeriod,
+        }).map(product => {
+          const isSelected = selectedProductId === product.id;
+          return (
+            <ListRow
+              key={product.id}
+              contents={
+                <SavingProduct
+                  name={product.name}
+                  interestRate={`${product.annualRate}`}
+                  depositRange={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원`}
+                  termMonths={`${product.availableTerms}`}
+                />
+              }
+              right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+              onClick={() => setSelectedProductId(product.id)}
+            />
+          );
+        })}
+
+      <Spacing size={8} />
+      {selectedTab === 'results' && (
+        <>
+          {hasProduct ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요" />} />
+          ) : (
+            <>
+              <CalculationResultItem name="예상 수익 금액" price={expectedProfit} unit="원" />
+              <CalculationResultItem name="목표 금액과의 차이" price={goalDifference} unit="원" />
+              <CalculationResultItem name="추천 월 납입 금액" price={recommendedDeposit} unit="원" />
+            </>
+          )}
+          <Divider spacing={8} />
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+          {getTopRateProducts(products, 2).map(product => {
+            const isSelected = selectedProductId === product.id;
+            return (
+              <ListRow
+                key={product.id}
+                contents={
+                  <SavingProduct
+                    name={product.name}
+                    interestRate={`${product.annualRate}`}
+                    depositRange={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원`}
+                    termMonths={`${product.availableTerms}`}
                   />
-                </RecommendedProduct>
-              </>
-            )}
-          </>
-        )}
-      />
+                }
+                right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                onClick={() => setSelectedProductId(product.id)}
+              />
+            );
+          })}
+        </>
+      )}
     </>
+  );
+}
+
+interface CalculationResultItemProps {
+  name: string;
+  price: number;
+  unit: string;
+}
+
+export function CalculationResultItem({ name, price, unit }: CalculationResultItemProps) {
+  return (
+    <ListRow
+      contents={
+        <ListRow.Texts
+          type="2RowTypeA"
+          top={name}
+          topProps={{ color: colors.grey600 }}
+          bottom={`${price.toLocaleString()}${unit}`}
+          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+        />
+      }
+    />
   );
 }
