@@ -1,4 +1,4 @@
-export type SavingsCalculatorFormState = {
+export type SavingsCondition = {
   targetAmount: number;
   monthlyAmount: number;
   term: number;

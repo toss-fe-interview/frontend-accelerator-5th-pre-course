@@ -1,13 +1,10 @@
 import { SavingsProduct } from 'entities/savings/model/types';
 
-import { SavingsCalculatorFormState } from 'features/savings-calculator/model/types';
+import { SavingsCondition } from 'features/savings-calculator/model/types';
 
-export const isAvailableProduct = (args: {
-  savingsProduct: SavingsProduct;
-  formState: SavingsCalculatorFormState;
-}): boolean => {
-  const { savingsProduct, formState } = args;
-  const { monthlyAmount, term } = formState;
+export const isAvailableProduct = (args: { savingsProduct: SavingsProduct; condition: SavingsCondition }): boolean => {
+  const { savingsProduct, condition } = args;
+  const { monthlyAmount, term } = condition;
   const { minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
 
   const isMonthlyAmountInRange = minMonthlyAmount <= monthlyAmount && maxMonthlyAmount >= monthlyAmount;

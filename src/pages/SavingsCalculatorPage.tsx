@@ -8,7 +8,7 @@ import { SavingsProductListItem } from 'entities/savings/ui/SavingsProductListIt
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
 import { isAvailableProduct } from 'features/savings-calculator/lib/isAvailableProduct';
-import { SavingsCalculatorFormState } from 'features/savings-calculator/model/types';
+import { SavingsCondition } from 'features/savings-calculator/model/types';
 import { AmountInput } from 'features/savings-calculator/ui/input/AmountInput';
 import { SavingsTermSelect } from 'features/savings-calculator/ui/input/SavingsTermSelect';
 import { RecommendedProductSection } from 'features/savings-calculator/ui/recommendation/RecommendedProductSection';
@@ -17,7 +17,7 @@ import { CalculationResultSection } from 'features/savings-calculator/ui/result/
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSavingsProducts();
-  const [formState, setFormState] = useState<SavingsCalculatorFormState>({
+  const [condition, setFormState] = useState<SavingsCondition>({
     targetAmount: 0,
     monthlyAmount: 0,
     term: 12,
@@ -25,7 +25,7 @@ export function SavingsCalculatorPage() {
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
-  const availableProducts = savingsProducts.filter(savingsProduct => isAvailableProduct({ savingsProduct, formState }));
+  const availableProducts = savingsProducts.filter(savingsProduct => isAvailableProduct({ savingsProduct, condition }));
 
   const selectedSavingsProduct = availableProducts.find(
     savingsProduct => savingsProduct.id === selectedSavingsProductId
@@ -41,23 +41,23 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={formState.targetAmount}
-        onChange={value => setFormState({ ...formState, targetAmount: value })}
+        value={condition.targetAmount}
+        onChange={value => setFormState({ ...condition, targetAmount: value })}
       />
       <Spacing size={16} />
       <AmountInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={formState.monthlyAmount}
-        onChange={value => setFormState({ ...formState, monthlyAmount: value })}
+        value={condition.monthlyAmount}
+        onChange={value => setFormState({ ...condition, monthlyAmount: value })}
       />
       <Spacing size={16} />
       <SavingsTermSelect
         label="저축 기간"
         title="저축 기간을 선택해주세요"
-        value={formState.term}
-        onChange={value => setFormState({ ...formState, term: value })}
+        value={condition.term}
+        onChange={value => setFormState({ ...condition, term: value })}
       />
 
       <Spacing size={24} />
@@ -97,8 +97,8 @@ export function SavingsCalculatorPage() {
 
           <CalculationResultSection
             product={selectedSavingsProduct || null}
-            investment={{ monthlyAmount: formState.monthlyAmount, term: formState.term }}
-            goal={{ targetAmount: formState.targetAmount }}
+            investment={{ monthlyAmount: condition.monthlyAmount, term: condition.term }}
+            goal={{ targetAmount: condition.targetAmount }}
             emptyFallback={<EmptyListItem message="상품을 선택해주세요." />}
           >
             {({ finalAmount, differenceAmount, recommendedMonthlyAmount }) => (
