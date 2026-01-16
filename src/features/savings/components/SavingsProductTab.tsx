@@ -73,13 +73,10 @@ function SavingsTabContent({
       : savingsProducts.filter(
           product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
         );
-
-  const baseProducts = filteredSavingsProducts.length ? filteredSavingsProducts : savingsProducts;
-  const recommendedProducts = [...baseProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-
+  const recommendedProducts = [...(filteredSavingsProducts.length ? filteredSavingsProducts : savingsProducts)]
+    .sort((a, b) => b.annualRate - a.annualRate)
+    .slice(0, 2);
   const selectedSavingsProduct = savingsProducts.find(product => product.id === selectedProductId);
-
-  const hasFilteredProducts = filteredSavingsProducts.length > 0;
 
   const expectedAmount = calculateExpectedAmount({
     annualRate: selectedSavingsProduct?.annualRate ?? 0,
@@ -93,11 +90,14 @@ function SavingsTabContent({
     terms: terms ?? 0,
   });
 
+  const showProductList = filteredSavingsProducts.length > 0;
+  const showCalculationResults = selectedSavingsProduct !== undefined;
+
   return (
     <>
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
         <>
-          {hasFilteredProducts ? (
+          {showProductList ? (
             filteredSavingsProducts.map(product => {
               const selected = selectedProductId === product.id;
               return (
@@ -127,7 +127,7 @@ function SavingsTabContent({
 
       {tab === SAVINGS_PRODUCT_TABS.RESULTS && (
         <>
-          {selectedSavingsProduct ? (
+          {showCalculationResults ? (
             <>
               <SavingsResultItem label="예상 수익 금액" amount={expectedAmount} />
               <SavingsResultItem label="목표 금액과의 차이" amount={differenceAmount} />
