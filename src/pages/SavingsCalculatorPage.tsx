@@ -1,9 +1,8 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, TextField } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
-import { AmountInputSection } from 'features/savings/components/AmountInputSection';
 import { TermsSelectBottomSheet } from 'features/savings/components/TermsSelectBottomSheet';
 import { CalculationResultList } from 'features/savings/components/CalculationResultList';
 import { savingsProductQuery } from 'features/savings/apis/queries';
@@ -14,17 +13,20 @@ import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [targetAmount, setTargetAmount] = useState<number | null>(null);
-  const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
+  const [targetAmount, setTargetAmount] = useState<string>('');
+  const [monthlyPayment, setMonthlyPayment] = useState<string>('');
   const [terms, setTerms] = useState<string>('');
 
   const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
 
+  const monthlyPaymentNumber = parseInt(monthlyPayment) || 0;
+
   const filteredSavingsProducts =
-    monthlyPayment === null
+    monthlyPaymentNumber === 0
       ? savingsProducts
       : savingsProducts?.filter(
-          product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
+          product =>
+            monthlyPaymentNumber >= product.minMonthlyAmount && monthlyPaymentNumber <= product.maxMonthlyAmount
         );
 
   const baseProducts = filteredSavingsProducts?.length ? filteredSavingsProducts : savingsProducts;
@@ -40,11 +42,20 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <AmountInputSection
-        targetAmount={targetAmount}
-        monthlyPayment={monthlyPayment}
-        setTargetAmount={setTargetAmount}
-        setMonthlyPayment={setMonthlyPayment}
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={targetAmount}
+        onChange={e => setTargetAmount(e.target.value.replace(/[^0-9]/g, ''))}
+      />
+      <Spacing size={16} />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={monthlyPayment}
+        onChange={e => setMonthlyPayment(e.target.value.replace(/[^0-9]/g, ''))}
       />
       <Spacing size={16} />
 
@@ -90,8 +101,8 @@ export function SavingsCalculatorPage() {
         <>
           <CalculationResultList
             product={selectedSavingsProduct}
-            targetAmount={targetAmount ?? 0}
-            monthlyPayment={monthlyPayment ?? 0}
+            targetAmount={parseInt(targetAmount) || 0}
+            monthlyPayment={monthlyPaymentNumber}
             terms={parseInt(terms) || 0}
           />
           <Spacing size={8} />
