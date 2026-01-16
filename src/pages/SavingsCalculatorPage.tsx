@@ -131,11 +131,10 @@ export function SavingsCalculatorPage() {
               <ListRow
                 key={product.id}
                 contents={
-                  <ListRowTexts
+                  <ProductListRowTexts
                     productName={product.name}
                     productAnnualRate={product.annualRate}
-                    monthlyAmountRangeText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원`}
-                    availableTerms={product.availableTerms}
+                    productInfoSummaryText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`}
                   />
                 }
                 right={isSelected && <CheckedIcon />}
@@ -195,11 +194,10 @@ export function SavingsCalculatorPage() {
                 <ListRow
                   key={product.id}
                   contents={
-                    <ListRowTexts
+                    <ProductListRowTexts
                       productName={product.name}
                       productAnnualRate={product.annualRate}
-                      monthlyAmountRangeText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원`}
-                      availableTerms={product.availableTerms}
+                      productInfoSummaryText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`}
                     />
                   }
                   right={isSelected && <CheckedIcon />}
@@ -221,23 +219,21 @@ const CheckedIcon = () => {
 };
 
 // WHAT은 props로 받아서 본질을 명확히 하기
-const ListRowTexts = ({
+const ProductListRowTexts = ({
   productName,
   productAnnualRate,
-  monthlyAmountRangeText,
-  availableTerms,
+  productInfoSummaryText,
 }: {
   productName: string;
   productAnnualRate: number;
-  monthlyAmountRangeText: string;
-  availableTerms: number;
+  productInfoSummaryText: string;
 }) => {
   return (
     <ListRow.Texts
       type="3RowTypeA"
       top={productName}
       middle={`연 이자율: ${productAnnualRate}%`}
-      bottom={`${monthlyAmountRangeText} | ${availableTerms}개월`}
+      bottom={productInfoSummaryText}
       topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
       middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
       bottomProps={{ fontSize: 13, color: colors.grey600 }}
