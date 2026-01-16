@@ -2,12 +2,12 @@ import { useFormContext } from 'react-hook-form';
 import { colors, ListRow } from 'tosslib';
 import { SavingsProduct } from 'hooks/useSavingsProducts';
 
-interface SavingsSummaryProps {
+interface CalculationResultProps {
   products: SavingsProduct[] | undefined;
   selectedProductId: string | null;
 }
 
-const SavingsSummary = ({ products, selectedProductId }: SavingsSummaryProps) => {
+const CalculationResult = ({ products, selectedProductId }: CalculationResultProps) => {
   const { watch } = useFormContext();
   const targetAmount = Number(watch('targetAmount')) || 0;
 
@@ -64,4 +64,4 @@ const SavingsSummary = ({ products, selectedProductId }: SavingsSummaryProps) =>
   );
 };
 
-export default SavingsSummary;
+export default CalculationResult;

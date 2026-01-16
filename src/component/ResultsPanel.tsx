@@ -1,7 +1,7 @@
 import { useSavingsProducts } from 'hooks/useSavingsProducts';
 import { Border, ListHeader, ListRow, Spacing } from 'tosslib';
 import { ProductSelection } from 'types/calculator';
-import SavingsSummary from './SavingsSummary';
+import CalculationResult from './CalculationResult';
 import RecommendedProductsList from './RecommendedProductsList';
 
 const ResultsPanel = ({ selectedProductId, setSelectedProductId }: ProductSelection) => {
@@ -22,7 +22,7 @@ const ResultsPanel = ({ selectedProductId, setSelectedProductId }: ProductSelect
   return (
     <>
       <Spacing size={8} />
-      <SavingsSummary products={products} selectedProductId={selectedProductId} />
+      <CalculationResult products={products} selectedProductId={selectedProductId} />
 
       <Spacing size={8} />
       <Border height={16} />
