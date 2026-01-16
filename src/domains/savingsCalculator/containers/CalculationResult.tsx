@@ -11,8 +11,8 @@ import {
 
 interface CalculationResultProps {
   userInputs: {
-    targetAmount: string;
-    monthlyPayment: string;
+    targetAmount: number;
+    monthlyPayment: number;
     term: number;
   };
   selectedProduct: SavingsProductType | null;
