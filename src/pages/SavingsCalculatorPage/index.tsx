@@ -1,17 +1,25 @@
 import { SuspenseQuery } from '@suspensive/react-query';
+import { SavingsProduct } from 'entities/savings-product/model/types';
 import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
+import { SavingsGoalFormData } from 'features/calculate-savings/model/types';
 import CalculationResult from 'features/calculate-savings/ui/CalculationResult';
 import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
 import RecommendedProducts from 'features/recommend-products/ui/RecommendedProducts';
 import { savingsProductsQueryOptions } from 'features/savings-product/api/useSavingsProducts';
+import { useState } from 'react';
 import { descending, inRange, isEqual } from 'shared/lib/compare';
 import AsyncBoundary from 'shared/ui/AsyncBoundary';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import { DEFAULT_TERM_MONTHS, RECOMMENDED_PRODUCTS_COUNT, TAB_VALUES, TabValue } from './model/constants';
-import { useSavingsCalculator } from './model/useSavingsCalculator';
 
 export function SavingsCalculatorPage() {
-  const { activeTab, selectedProduct, filter, updateFilter, selectProduct, changeTab } = useSavingsCalculator();
+  const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+  const [filter, setFilter] = useState<SavingsGoalFormData>({
+    targetAmount: 0,
+    monthlyAmount: 0,
+    term: DEFAULT_TERM_MONTHS,
+  });
 
   return (
     <>
@@ -19,13 +27,13 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <SavingsGoalForm defaultValues={{ term: DEFAULT_TERM_MONTHS }} onChange={updateFilter} />
+      <SavingsGoalForm defaultValues={{ term: DEFAULT_TERM_MONTHS }} onChange={setFilter} />
 
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={value => changeTab(value as TabValue)}>
+      <Tab onChange={value => setActiveTab(value as TabValue)}>
         <Tab.Item value={TAB_VALUES.PRODUCTS} selected={activeTab === TAB_VALUES.PRODUCTS}>
           적금 상품
         </Tab.Item>
@@ -64,7 +72,7 @@ export function SavingsCalculatorPage() {
                       key={product.id}
                       product={product}
                       selected={selectedProduct?.id === product.id}
-                      onClick={() => selectProduct(product)}
+                      onClick={() => setSelectedProduct(product)}
                     />
                   ))}
 
