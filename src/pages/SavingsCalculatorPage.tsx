@@ -3,7 +3,6 @@ import { useTab } from 'shared/hooks/useTab';
 import { Border, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
-import { toNumber } from 'shared/utils/format';
 import { useSavingsProducts } from 'features/savings/hooks/useSavingsProducts';
 import { AmountInputSection } from 'features/savings/components/AmountInputSection';
 import { TermsSelectBottomSheet } from 'features/savings/components/TermsSelectBottomSheet';
@@ -14,8 +13,8 @@ import { RecommendedProductList } from 'features/savings/components/RecommendedP
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [targetAmount, setTargetAmount] = useState<string>('');
-  const [monthlyPayment, setMonthlyPayment] = useState<string>('');
+  const [targetAmount, setTargetAmount] = useState<number>(0);
+  const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
   const [terms, setTerms] = useState<string>('');
 
   const { filteredSavingsProducts, recommendedProducts, savingsProducts } = useSavingsProducts(monthlyPayment);
@@ -58,9 +57,9 @@ export function SavingsCalculatorPage() {
         <>
           <CalculationResultList
             product={selectedSavingsProduct}
-            targetAmount={toNumber(targetAmount)}
-            monthlyPayment={toNumber(monthlyPayment)}
-            terms={toNumber(terms)}
+            targetAmount={targetAmount}
+            monthlyPayment={monthlyPayment}
+            terms={parseInt(terms) || 0}
           />
           <Spacing size={8} />
           <Border height={16} />

@@ -1,17 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { savingsProductQuery } from '../apis/queries';
 
-export const useSavingsProducts = (monthlyPayment: string) => {
+export const useSavingsProducts = (monthlyPayment: number) => {
   const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
 
   const filteredSavingsProducts = savingsProducts?.filter(product => {
-    const monthly = parseInt(monthlyPayment) || 0;
-
-    if (monthly === 0) {
+    if (monthlyPayment === 0) {
       return true;
     }
 
-    return monthly >= product.minMonthlyAmount && monthly <= product.maxMonthlyAmount;
+    return monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount;
   });
 
   const baseProducts = filteredSavingsProducts?.length ? filteredSavingsProducts : savingsProducts;

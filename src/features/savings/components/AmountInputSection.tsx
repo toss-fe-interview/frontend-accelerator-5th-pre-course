@@ -2,10 +2,10 @@ import { NumberInput } from 'shared/components/NumberInput';
 import { Spacing } from 'tosslib';
 
 type AmountInputSectionProps = {
-  targetAmount: string;
-  monthlyPayment: string;
-  setTargetAmount: (value: string) => void;
-  setMonthlyPayment: (value: string) => void;
+  targetAmount: number;
+  monthlyPayment: number;
+  setTargetAmount: (value: number) => void;
+  setMonthlyPayment: (value: number) => void;
 };
 
 export const AmountInputSection = ({
