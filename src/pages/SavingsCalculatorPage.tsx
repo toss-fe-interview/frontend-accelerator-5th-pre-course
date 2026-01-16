@@ -5,11 +5,11 @@ import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
 import { AmountInputSection } from 'features/savings/components/AmountInputSection';
 import { TermsSelectBottomSheet } from 'features/savings/components/TermsSelectBottomSheet';
-import { SavingsProductList } from 'features/savings/components/SavingsProductList';
 import { CalculationResultList } from 'features/savings/components/CalculationResultList';
 import { RecommendedProductList } from 'features/savings/components/RecommendedProductList';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
+import { SavingsProductItem } from 'features/savings/components/SavingsProductItem';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -58,11 +58,16 @@ export function SavingsCalculatorPage() {
       <SavingsProductTab tab={tab} handleTabChange={handleTabChange} />
 
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
-        <SavingsProductList
-          products={filteredSavingsProducts}
-          selectedProductId={selectedProductId}
-          onSelect={setSelectedProductId}
-        />
+        <>
+          {filteredSavingsProducts?.map(product => (
+            <SavingsProductItem
+              key={product.id}
+              product={product}
+              selected={selectedProductId === product.id}
+              onSelect={() => setSelectedProductId(product.id)}
+            />
+          ))}
+        </>
       )}
 
       <Spacing size={8} />
