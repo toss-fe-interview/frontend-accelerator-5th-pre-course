@@ -44,27 +44,24 @@ export function BestMatchingSavingsFinderPage() {
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   // 3. 선택된 탭 - SelectedTabData -> 내부 데이터
   const [selectedTab, setSelectedTab] = useState<SelectedTabData>('productList');
+
   // 외부 데이터
   // 1. 적금 상품 목록 - SavingsProductListData -> 외부 데이터
-  const {
-    data: savingsProductListData,
-    isLoading: isLoadingSavingsProductList,
-    isError: isErrorSavingsProductList,
-  } = useSavingsProducts();
+  const { data: savingsProductListData } = useSavingsProducts();
 
   // 가공해야하는 데이터
   // 1. 적금 상품 목록을 필터링한 데이터
   const filteredProducts = useMemo(() => {
     if (!savingsProductListData) return [];
     if (!userSavingGoal) return savingsProductListData;
-    return savingsProductListData
-      .filter(
-        product =>
-          product.minMonthlyAmount >= userSavingGoal.monthlyAmount &&
-          product.maxMonthlyAmount <= userSavingGoal.monthlyAmount &&
-          product.availableTerms === userSavingGoal.savingTerm
-      )
-      .sort((a, b) => b.annualRate - a.annualRate);
+
+    const 최소월납입액이상 = (product: SavingsProduct) => product.minMonthlyAmount >= userSavingGoal.monthlyAmount;
+    const 최대월납입액이하 = (product: SavingsProduct) => product.maxMonthlyAmount <= userSavingGoal.monthlyAmount;
+    const 저축기간일치 = (product: SavingsProduct) => product.availableTerms === userSavingGoal.savingTerm;
+
+    return savingsProductListData.filter(
+      product => 최소월납입액이상(product) && 최대월납입액이하(product) && 저축기간일치(product)
+    );
   }, [savingsProductListData, userSavingGoal]);
 
   // 2. 계산 결과 데이터 - CalculationResultData -> 내부 데이터 + 외부 데이터
@@ -88,13 +85,13 @@ export function BestMatchingSavingsFinderPage() {
   // 3. 필터링 된 상품 중 연이자율 상위 2개 상품 출력 - Top2RecommendedSavingsProductsData -> 내부 데이터 + 외부 데이터
   const top2RecommendedSavingsProducts = useMemo(() => {
     if (!filteredProducts) return [];
-    return filteredProducts.slice(0, 2);
+    const 이자율내림차순 = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
+    return filteredProducts.sort(이자율내림차순).slice(0, 2);
   }, [filteredProducts]);
 
   return (
     <>
       <NavigationBar title="적금 계산기" />
-
       <Spacing size={16} />
 
       {/* 사용자가 목표로 하는 저축 금액과 월 납입액, 저축 기간을 입력받는 영역 */}
@@ -221,14 +218,17 @@ export function BestMatchingSavingsFinderPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {top2RecommendedSavingsProducts.map(product => (
-            <ProductListItem
-              key={product.id}
-              product={product}
-              isSelected={selectedSavingsProduct?.id === product.id}
-              onClick={() => setSelectedSavingsProduct(product)}
-            />
-          ))}
+          {top2RecommendedSavingsProducts.map(product => {
+            const isSelected = selectedSavingsProduct?.id === product.id;
+            return (
+              <ProductListItem
+                key={product.id}
+                product={product}
+                isSelected={isSelected}
+                onClick={() => setSelectedSavingsProduct(product)}
+              />
+            );
+          })}
 
           <Spacing size={40} />
         </>
