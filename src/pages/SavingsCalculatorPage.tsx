@@ -12,7 +12,18 @@ import {
   getTopRateProducts,
 } from 'domains/Savings/utils/savings';
 import React, { useState, useEffect } from 'react';
-import { TextField, Spacing, SelectBottomSheet, ListRow, colors, Assets, ListHeader, NavigationBar } from 'tosslib';
+import {
+  TextField,
+  Spacing,
+  SelectBottomSheet,
+  ListRow,
+  colors,
+  Assets,
+  ListHeader,
+  NavigationBar,
+  Border,
+  Tab,
+} from 'tosslib';
 
 export function SavingsCalculatorPage() {
   // 계산기 상태
@@ -73,14 +84,15 @@ export function SavingsCalculatorPage() {
       </SelectBottomSheet>
 
       <Divider />
-      <SavingsTabNavigation
-        tabs={[
-          { value: 'products', name: '적금 상품' },
-          { value: 'results', name: '계산 결과' },
-        ]}
-        selectedTab={selectedTab}
-        onTabChange={setSelectedTab}
-      />
+
+      <Tab onChange={v => setSelectedTab(v as SavingsTabValue)}>
+        <Tab.Item value={'products'} selected={selectedTab === 'products'}>
+          적금 상품
+        </Tab.Item>
+        <Tab.Item value={'results'} selected={selectedTab === 'results'}>
+          계산 결과
+        </Tab.Item>
+      </Tab>
 
       {selectedTab === 'products' &&
         filterSavingsProducts(products, {
@@ -179,5 +191,20 @@ function CalculationResultItem({ name, price, unit }: CalculationResultItemProps
         />
       }
     />
+  );
+}
+
+interface DividerProps {
+  spacing?: number;
+  height?: number;
+}
+
+function Divider({ spacing = 24, height = 16 }: DividerProps) {
+  return (
+    <>
+      <Spacing size={spacing} />
+      <Border height={height} />
+      <Spacing size={8} />
+    </>
   );
 }
