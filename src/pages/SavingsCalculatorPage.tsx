@@ -3,12 +3,12 @@ import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
 
-import { useSavingsProducts } from 'entities/savings/model/useSavingsProducts';
 import { SavingsProductListItem } from 'entities/savings/ui/SavingsProductListItem';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
-import { isAvailableProduct } from 'features/savings-calculator/lib/isAvailableProduct';
-import { SavingsCondition } from 'features/savings-calculator/model/types';
+import { useAvailableProducts } from 'features/savings-calculator/model/useAvailableProducts';
+import { useProductSelection } from 'features/savings-calculator/model/useProductSelection';
+import { useSavingsCondition } from 'features/savings-calculator/model/useSavingsCondition';
 import { AmountInput } from 'features/savings-calculator/ui/input/AmountInput';
 import { SavingsTermSelect } from 'features/savings-calculator/ui/input/SavingsTermSelect';
 import { RecommendedProductSection } from 'features/savings-calculator/ui/recommendation/RecommendedProductSection';
@@ -16,20 +16,11 @@ import { CalculationResultItem } from 'features/savings-calculator/ui/result/Cal
 import { CalculationResultSection } from 'features/savings-calculator/ui/result/CalculationResultSection';
 
 export function SavingsCalculatorPage() {
-  const { data: savingsProducts } = useSavingsProducts();
-  const [condition, setFormState] = useState<SavingsCondition>({
-    targetAmount: 0,
-    monthlyAmount: 0,
-    term: 12,
-  });
-  const [selectedSavingsProductId, setSelectedSavingsProductId] = useState<string | null>(null);
+  const { condition, handleMonthlyAmountChange, handleTargetAmountChange, handleTermChange } = useSavingsCondition();
+  const availableProducts = useAvailableProducts(condition);
+  const { selectedProduct, handleSelectProduct } = useProductSelection(availableProducts);
+
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
-
-  const availableProducts = savingsProducts.filter(savingsProduct => isAvailableProduct({ savingsProduct, condition }));
-
-  const selectedSavingsProduct = availableProducts.find(
-    savingsProduct => savingsProduct.id === selectedSavingsProductId
-  );
 
   return (
     <>
@@ -42,7 +33,7 @@ export function SavingsCalculatorPage() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={condition.targetAmount}
-        onChange={value => setFormState({ ...condition, targetAmount: value })}
+        onChange={handleTargetAmountChange}
       />
       <Spacing size={16} />
       <AmountInput
@@ -50,14 +41,14 @@ export function SavingsCalculatorPage() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={condition.monthlyAmount}
-        onChange={value => setFormState({ ...condition, monthlyAmount: value })}
+        onChange={handleMonthlyAmountChange}
       />
       <Spacing size={16} />
       <SavingsTermSelect
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={condition.term}
-        onChange={value => setFormState({ ...condition, term: value })}
+        onChange={handleTermChange}
       />
 
       <Spacing size={24} />
@@ -83,8 +74,8 @@ export function SavingsCalculatorPage() {
               <SavingsProductListItem
                 key={product.id}
                 savingsProduct={product}
-                isSelected={selectedSavingsProductId === product.id}
-                handleSelectSavingsProduct={p => setSelectedSavingsProductId(p?.id || null)}
+                isSelected={selectedProduct?.id === product.id}
+                handleSelectSavingsProduct={() => handleSelectProduct(product.id)}
               />
             ))
           }
@@ -96,7 +87,7 @@ export function SavingsCalculatorPage() {
           <Spacing size={8} />
 
           <CalculationResultSection
-            product={selectedSavingsProduct || null}
+            product={selectedProduct ?? null}
             investment={{ monthlyAmount: condition.monthlyAmount, term: condition.term }}
             goal={{ targetAmount: condition.targetAmount }}
             emptyFallback={<EmptyListItem message="상품을 선택해주세요." />}
@@ -126,8 +117,8 @@ export function SavingsCalculatorPage() {
                 <SavingsProductListItem
                   key={product.id}
                   savingsProduct={product}
-                  isSelected={selectedSavingsProductId === product.id}
-                  handleSelectSavingsProduct={p => setSelectedSavingsProductId(p?.id || null)}
+                  isSelected={selectedProduct?.id === product.id}
+                  handleSelectSavingsProduct={() => handleSelectProduct(product.id)}
                 />
               ))
             }
