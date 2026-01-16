@@ -484,6 +484,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fxts/core@npm:^1.23.0":
+  version: 1.23.0
+  resolution: "@fxts/core@npm:1.23.0"
+  dependencies:
+    tslib: "npm:^2.6.0"
+  checksum: 10c0/ebb9dbad7a92617cdd7d8b483551daff475a4827607aa506503562c4acdbf1d778ae212563facf3e731f3c9372c589ed7ac16d95f3119b5f44fd4c21ff1f7e33
+  languageName: node
+  linkType: hard
+
 "@hono/node-server@npm:^1.12.0":
   version: 1.19.4
   resolution: "@hono/node-server@npm:1.19.4"
@@ -4418,6 +4427,7 @@ __metadata:
   dependencies:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
+    "@fxts/core": "npm:^1.23.0"
     "@hono/vite-dev-server": "npm:^0.18.0"
     "@tanstack/react-query": "npm:^5.90.17"
     "@types/react": "npm:^18"
@@ -4491,6 +4501,13 @@ __metadata:
     minimist: "npm:^1.2.6"
     strip-bom: "npm:^3.0.0"
   checksum: 10c0/5b4f301a2b7a3766a986baf8fc0e177eb80bdba6e396792ff92dc23b5bca8bb279fc96517dcaaef63a3b49bebc6c4c833653ec58155780bc906bdbcf7dda0ef5
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.6.0":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
   languageName: node
   linkType: hard
 
