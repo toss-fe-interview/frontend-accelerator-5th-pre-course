@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
+import { CheckCircleIcon } from 'shared/ui/CheckCircleIcon';
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
 
 import { SavingsProductInfo } from 'entities/savings/ui/SavingsProductInfo';
@@ -76,7 +77,7 @@ export function SavingsCalculatorPage() {
                 <ListRow
                   key={product.id}
                   contents={<SavingsProductInfo product={product} />}
-                  right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
+                  right={isSelected && <CheckCircleIcon />}
                   onClick={() => handleSelectProduct(isSelected ? null : product)}
                 />
               );
@@ -122,7 +123,7 @@ export function SavingsCalculatorPage() {
                   <ListRow
                     key={product.id}
                     contents={<SavingsProductInfo product={product} />}
-                    right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
+                    right={isSelected && <CheckCircleIcon />}
                     onClick={() => handleSelectProduct(isSelected ? null : product)}
                   />
                 );
