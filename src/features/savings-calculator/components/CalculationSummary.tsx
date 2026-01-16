@@ -11,11 +11,9 @@ export default function CalculationSummary({ product }: { product: SavingsProduc
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="저축 기간을 선택해주세요." />} />;
   }
 
-  const expectedProfit = calculateExpectedProfit(monthlyAmount ?? 0, savingTerms, product.annualRate);
-  const differenceAmount = (targetAmount ?? 0) - expectedProfit;
-  const recommendedMonthlyAmount = roundToThousand(
-    calculateMonthlyAmount(targetAmount ?? 0, savingTerms, product.annualRate)
-  );
+  const 예상만기금액 = get_예상만기금액(monthlyAmount ?? 0, savingTerms, product.annualRate);
+  const 목표금액과의차이 = get_목표금액과의차이(targetAmount ?? 0, 예상만기금액);
+  const 추천월납입금액 = get_추천월납입금액(targetAmount ?? 0, savingTerms, product.annualRate);
 
   return (
     <>
@@ -25,7 +23,7 @@ export default function CalculationSummary({ product }: { product: SavingsProduc
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatNumber(expectedProfit)}원`}
+            bottom={`${formatNumber(예상만기금액)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -36,7 +34,7 @@ export default function CalculationSummary({ product }: { product: SavingsProduc
             type="2RowTypeA"
             top="목표 금액과의 차이"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatNumber(differenceAmount)}원`}
+            bottom={`${formatNumber(목표금액과의차이)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -47,7 +45,7 @@ export default function CalculationSummary({ product }: { product: SavingsProduc
             type="2RowTypeA"
             top="추천 월 납입 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatNumber(recommendedMonthlyAmount)}원`}
+            bottom={`${formatNumber(추천월납입금액)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -56,10 +54,17 @@ export default function CalculationSummary({ product }: { product: SavingsProduc
   );
 }
 
-const calculateExpectedProfit = (monthlyAmount: number, savingTerms: number, annualRate: number) => {
-  return monthlyAmount * savingTerms * (1 + (annualRate / 100) * 0.5);
+const 평균적립기간비율 = 0.5;
+
+const get_예상만기금액 = (월납입액: number, 저축기간: number, 연이자율: number) => {
+  return 월납입액 * 저축기간 * (1 + (연이자율 / 100) * 평균적립기간비율);
 };
 
-const calculateMonthlyAmount = (targetAmount: number, savingTerms: number, annualRate: number) => {
-  return targetAmount / (savingTerms * (1 + (annualRate / 100) * 0.5));
+const get_목표금액과의차이 = (목표금액: number, 예상만기금액: number) => {
+  return 목표금액 - 예상만기금액;
+};
+
+const get_추천월납입금액 = (목표금액: number, 저축기간: number, 연이자율: number) => {
+  const value = 목표금액 / (저축기간 * (1 + (연이자율 / 100) * 평균적립기간비율));
+  return roundToThousand(value);
 };
