@@ -8,6 +8,8 @@ type SavingsProductItemProps = {
   onClick?: ComponentProps<typeof ListRow>['onClick'];
 };
 
+const CheckCircleGreen = () => <Assets.Icon name="icon-check-circle-green" />;
+
 const SavingsProductItem = ({ product, checked = false, onClick }: SavingsProductItemProps) => {
   return (
     <ListRow
@@ -22,7 +24,7 @@ const SavingsProductItem = ({ product, checked = false, onClick }: SavingsProduc
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
-      right={checked && <Assets.Icon name="icon-check-circle-green" />}
+      right={checked && <CheckCircleGreen />}
       onClick={onClick}
     />
   );

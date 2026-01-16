@@ -1,16 +1,15 @@
 import { AsyncValue } from 'shared/model';
 import { SavingsProduct } from '../model';
 import { sortBy, takeFromHead, isBetween } from 'shared/lib';
-import { NON_DIGIT_REGEX, THOUSANDS_SEPARATOR_REGEX } from '../config';
 
 export const extractNumbers = (value: string) => {
+  const NON_DIGIT_REGEX = /[^0-9]/g;
+
   return value.replace(NON_DIGIT_REGEX, '');
 };
 
-export const formatNumberWithCommas = (value: string | number) => {
-  if (typeof value === 'number') {
-    return String(value).replace(THOUSANDS_SEPARATOR_REGEX, ',');
-  }
+export const formatNumberWithCommas = (value: string) => {
+  const THOUSANDS_SEPARATOR_REGEX = /\B(?=(\d{3})+(?!\d))/g;
 
   return value.replace(THOUSANDS_SEPARATOR_REGEX, ',');
 };
