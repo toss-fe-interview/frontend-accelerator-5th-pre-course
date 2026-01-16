@@ -18,7 +18,7 @@ export const MoneyInputField = ({ label, value, onValueChange }: InputFieldProps
       label={label}
       placeholder={`${label}을 입력하세요`}
       suffix="원"
-      value={addComma(value)}
+      value={addComma(value) ?? ''}
       onChange={handleMoneyInputChange}
     />
   );

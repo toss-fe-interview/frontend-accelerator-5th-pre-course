@@ -1,13 +1,14 @@
-import { type SavingsProduct, useFetchSavingProducts } from 'api/savings-products';
+import { type SavingsProduct } from 'api/savings-products';
 import { CalculationResult } from 'components/CalculationResult';
 import { MoneyInputField } from 'components/controls/MoneyInputField';
 import { TermSelectBottomSheet } from 'components/controls/TermSelectBottomSheet';
+import GetProductRecommendation from 'components/GetProductRecommendation';
+import GetSavingsProductList from 'components/GetSavingsProductList';
 import { MessageText } from 'components/MessageText';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { useTab } from 'hooks/useTab';
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
-import { filterSavingsProducts } from 'utils/savings-filter';
 
 const TAB = {
   PRODUCTS: 'products',
@@ -27,35 +28,6 @@ export function SavingsCalculatorPage() {
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   // 탭
   const { currentTab, handleTabChange } = useTab<TabType[]>([TAB.PRODUCTS, TAB.RESULTS]);
-
-  const { savingsProducts, isLoading, isError } = useFetchSavingProducts();
-  // 적금계산기를 통한 필터링
-  const filteredSavingsProducts = useMemo(() => {
-    return filterSavingsProducts(savingsProducts, term, monthlyAmount);
-  }, [savingsProducts, term, monthlyAmount]);
-
-  /**
-   * 데이터 전송 상태 뷰
-   */
-  if (isLoading) {
-    return (
-      <>
-        <NavigationBar title="적금 계산기" />
-        <Spacing size={16} />
-        <MessageText message="적금 상품을 불러오는 중입니다." />
-      </>
-    );
-  }
-
-  if (isError) {
-    return (
-      <>
-        <NavigationBar title="적금 계산기" />
-        <Spacing size={16} />
-        <MessageText message="적금 상품을 불러오는데 실패했습니다." />
-      </>
-    );
-  }
 
   return (
     <>
@@ -85,38 +57,47 @@ export function SavingsCalculatorPage() {
 
       {/* 적금 상품 */}
       {currentTab === TAB.PRODUCTS && (
-        <>
-          {filteredSavingsProducts.length > 0 ? (
-            filteredSavingsProducts.map(product => {
-              const isSavingsProductSelected = selectedSavingsProduct?.id === product.id;
-              const handleSavingsProductClick = () => {
-                if (isSavingsProductSelected) {
-                  setSelectedSavingsProduct(null);
-                } else {
-                  setSelectedSavingsProduct(product);
-                }
-              };
+        <Suspense fallback={<MessageText message="적금 상품을 불러오는 중입니다." />}>
+          <GetSavingsProductList {...userInputs}>
+            {savingsProducts => {
+              const isSavingsProductsEmpty = savingsProducts.length === 0;
+
+              if (isSavingsProductsEmpty) {
+                return <MessageText message="적금 상품이 없습니다." />;
+              }
 
               return (
-                <SavingsProductItem
-                  key={product.id}
-                  product={product}
-                  onClick={handleSavingsProductClick}
-                  isSelected={isSavingsProductSelected}
-                />
+                <>
+                  {savingsProducts.map(product => {
+                    const isSavingsProductSelected = selectedSavingsProduct?.id === product.id;
+                    const handleSavingsProductClick = () => {
+                      if (isSavingsProductSelected) {
+                        setSelectedSavingsProduct(null);
+                      } else {
+                        setSelectedSavingsProduct(product);
+                      }
+                    };
+
+                    return (
+                      <SavingsProductItem
+                        key={product.id}
+                        product={product}
+                        onClick={handleSavingsProductClick}
+                        isSelected={isSavingsProductSelected}
+                      />
+                    );
+                  })}
+                </>
               );
-            })
-          ) : (
-            <MessageText message="적금 상품이 없습니다." />
-          )}
-        </>
+            }}
+          </GetSavingsProductList>
+        </Suspense>
       )}
 
       {/* 계산 결과 */}
       {currentTab === TAB.RESULTS && (
         <>
           <Spacing size={8} />
-
           <CalculationResult.ExpectedProfit
             {...userInputs}
             label="예상 수익 금액"
@@ -132,7 +113,6 @@ export function SavingsCalculatorPage() {
             label="추천 월 납입 금액"
             selectedSavingsProduct={selectedSavingsProduct}
           />
-
           <Spacing size={8} />
           <Border height={16} />
           <Spacing size={8} />
@@ -141,21 +121,23 @@ export function SavingsCalculatorPage() {
           <Spacing size={12} />
 
           {/* 추천 상품 목록 */}
-          {filteredSavingsProducts.length > 0 ? (
-            <>
-              {filteredSavingsProducts
-                .sort(function sortByAnnualRateDesc(a, b) {
-                  return b.annualRate - a.annualRate;
-                })
-                .slice(0, 2)
-                .map(product => (
-                  <SavingsProductItem key={product.id} product={product} isSelected={false} />
-                ))}
-            </>
-          ) : (
-            <MessageText message="추천 상품이 없습니다." />
-          )}
+          <GetProductRecommendation {...userInputs}>
+            {recommendedSavingsProducts => {
+              const isRecommendedSavingsProductsEmpty = recommendedSavingsProducts.length === 0;
 
+              if (isRecommendedSavingsProductsEmpty) {
+                return <MessageText message="추천 상품이 없습니다." />;
+              }
+
+              return (
+                <>
+                  {recommendedSavingsProducts.map(product => (
+                    <SavingsProductItem key={product.id} product={product} isSelected={false} />
+                  ))}
+                </>
+              );
+            }}
+          </GetProductRecommendation>
           <Spacing size={40} />
         </>
       )}
