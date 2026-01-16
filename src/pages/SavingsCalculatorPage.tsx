@@ -1,6 +1,6 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, TextField } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, TextField } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
 import { CalculationResultList } from 'features/savings/components/CalculationResultList';
@@ -8,6 +8,7 @@ import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
 import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
+import { Select } from 'shared/components/Select';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -58,11 +59,17 @@ export function SavingsCalculatorPage() {
       />
       <Spacing size={16} />
 
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={terms} onChange={setTerms}>
-        <SelectBottomSheet.Option value="6">6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value="12">12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value="24">24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <Select
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={terms}
+        options={[
+          { value: '6', text: '6개월' },
+          { value: '12', text: '12개월' },
+          { value: '24', text: '24개월' },
+        ]}
+        onChange={setTerms}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
