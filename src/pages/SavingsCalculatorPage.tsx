@@ -21,13 +21,13 @@ export function SavingsCalculatorPage() {
       return isMatchedSavingDuration;
     })
     .filter(product => {
-      const isMatchedMonthlyDeposit = isBetween({
+      const isBetweenMonthlyDeposit = isBetween({
         value: Number(monthlyDeposit),
         min: product.minMonthlyAmount,
         max: product.maxMonthlyAmount,
         inclusive: true,
       });
-      return isMatchedMonthlyDeposit;
+      return isBetweenMonthlyDeposit;
     });
 
   const recommendedSavingsProducts = (() => {
