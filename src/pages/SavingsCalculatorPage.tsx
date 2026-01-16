@@ -1,16 +1,21 @@
 import { ErrorBoundary, Suspense } from '@suspensive/react';
 import ErrorFallback from 'components/ErrorFallback';
 import SuspenseFallback from 'components/SuspenseFallback';
-import CalculationResult from 'features/savings/components/CalculationResult';
 import SavingsFieldInput from 'features/savings/components/SavingsFieldInput';
-import SavingsProductList from 'features/savings/components/SavingsProductList';
+import SavingsProductItem from 'features/savings/components/SavingsProductItem';
+import SavingsResult from 'features/savings/components/SavingsResult';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
+import {
+  calculateEstimatedEaringsAmount,
+  calculateDifferenceWithTargetAmount,
+  calculateRecommendedMonthlyPayment,
+} from 'features/savings/utils/calculation/savings';
 import { parseNumberInput } from 'features/savings/utils/parse/number';
-import { filterSavings } from 'features/savings/utils/product/savings';
+import { filterSavings, recommendSavings } from 'features/savings/utils/product/savings';
 import { ChangeEvent, useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [savingsValues, setSavingsValues] = useState<SavingsValues>({
@@ -26,6 +31,9 @@ export function SavingsCalculatorPage() {
     savingsValues.monthlyPaymentAmount,
     savingsValues.savingsPeriod
   );
+
+  const selectedProduct = filteredSavingsProducts.find(product => product.id === selectedProductId);
+  const isProductNotSelected = !selectedProductId || !selectedProduct;
 
   const changeSelectedProduct = (newValue: string) => {
     setSelectedProductId(newValue);
@@ -101,18 +109,85 @@ export function SavingsCalculatorPage() {
       <ErrorBoundary fallback={ErrorFallback}>
         <Suspense fallback={<SuspenseFallback />}>
           {selectedTab === 'products' ? (
-            <SavingsProductList
-              savingsProducts={filteredSavingsProducts}
-              selectedProductId={selectedProductId}
-              changeSelectedProduct={changeSelectedProduct}
-              clickable
-            />
+            filteredSavingsProducts.map(savingsProduct => {
+              const isProductSelected = savingsProduct.id === selectedProductId;
+
+              return (
+                <ListRow
+                  key={savingsProduct.id}
+                  contents={<SavingsProductItem savingsProduct={savingsProduct} />}
+                  right={isProductSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                  onClick={() => {
+                    changeSelectedProduct(savingsProduct.id);
+                  }}
+                />
+              );
+            })
           ) : (
-            <CalculationResult
-              savingsValues={savingsValues}
-              savingsProducts={filteredSavingsProducts}
-              selectedProductId={selectedProductId}
-            />
+            <>
+              <Spacing size={8} />
+
+              <>
+                {isProductNotSelected ? (
+                  <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+                ) : (
+                  <>
+                    <SavingsResult
+                      label="예상 수익 금액"
+                      value={calculateEstimatedEaringsAmount(
+                        savingsValues.monthlyPaymentAmount,
+                        savingsValues.savingsPeriod,
+                        selectedProduct.annualRate
+                      )}
+                    />
+                    <SavingsResult
+                      label="목표 금액과의 차이"
+                      value={calculateDifferenceWithTargetAmount(
+                        savingsValues.targetAmount,
+                        calculateEstimatedEaringsAmount(
+                          savingsValues.monthlyPaymentAmount,
+                          savingsValues.savingsPeriod,
+                          selectedProduct.annualRate
+                        )
+                      )}
+                    />
+                    <SavingsResult
+                      label="추천 월 납입 금액"
+                      value={calculateRecommendedMonthlyPayment(
+                        savingsValues.targetAmount,
+                        savingsValues.savingsPeriod,
+                        selectedProduct.annualRate
+                      )}
+                    />
+                  </>
+                )}
+              </>
+
+              <Spacing size={8} />
+              <Border height={16} />
+              <Spacing size={8} />
+
+              <ListHeader
+                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+              />
+              <Spacing size={12} />
+
+              <>
+                {recommendSavings(filteredSavingsProducts).map(savingsProduct => {
+                  const isProductSelected = savingsProduct.id === selectedProductId;
+
+                  return (
+                    <ListRow
+                      key={savingsProduct.id}
+                      contents={<SavingsProductItem savingsProduct={savingsProduct} />}
+                      right={isProductSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                    />
+                  );
+                })}
+              </>
+
+              <Spacing size={40} />
+            </>
           )}
         </Suspense>
       </ErrorBoundary>
