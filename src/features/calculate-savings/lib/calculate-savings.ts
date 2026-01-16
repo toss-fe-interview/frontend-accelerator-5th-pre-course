@@ -14,8 +14,9 @@ function calculateDifference(targetAmount: number, expectedProfit: number) {
 }
 
 function calculateRecommendedMonthlyAmount(targetAmount: number, term: number, annualRate: number) {
+  const { ROUNDING_VALUE } = CALCULATION_CONFIG;
   const calculated = targetAmount / getDepositAmount(term, annualRate);
-  return Math.round(calculated / 1000) * 1000;
+  return Math.round(calculated / ROUNDING_VALUE) * ROUNDING_VALUE;
 }
 
 export { calculateExpectedProfit, calculateDifference, calculateRecommendedMonthlyAmount };

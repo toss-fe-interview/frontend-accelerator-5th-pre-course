@@ -1,6 +1,11 @@
 import { SuspenseQuery } from '@suspensive/react-query';
 import { SavingsProduct } from 'entities/savings-product/model/types';
 import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
+import {
+  calculateDifference,
+  calculateExpectedProfit,
+  calculateRecommendedMonthlyAmount,
+} from 'features/calculate-savings/lib/calculate-savings';
 import CalculationResult from 'features/calculate-savings/ui/CalculationResult';
 import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
 import RecommendedProducts from 'features/recommend-products/ui/RecommendedProducts';
@@ -9,7 +14,7 @@ import { parseAsInteger, useQueryStates } from 'nuqs';
 import { useState } from 'react';
 import { descending, inRange, isEqual } from 'shared/lib/compare';
 import AsyncBoundary from 'shared/ui/AsyncBoundary';
-import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, NavigationBar, Spacing, Tab, ListRow } from 'tosslib';
 import { DEFAULT_TERM_MONTHS, RECOMMENDED_PRODUCTS_COUNT, TAB_VALUES, TabValue } from './model/constants';
 
 export function SavingsCalculatorPage() {
@@ -77,13 +82,37 @@ export function SavingsCalculatorPage() {
 
                 {activeTab === TAB_VALUES.RESULTS && (
                   <>
-                    <CalculationResult
-                      selectedProduct={selectedProduct}
-                      targetAmount={savingsGoal.targetAmount}
-                      monthlyAmount={savingsGoal.monthlyAmount}
-                      term={savingsGoal.term}
-                    />
-                    <RecommendedProducts selectedProduct={selectedProduct} products={recommendedProducts} />
+                    {selectedProduct ? (
+                      (() => {
+                        const expectedProfit = calculateExpectedProfit(
+                          savingsGoal.monthlyAmount,
+                          savingsGoal.term,
+                          selectedProduct.annualRate
+                        );
+                        const difference = calculateDifference(savingsGoal.targetAmount, expectedProfit);
+                        const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(
+                          savingsGoal.targetAmount,
+                          savingsGoal.term,
+                          selectedProduct.annualRate
+                        );
+
+                        return (
+                          <>
+                            <CalculationResult
+                              expectedProfit={expectedProfit}
+                              difference={difference}
+                              recommendedMonthlyAmount={recommendedMonthlyAmount}
+                            />
+                            <RecommendedProducts
+                              products={recommendedProducts}
+                              selectedProductId={selectedProduct.id}
+                            />
+                          </>
+                        );
+                      })()
+                    ) : (
+                      <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+                    )}
                   </>
                 )}
               </>

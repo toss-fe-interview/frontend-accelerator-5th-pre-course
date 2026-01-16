@@ -3,18 +3,15 @@ import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
 import { ListHeader, ListRow, Spacing } from 'tosslib';
 
 interface RecommendedProductsProps {
-  selectedProduct: SavingsProduct | null;
-  products: SavingsProduct[] | null;
+  products: SavingsProduct[];
+  selectedProductId: string;
 }
 
-const RecommendedProducts = ({ selectedProduct, products }: RecommendedProductsProps) => {
-  if (!selectedProduct) {
-    return null;
-  }
-
-  if (!products || products.length === 0) {
+const RecommendedProducts = ({ products, selectedProductId }: RecommendedProductsProps) => {
+  if (products.length === 0) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="추천 상품이 없습니다." />} />;
   }
+
   return (
     <>
       <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
@@ -24,7 +21,7 @@ const RecommendedProducts = ({ selectedProduct, products }: RecommendedProductsP
         <SavingsProductItem
           key={product.id}
           product={product}
-          selected={selectedProduct?.id === product.id}
+          selected={selectedProductId === product.id}
           onClick={() => {}}
         />
       ))}
