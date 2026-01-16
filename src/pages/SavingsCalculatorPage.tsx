@@ -51,7 +51,15 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
       <MonthlyPaymentInput value={monthlyPayment} onChange={v => setValue('monthlyPayment', v)} />
       <Spacing size={16} />
-      <SavingPeriodSelect value={savingPeriod} onChange={v => setValue('savingPeriod', v)} />
+      <SavingPeriodSelect
+        value={savingPeriod}
+        onChange={v => setValue('savingPeriod', v)}
+        options={[
+          { value: 6, label: '6개월' },
+          { value: 12, label: '12개월' },
+          { value: 24, label: '24개월' },
+        ]}
+      />
 
       <Spacing size={24} />
       <Border height={16} />

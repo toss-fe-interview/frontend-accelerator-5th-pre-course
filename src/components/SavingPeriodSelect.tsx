@@ -3,9 +3,10 @@ import { SelectBottomSheet } from 'tosslib';
 interface SavingPeriodSelectProps {
   value: number;
   onChange: (value: number) => void;
+  options: Array<{ value: number; label: string }>;
 }
 
-export const SavingPeriodSelect = ({ value, onChange }: SavingPeriodSelectProps) => {
+export const SavingPeriodSelect = ({ value, onChange, options }: SavingPeriodSelectProps) => {
   return (
     <SelectBottomSheet
       title="저축 기간을 선택해주세요"
@@ -14,9 +15,11 @@ export const SavingPeriodSelect = ({ value, onChange }: SavingPeriodSelectProps)
         onChange(value);
       }}
     >
-      <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-      <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-      <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+      {options.map(option => (
+        <SelectBottomSheet.Option key={option.value} value={option.value}>
+          {option.label}
+        </SelectBottomSheet.Option>
+      ))}
     </SelectBottomSheet>
   );
 };
