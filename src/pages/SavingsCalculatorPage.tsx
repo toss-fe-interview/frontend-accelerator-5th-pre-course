@@ -123,10 +123,12 @@ export function SavingsCalculatorPage() {
                     />
                     <ResultItem
                       label="추천 월 납입 금액"
-                      value={calculateRecommendedMonthlyPayment(
-                        targetAmount,
-                        savingPeriod,
-                        selectedSavingsProduct.annualRate
+                      value={roundToThousand(
+                        calculateRecommendedMonthlyPayment(
+                          targetAmount,
+                          savingPeriod,
+                          selectedSavingsProduct.annualRate
+                        )
                       )}
                     />
                   </>
@@ -194,6 +196,5 @@ const calculateDifferenceWithTargetAmount = (targetAmount: number, expectedProfi
 };
 
 const calculateRecommendedMonthlyPayment = (targetAmount: number, savingPeriod: number, annualRate: number) => {
-  const recommendedAmount = targetAmount / (savingPeriod * (1 + annualRate * 0.5));
-  return roundToThousand(recommendedAmount);
+  return targetAmount / (savingPeriod * (1 + annualRate * 0.5));
 };
