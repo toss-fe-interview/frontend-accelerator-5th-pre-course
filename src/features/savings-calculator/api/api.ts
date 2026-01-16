@@ -5,12 +5,7 @@ import { type SavingsProduct, SavingsProductSchema } from './schema';
 export async function fetchSavingsProducts(): Promise<SavingsProduct[]> {
   try {
     const response = await http.get<unknown[]>('/api/savings-products');
-
-    return response.reduce<SavingsProduct[]>((acc, item) => {
-      const result = v.safeParse(SavingsProductSchema, item);
-      if (result.success) acc.push(result.output);
-      return acc;
-    }, []);
+    return parseValidProducts(response);
   } catch (error) {
     if (isHttpError(error)) {
       throw new Error(error.message);
@@ -18,3 +13,10 @@ export async function fetchSavingsProducts(): Promise<SavingsProduct[]> {
     throw error;
   }
 }
+
+const parseValidProducts = (items: unknown[]): SavingsProduct[] => {
+  return items.flatMap(item => {
+    const result = v.safeParse(SavingsProductSchema, item);
+    return result.success ? [result.output] : [];
+  });
+};
