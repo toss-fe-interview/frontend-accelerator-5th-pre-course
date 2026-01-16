@@ -1,4 +1,4 @@
-import { http, isHttpError } from 'tosslib';
+import { http } from 'tosslib';
 
 export type SavingsProduct = {
   id: string;
@@ -10,13 +10,5 @@ export type SavingsProduct = {
 };
 
 export async function getSavingsProducts(): Promise<SavingsProduct[]> {
-  try {
-    const response = await http.get<SavingsProduct[]>('/api/savings-products');
-    return response;
-  } catch (error) {
-    if (isHttpError(error)) {
-      throw new Error(error.message);
-    }
-    throw error;
-  }
+  return http.get<SavingsProduct[]>('/api/savings-products');
 }
