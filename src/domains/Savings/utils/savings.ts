@@ -1,20 +1,15 @@
-import type { SavingsProduct } from "../types";
+import type { SavingsProduct } from '../types';
 
 interface FilterCriteria {
   monthlyDeposit: number;
   period: number;
 }
 
-export function filterSavingsProducts(
-  products: SavingsProduct[],
-  criteria: FilterCriteria
-): SavingsProduct[] {
+export function filterSavingsProducts(products: SavingsProduct[], criteria: FilterCriteria): SavingsProduct[] {
   const { monthlyDeposit, period } = criteria;
 
-  return products.filter((product) => {
-    const isValidAmount =
-      monthlyDeposit > product.minMonthlyAmount &&
-      monthlyDeposit < product.maxMonthlyAmount;
+  return products.filter(product => {
+    const isValidAmount = monthlyDeposit > product.minMonthlyAmount && monthlyDeposit < product.maxMonthlyAmount;
 
     const isValidPeriod = product.availableTerms === period;
 
@@ -25,7 +20,6 @@ export function filterSavingsProducts(
 export function getTopRateProducts(products: SavingsProduct[], count: number): SavingsProduct[] {
   return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, count);
 }
-
 
 export function calculateExpectedProfit(monthlyDeposit: number, period: number, annualRate: number): number {
   return monthlyDeposit * period * (1 + annualRate * 0.5);

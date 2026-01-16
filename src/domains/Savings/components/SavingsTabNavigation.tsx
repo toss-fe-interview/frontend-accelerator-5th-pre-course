@@ -1,5 +1,5 @@
-import { SavingsTabValue, SavingTabListType } from 'pages/SavingsCalculatorPage';
 import { Tab } from 'tosslib';
+import { SavingsTabValue, SavingTabListType } from '../types';
 
 interface SavingsTabNavigationProps {
   tabs: SavingTabListType;
@@ -9,8 +9,8 @@ interface SavingsTabNavigationProps {
 
 export function SavingsTabNavigation({ tabs, selectedTab, onTabChange }: SavingsTabNavigationProps) {
   return (
-    <Tab onChange={(v) => onTabChange(v as SavingsTabValue)}>
-      {tabs.map((tab) => (
+    <Tab onChange={v => onTabChange(v as SavingsTabValue)}>
+      {tabs.map(tab => (
         <Tab.Item key={tab.value} value={tab.value} selected={selectedTab === tab.value}>
           {tab.name}
         </Tab.Item>
