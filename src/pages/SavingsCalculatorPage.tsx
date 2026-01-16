@@ -1,8 +1,8 @@
 import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProduct } from 'api/product';
-import { ProductsTab } from 'components/ProductsTab';
-import { ResultsTab } from 'components/ResultsTab';
+import { SavingsProductList } from 'components/SavingsProductList';
+import { CalculationResult } from 'components/CalculationResult';
 
 const useTab = () => {
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
@@ -83,7 +83,7 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {selectedTab === 'products' && (
-        <ProductsTab
+        <SavingsProductList
           monthlyPayment={monthlyPayment}
           savingPeriod={savingPeriod}
           selectedSavingsProduct={selectedSavingsProduct}
@@ -92,7 +92,7 @@ export function SavingsCalculatorPage() {
       )}
 
       {selectedTab === 'results' && (
-        <ResultsTab
+        <CalculationResult
           targetAmount={targetAmount}
           monthlyPayment={monthlyPayment}
           savingPeriod={savingPeriod}

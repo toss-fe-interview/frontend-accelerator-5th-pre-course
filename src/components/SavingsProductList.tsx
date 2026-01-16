@@ -2,19 +2,19 @@ import { Assets, colors, ListRow } from 'tosslib';
 import { SavingsProduct } from 'api/product';
 import { useProducts } from 'hook/useProducts';
 
-interface ProductsTabProps {
+interface SavingsProductListProps {
   monthlyPayment: number;
   savingPeriod: number;
   selectedSavingsProduct: SavingsProduct | null;
   onSelectProduct: (product: SavingsProduct) => void;
 }
 
-export function ProductsTab({
+export function SavingsProductList({
   monthlyPayment,
   savingPeriod,
   selectedSavingsProduct,
   onSelectProduct,
-}: ProductsTabProps) {
+}: SavingsProductListProps) {
   const { products } = useProducts({
     monthlyPayment,
     savingPeriod,
