@@ -65,8 +65,9 @@ export function SavingsCalculatorPage() {
 
   const recommendedProducts = [...filteredProducts].sort((prev, curr) => curr.annualRate - prev.annualRate).slice(0, 2);
 
-  console.log(targetAmount);
-  if (error) return <div>적금 상품 데이터를 가져오는데 실패했어요.</div>;
+  if (error) {
+    return <div>적금 상품 데이터를 가져오는데 실패했어요.</div>;
+  }
 
   return (
     <>
@@ -124,22 +125,17 @@ export function SavingsCalculatorPage() {
       {selectedTab === 'products' ? (
         <>
           {filteredProducts.map(product => {
-            const description = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`;
             const isSelected = selectedSavingProduct?.id === product.id;
 
             return (
               <ListRow
                 key={product.id}
                 contents={
-                  <ListRow.Texts
-                    type="3RowTypeA"
-                    top={product.name}
-                    bottom={description}
-                    middle={`연 이자율: ${product.annualRate}%`}
-                    // css와 ui에 관련된 값들은 본질과 먼 느낌. HOW와 가깝다.
-                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                  <ListRowTexts
+                    productName={product.name}
+                    productAnnualRate={product.annualRate}
+                    monthlyAmountRangeText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원`}
+                    availableTerms={product.availableTerms}
                   />
                 }
                 right={isSelected && <CheckedIcon />}
@@ -193,23 +189,17 @@ export function SavingsCalculatorPage() {
 
           {recommendedProducts.length > 0 ? (
             recommendedProducts.map(product => {
-              const description = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`;
               const isSelected = selectedSavingProduct?.id === product.id;
 
               return (
                 <ListRow
                   key={product.id}
                   contents={
-                    <ListRow.Texts
-                      // 여기는 Text를 결정하는 큰 요소들, WHAT에 해당하지 않을까?
-                      type="3RowTypeA"
-                      top={product.name}
-                      middle={`연 이자율: ${product.annualRate}%`}
-                      bottom={description}
-                      // css와 ui에 관련된 값들은 본질과 먼 느낌. HOW와 가깝다.
-                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                    <ListRowTexts
+                      productName={product.name}
+                      productAnnualRate={product.annualRate}
+                      monthlyAmountRangeText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원`}
+                      availableTerms={product.availableTerms}
                     />
                   }
                   right={isSelected && <CheckedIcon />}
@@ -228,4 +218,29 @@ export function SavingsCalculatorPage() {
 
 const CheckedIcon = () => {
   return <Assets.Icon name="icon-check-circle-green" />;
+};
+
+// WHAT은 props로 받아서 본질을 명확히 하기
+const ListRowTexts = ({
+  productName,
+  productAnnualRate,
+  monthlyAmountRangeText,
+  availableTerms,
+}: {
+  productName: string;
+  productAnnualRate: number;
+  monthlyAmountRangeText: string;
+  availableTerms: number;
+}) => {
+  return (
+    <ListRow.Texts
+      type="3RowTypeA"
+      top={productName}
+      middle={`연 이자율: ${productAnnualRate}%`}
+      bottom={`${monthlyAmountRangeText} | ${availableTerms}개월`}
+      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+    />
+  );
 };
