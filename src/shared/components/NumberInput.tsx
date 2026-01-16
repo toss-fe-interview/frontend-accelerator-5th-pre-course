@@ -4,15 +4,19 @@ type NumberInputProps = {
   label: string;
   placeholder: string;
   suffix: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: number | null;
+  onChange: (value: number | null) => void;
 };
 
 export const NumberInput = ({ label, placeholder, suffix, value, onChange }: NumberInputProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numericValue = e.target.value.replace(/[^0-9]/g, '');
-    onChange(numericValue);
+    const numericString = e.target.value.replace(/[^0-9]/g, '');
+    onChange(numericString === '' ? null : parseInt(numericString));
   };
 
-  return <TextField label={label} placeholder={placeholder} suffix={suffix} value={value} onChange={handleChange} />;
+  const displayValue = value === null ? '' : String(value);
+
+  return (
+    <TextField label={label} placeholder={placeholder} suffix={suffix} value={displayValue} onChange={handleChange} />
+  );
 };
