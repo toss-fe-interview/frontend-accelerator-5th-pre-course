@@ -1,13 +1,13 @@
-import { ErrorBoundary, Suspense } from '@suspensive/react';
-import { usePrefetchQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { savingsProductsQueries } from './api/queries';
 import CalculationResult from './components/CalculationResult';
 import { MonthlyAmountInput, SavingTermsSelect, TargetAmountInput } from './components/CalculatorFields';
-import ProductListTab from './components/ProductListTab';
-import RecommendedProductList from './components/RecommendProductList';
+import SavingsProductInfo from './components/SavingsProductInfo';
 import { useCalculatorParams } from './hooks/useCalculatorParams';
+import { useSelectProductParams } from './hooks/useSelectProductParams';
+import { matchesPaymentRange, matchesPeriod } from './utils/productFilters';
 
 const TABS_CONFIG = {
   products: '적금 상품',
@@ -18,10 +18,14 @@ type TabKey = keyof typeof TABS_CONFIG;
 const isValidTabKey = (tab: string): tab is TabKey => tab in TABS_CONFIG;
 
 export default function SavingsCalculatorPage() {
-  usePrefetchQuery(savingsProductsQueries.listQuery());
+  const { data: products } = useSuspenseQuery(savingsProductsQueries.listQuery());
 
   const [currentTab, setCurrentTab] = useState<TabKey>('products');
   const { targetAmount, monthlyAmount, savingTerms, setCalculatorParams } = useCalculatorParams();
+  const { selectedProductId, setSelectedProductId } = useSelectProductParams();
+
+  const filteredProducts = products.filter(matchesPaymentRange(monthlyAmount)).filter(matchesPeriod(savingTerms));
+  const selectedProduct = products.find(product => product.id === selectedProductId);
 
   const handleTabChange = (tab: string) => {
     if (isValidTabKey(tab)) {
@@ -52,24 +56,67 @@ export default function SavingsCalculatorPage() {
           </Tab.Item>
         ))}
       </Tab>
-      {currentTab === 'products' && (
-        <ErrorBoundary fallback={<div>상품 목록을 불러오는 중 에러가 발생했습니다.</div>}>
-          <Suspense fallback={<div>상품 목록을 불러오는 중입니다...</div>}>
-            <ProductListTab />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-      {currentTab === 'results' && (
-        <ErrorBoundary fallback={<div>계산 결과를 불러오는 중 에러가 발생했습니다.</div>}>
-          <Suspense fallback={<div>계산 결과를 불러오는 중입니다...</div>}>
-            <CalculationResult />
-            <Spacing size={8} />
-            <Border height={16} />
-            <Spacing size={8} />
-            <RecommendedProductList />
-          </Suspense>
-        </ErrorBoundary>
-      )}
+      {(() => {
+        switch (currentTab) {
+          case 'products':
+            return filteredProducts.length > 0 ? (
+              filteredProducts.map(product => {
+                const isSelected = selectedProductId === product.id;
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={<SavingsProductInfo product={product} />}
+                    right={isSelected ? <CheckedCircleIcon /> : null}
+                    onClick={() => setSelectedProductId(product.id)}
+                  />
+                );
+              })
+            ) : (
+              <EmptyProductList />
+            );
+          case 'results':
+            return (
+              <>
+                <CalculationResult product={selectedProduct} />
+
+                <Spacing size={8} />
+                <Border height={16} />
+                <Spacing size={8} />
+
+                <ListHeader
+                  title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+                />
+                <Spacing size={12} />
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map(product => {
+                    const isSelected = selectedProductId === product.id;
+                    return (
+                      <ListRow
+                        key={product.id}
+                        contents={<SavingsProductInfo product={product} />}
+                        right={isSelected ? <CheckedCircleIcon /> : null}
+                        onClick={() => setSelectedProductId(product.id)}
+                      />
+                    );
+                  })
+                ) : (
+                  <EmptyProductList />
+                )}
+                <Spacing size={40} />
+              </>
+            );
+          default:
+            return null;
+        }
+      })()}
     </>
   );
+}
+
+function CheckedCircleIcon() {
+  return <Assets.Icon name="icon-check-circle-green" />;
+}
+
+function EmptyProductList() {
+  return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />;
 }
