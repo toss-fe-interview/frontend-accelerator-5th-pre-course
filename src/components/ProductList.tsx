@@ -17,10 +17,6 @@ export function ProductList({ filters, sortBy, limit }: ProductListProps) {
   const { data: products } = useSavingsProductsQuery({ filters, sortBy, limit });
   const [selectedProductId, setSelectedProductId] = useSelectedProductId();
 
-  const handleSelectProduct = (productId: string) => {
-    setSelectedProductId(productId);
-  };
-
   if (products.length === 0) {
     return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />;
   }
@@ -32,7 +28,7 @@ export function ProductList({ filters, sortBy, limit }: ProductListProps) {
           isSelected={selectedProductId === product.id}
           key={product.id}
           product={product}
-          onSelect={handleSelectProduct}
+          onSelect={setSelectedProductId}
         />
       ))}
     </>
