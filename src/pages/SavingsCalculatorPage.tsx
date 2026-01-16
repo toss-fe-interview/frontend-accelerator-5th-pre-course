@@ -1,14 +1,17 @@
-import SavingsProductList from 'domains/savingsCalculator/containers/SavingsProductList';
-
 import { SavingsProductType } from 'shared/types/api/savings';
 
-import { NavigationBar, Spacing } from 'tosslib';
+import { Assets, colors, ListRow, NavigationBar, Spacing } from 'tosslib';
 import TabScreen from 'shared/components/layout/TabScreen';
 import { useState } from 'react';
 import CalculationResult from 'domains/savingsCalculator/containers/CalculationResult';
 import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
 import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
 import TermField from 'domains/savingsCalculator/components/form/TermField';
+import SavingsQuery from 'shared/query/saving';
+import { useQuery } from '@tanstack/react-query';
+
+import { formatCurrency } from 'shared/utils/format';
+import { rangeIn } from 'domains/savingsCalculator/utils/filter';
 
 export function SavingsCalculatorPage() {
   /** refactor : useSavingsInputs 훅 제거하기
@@ -22,6 +25,24 @@ export function SavingsCalculatorPage() {
   const [term, setTerm] = useState<6 | 12 | 24>(12);
 
   const [selectedProduct, setSelectedProduct] = useState<SavingsProductType | null>(null);
+
+  const findMatchingProducts = (product: SavingsProductType) => {
+    const 저축_기간이_일치함 = product.availableTerms === term;
+    const 월_납입한도_내에_있음 = rangeIn(monthlyPayment, {
+      min: product.minMonthlyAmount,
+      max: product.maxMonthlyAmount,
+    });
+
+    return 저축_기간이_일치함 && 월_납입한도_내에_있음;
+  };
+
+  const { data: matchingProducts = [] } = useQuery(
+    SavingsQuery.getSavingsProducts({
+      select: data => data.filter(findMatchingProducts),
+    })
+  );
+
+  const hasNoMatchingProducts = matchingProducts.length === 0;
 
   return (
     <TabScreen
@@ -43,12 +64,46 @@ export function SavingsCalculatorPage() {
           value: 'products',
           label: '적금 상품',
           contents: (
-            <SavingsProductList
-              term={term}
-              monthlyPayment={monthlyPayment}
-              onSelect={product => setSelectedProduct(product)}
-              selectedId={selectedProduct?.id}
-            />
+            <>
+              {/* 본질이 뭘까? 
+               - 목표금액, 월 납입액, 저축기간에 따라서 필터링 조건에 맞는 적금 상품을 보여준다. 
+               - 사용자 입력이 없으면 ? 보여주지 않는다 or 모두 보여준다 
+                - 모두 보여준다
+                   -> Case 1) 적금 상품을 선택 가능  -> 계산 결과에 어떻게 보여줄지 결정 & 사용자의 제품 흐름이 입력보다 적금 상품을 선택하는 것부터 시작할 수 있음 
+                   -> Case 2) 적금 상품을 선택 불가능 -> 추가 방어 처리 필요
+                   => 고려할 사항이 늘어남 (x)
+                - 보여주지 않는다 
+                   -> 사용자가 입력부터 시작하게 강제하여 자연스럽게 제품이 의도한 방향으로 흘러갈 수 있음 (o)
+                   -> 보여줄 상품이 없다는 건 == 조건에 맞는 상품이 없다는 것 (hasNoMatchingProducts)
+                   -> 보여줄 상품들 === 조건에 맞는 상품들 (matchingProducts)
+              */}
+              {hasNoMatchingProducts ? (
+                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
+              ) : (
+                matchingProducts.map(product => {
+                  const isSelected = selectedProduct?.id === product.id;
+
+                  return (
+                    <ListRow
+                      key={product.id}
+                      contents={
+                        <ListRow.Texts
+                          type="3RowTypeA"
+                          top={product.name}
+                          topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                          middle={`연 이자율: ${product.annualRate}%`}
+                          middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                          bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                          bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                        />
+                      }
+                      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                      onClick={() => setSelectedProduct(product)}
+                    />
+                  );
+                })
+              )}
+            </>
           ),
         },
         {
