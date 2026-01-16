@@ -1,26 +1,20 @@
-import { Border, colors, ListRow, Spacing, ListHeader, Assets } from 'tosslib';
+import { orderBy, take } from 'es-toolkit';
+import { colors, ListRow, Assets } from 'tosslib';
 import { SavingsProduct } from 'types/savings';
 import { formatCurrency } from 'utils/format';
 
 export function RecommendedProductList({
-  recommendedProductList,
+  savingsProductList,
   selectedProduct,
-  setSelectedProduct,
+  onSelectProduct,
 }: {
-  recommendedProductList: SavingsProduct[];
+  savingsProductList: SavingsProduct[];
   selectedProduct: SavingsProduct | null;
-  setSelectedProduct: (product: SavingsProduct) => void;
+  onSelectProduct: (product: SavingsProduct) => void;
 }) {
   return (
     <>
-      <Spacing size={8} />
-      <Border height={16} />
-      <Spacing size={8} />
-
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
-
-      {recommendedProductList.map(product => (
+      {take(orderBy(savingsProductList, ['annualRate'], ['desc']), 2).map(product => (
         <ListRow
           key={product.id}
           contents={
@@ -35,11 +29,9 @@ export function RecommendedProductList({
             />
           }
           right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-          onClick={() => setSelectedProduct(product)}
+          onClick={() => onSelectProduct(product)}
         />
       ))}
-
-      <Spacing size={40} />
     </>
   );
 }

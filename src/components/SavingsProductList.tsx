@@ -2,16 +2,16 @@ import { SavingsProduct } from 'types/savings';
 import { Assets, colors, ListRow } from 'tosslib';
 import { formatCurrency } from 'utils/format';
 
-export function SavingsProudctList({
-  filteredSavingsProductList,
+export function SavingsProductList({
+  savingsProductList,
   selectedProduct,
-  setSelectedProduct,
+  onSelectProduct,
 }: {
-  filteredSavingsProductList: SavingsProduct[];
+  savingsProductList: SavingsProduct[];
   selectedProduct: SavingsProduct | null;
-  setSelectedProduct: (product: SavingsProduct) => void;
+  onSelectProduct: (product: SavingsProduct) => void;
 }) {
-  return filteredSavingsProductList.map(product => (
+  return savingsProductList.map(product => (
     <ListRow
       key={product.id}
       contents={
@@ -26,7 +26,7 @@ export function SavingsProudctList({
         />
       }
       right={selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null}
-      onClick={() => setSelectedProduct(product)}
+      onClick={() => onSelectProduct(product)}
     />
   ));
 }
