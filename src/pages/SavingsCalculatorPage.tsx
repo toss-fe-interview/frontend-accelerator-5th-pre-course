@@ -5,7 +5,7 @@ import { CheckCircleIcon } from 'components/CheckCircleIcon';
 import { GoalAmountInput } from 'components/GoalAmountInput';
 import { MonthlyPaymentInput } from 'components/MonthlyPaymentInput';
 import { Product } from 'components/Product';
-import { ResultItem } from 'components/ResultItem';
+import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
 import { useTabState, Tab as TabType } from 'hooks/useTabState';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
@@ -118,25 +118,20 @@ export function SavingsCalculatorPage() {
 
                 {selectedSavingsProduct ? (
                   <>
-                    <ResultItem
+                    <CalculationResultItem
                       label="예상 수익 금액"
-                      value={calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate)}
+                      value={monthlyPayment * savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)}
                     />
-                    <ResultItem
+                    <CalculationResultItem
                       label="목표 금액과의 차이"
-                      value={calculateDifferenceWithTargetAmount(
-                        targetAmount,
-                        calculateExpectedProfit(monthlyPayment, savingPeriod, selectedSavingsProduct.annualRate)
-                      )}
+                      value={
+                        targetAmount - monthlyPayment * savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)
+                      }
                     />
-                    <ResultItem
+                    <CalculationResultItem
                       label="추천 월 납입 금액"
                       value={roundToThousand(
-                        calculateRecommendedMonthlyPayment(
-                          targetAmount,
-                          savingPeriod,
-                          selectedSavingsProduct.annualRate
-                        )
+                        targetAmount / (savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5))
                       )}
                     />
                   </>
@@ -194,15 +189,3 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
-
-const calculateExpectedProfit = (monthlyPayment: number, savingPeriod: number, annualRate: number) => {
-  return monthlyPayment * savingPeriod * (1 + annualRate * 0.5);
-};
-
-const calculateDifferenceWithTargetAmount = (targetAmount: number, expectedProfit: number) => {
-  return targetAmount - expectedProfit;
-};
-
-const calculateRecommendedMonthlyPayment = (targetAmount: number, savingPeriod: number, annualRate: number) => {
-  return targetAmount / (savingPeriod * (1 + annualRate * 0.5));
-};

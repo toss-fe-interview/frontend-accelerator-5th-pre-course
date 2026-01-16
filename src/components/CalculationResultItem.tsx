@@ -1,11 +1,11 @@
 import { colors, ListRow } from 'tosslib';
 
-interface ResultItemProps {
+interface CalculationResultItemProps {
   label: string;
   value: number;
 }
 
-export function ResultItem({ label, value }: ResultItemProps) {
+export function CalculationResultItem({ label, value }: CalculationResultItemProps) {
   return (
     <ListRow
       contents={
