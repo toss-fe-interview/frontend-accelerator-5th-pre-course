@@ -1,8 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { formatNumber } from 'utils/format';
+import { roundToThousand } from 'utils/roundToThousand';
 import { savingsProductsQueries } from './api/queries';
-import CalculationResult from './components/CalculationResult';
 import { MonthlyAmountInput, SavingTermsSelect, TargetAmountInput } from './components/CalculatorFields';
 import SavingsProductInfo from './components/SavingsProductInfo';
 import { useCalculatorParams } from './hooks/useCalculatorParams';
@@ -73,13 +74,35 @@ export default function SavingsCalculatorPage() {
                 );
               })
             ) : (
-              <EmptyProductList />
+              <EmptyMessage message="조건에 맞는 상품이 없습니다." />
             );
-          case 'results':
+          case 'results': {
+            const 예상만기금액 =
+              selectedProduct && savingTerms
+                ? get_예상만기금액(monthlyAmount ?? 0, savingTerms, selectedProduct.annualRate)
+                : 0;
+            const 목표금액과의차이 = get_목표금액과의차이(targetAmount ?? 0, 예상만기금액);
+            const 추천월납입금액 =
+              selectedProduct && savingTerms
+                ? get_추천월납입금액(targetAmount ?? 0, savingTerms, selectedProduct.annualRate)
+                : 0;
+
             return (
               <>
                 <Spacing size={8} />
-                {selectedProduct ? <CalculationResult product={selectedProduct} /> : <EmptyProductSelection />}
+                {selectedProduct ? (
+                  savingTerms ? (
+                    <>
+                      <ResultRow label="예상 수익 금액" value={`${formatNumber(예상만기금액)}원`} />
+                      <ResultRow label="목표 금액과의 차이" value={`${formatNumber(목표금액과의차이)}원`} />
+                      <ResultRow label="추천 월 납입 금액" value={`${formatNumber(추천월납입금액)}원`} />
+                    </>
+                  ) : (
+                    <EmptyMessage message="저축 기간을 선택해주세요." />
+                  )
+                ) : (
+                  <EmptyMessage message="상품을 선택해주세요." />
+                )}
 
                 <Spacing size={8} />
                 <Border height={16} />
@@ -102,11 +125,12 @@ export default function SavingsCalculatorPage() {
                     );
                   })
                 ) : (
-                  <EmptyProductList />
+                  <EmptyMessage message="조건에 맞는 상품이 없습니다." />
                 )}
                 <Spacing size={40} />
               </>
             );
+          }
           default: {
             const _exhaustiveCheck: never = currentTab;
             return _exhaustiveCheck;
@@ -121,10 +145,37 @@ function CheckedCircleIcon() {
   return <Assets.Icon name="icon-check-circle-green" />;
 }
 
-function EmptyProductList() {
-  return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />;
+function EmptyMessage({ message }: { message: string }) {
+  return <ListRow contents={<ListRow.Texts type="1RowTypeA" top={message} />} />;
 }
 
-function EmptyProductSelection() {
-  return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
+function ResultRow({ label, value }: { label: string; value: string }) {
+  return (
+    <ListRow
+      contents={
+        <ListRow.Texts
+          type="2RowTypeA"
+          top={label}
+          topProps={{ color: colors.grey600 }}
+          bottom={value}
+          bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+        />
+      }
+    />
+  );
 }
+
+const 평균적립기간비율 = 0.5;
+
+const get_예상만기금액 = (월납입액: number, 저축기간: number, 연이자율: number) => {
+  return 월납입액 * 저축기간 * (1 + (연이자율 / 100) * 평균적립기간비율);
+};
+
+const get_목표금액과의차이 = (목표금액: number, 예상만기금액: number) => {
+  return 목표금액 - 예상만기금액;
+};
+
+const get_추천월납입금액 = (목표금액: number, 저축기간: number, 연이자율: number) => {
+  const value = 목표금액 / (저축기간 * (1 + (연이자율 / 100) * 평균적립기간비율));
+  return roundToThousand(value);
+};
