@@ -17,7 +17,7 @@ export function SavingsCalculatorPage() {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
   const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
-  const [terms, setTerms] = useState<string>('');
+  const [terms, setTerms] = useState<number | null>(null);
 
   const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
 
@@ -61,13 +61,13 @@ export function SavingsCalculatorPage() {
       <Select
         label="저축 기간"
         title="저축 기간을 선택해주세요"
-        value={terms}
+        value={terms?.toString() ?? ''}
         options={[
           { value: '6', label: '6개월' },
           { value: '12', label: '12개월' },
           { value: '24', label: '24개월' },
         ]}
-        onChange={setTerms}
+        onChange={value => setTerms(parseInt(value))}
       />
 
       <Spacing size={24} />
@@ -122,7 +122,7 @@ export function SavingsCalculatorPage() {
                 value={calculateExpectedAmount({
                   annualRate: selectedSavingsProduct.annualRate,
                   monthlyPayment: monthlyPayment ?? 0,
-                  terms: parseInt(terms) || 0,
+                  terms: terms ?? 0,
                 })}
               />
               <SavingsResultItem
@@ -132,7 +132,7 @@ export function SavingsCalculatorPage() {
                   calculateExpectedAmount({
                     annualRate: selectedSavingsProduct.annualRate,
                     monthlyPayment: monthlyPayment ?? 0,
-                    terms: parseInt(terms) || 0,
+                    terms: terms ?? 0,
                   })
                 }
               />
@@ -141,7 +141,7 @@ export function SavingsCalculatorPage() {
                 value={calculateRecommendedMonthlyPayment({
                   targetAmount: targetAmount ?? 0,
                   annualRate: selectedSavingsProduct.annualRate,
-                  terms: parseInt(terms) || 0,
+                  terms: terms ?? 0,
                 })}
               />
             </>
