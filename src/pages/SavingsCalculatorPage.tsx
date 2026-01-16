@@ -1,6 +1,6 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, NavigationBar, Spacing } from 'tosslib';
+import { Assets, Border, colors, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
 import { AmountInputSection } from 'features/savings/components/AmountInputSection';
@@ -9,7 +9,7 @@ import { CalculationResultList } from 'features/savings/components/CalculationRe
 import { RecommendedProductList } from 'features/savings/components/RecommendedProductList';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
-import { SavingsProductItem } from 'features/savings/components/SavingsProductItem';
+import { formatPrice } from 'shared/utils/price';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -59,14 +59,28 @@ export function SavingsCalculatorPage() {
 
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
         <>
-          {filteredSavingsProducts?.map(product => (
-            <SavingsProductItem
-              key={product.id}
-              product={product}
-              selected={selectedProductId === product.id}
-              onSelect={() => setSelectedProductId(product.id)}
-            />
-          ))}
+          {filteredSavingsProducts && filteredSavingsProducts.length > 0 ? (
+            filteredSavingsProducts.map(product => (
+              <ListRow
+                key={product.id}
+                contents={
+                  <ListRow.Texts
+                    type="3RowTypeA"
+                    top={product.name}
+                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                    middle={`연 이자율: ${product.annualRate}%`}
+                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                    bottom={`${formatPrice(product.minMonthlyAmount)}원 ~ ${formatPrice(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                  />
+                }
+                right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                onClick={() => setSelectedProductId(product.id)}
+              />
+            ))
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다." />} />
+          )}
         </>
       )}
 
