@@ -7,7 +7,7 @@ export const calculateEstimatedEaringsAmount = (
   savingsPeriod: number,
   annualRate: number
 ) => {
-  const result = monthlyPaymentAmount * savingsPeriod * (1 + annualRate * 0.5);
+  const result = monthlyPaymentAmount * savingsPeriod * (1 + annualRate * 0.01 * 0.5);
 
   return result;
 };
@@ -19,7 +19,7 @@ export const calculateDifferenceWithTargetAmount = (targetAmount: number, estima
 };
 
 export const calculateRecommendedMonthlyPayment = (targetAmount: number, savingsPeriod: number, annualRate: number) => {
-  const result = targetAmount / (savingsPeriod * (1 + annualRate * 0.5));
+  const result = targetAmount / (savingsPeriod * (1 + annualRate * 0.01 * 0.5));
 
   return roundThousand(result);
 };
