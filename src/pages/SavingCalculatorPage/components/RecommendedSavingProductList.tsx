@@ -1,6 +1,6 @@
 import { ListHeader, Spacing } from 'tosslib';
 import { SavingProductList } from './SavingProductList';
-import { SavingProduct } from 'models/SavingProduct';
+import { compareByHighestRate, SavingProduct } from 'models/SavingProduct';
 
 const MAX_RECOMMENDED_COUNT = 2;
 
@@ -13,7 +13,7 @@ export const RecommendedSavingProductList = ({
   selectedSavingProduct: SavingProduct | null;
   selectSavingProduct: (product: SavingProduct) => void;
 }) => {
-  const recommendedSavingsProducts = savingsProducts.slice(0, MAX_RECOMMENDED_COUNT);
+  const recommendedSavingsProducts = savingsProducts.sort(compareByHighestRate).slice(0, MAX_RECOMMENDED_COUNT);
 
   return (
     <div>

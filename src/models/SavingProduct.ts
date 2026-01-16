@@ -7,10 +7,6 @@ export interface SavingProduct {
   availableTerms: number;
 }
 
-export const isSuitableSavingProduct = (product: SavingProduct, monthlyPayment: number, term: number) => {
-  return (
-    product.minMonthlyAmount <= monthlyPayment &&
-    product.maxMonthlyAmount >= monthlyPayment &&
-    product.availableTerms === term
-  );
+export const compareByHighestRate = (a: SavingProduct, b: SavingProduct): number => {
+  return b.annualRate - a.annualRate;
 };
