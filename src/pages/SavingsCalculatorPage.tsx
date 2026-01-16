@@ -1,7 +1,7 @@
 import { ErrorBoundary, Suspense } from '@suspensive/react';
 import ErrorFallback from 'components/ErrorFallback';
 import SuspenseFallback from 'components/SuspenseFallback';
-import SavingsFieldInput from 'features/savings/components/SavingsFieldInput';
+import LabeledAmountInput from 'features/savings/components/LabeledAmountInput';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
@@ -62,9 +62,10 @@ export function SavingsCalculatorPage() {
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      <SavingsFieldInput
+      <LabeledAmountInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
+        unit="원"
         value={savingsValues.targetAmount}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue = parseNumberInput(e.target.value);
@@ -76,9 +77,10 @@ export function SavingsCalculatorPage() {
         }}
       />
       <Spacing size={16} />
-      <SavingsFieldInput
+      <LabeledAmountInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
+        unit="원"
         value={savingsValues.monthlyPaymentAmount}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const newValue = parseNumberInput(e.target.value);

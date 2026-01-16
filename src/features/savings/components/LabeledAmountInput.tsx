@@ -2,19 +2,20 @@ import { ChangeEvent } from 'react';
 import { TextField } from 'tosslib';
 import { formatNumberWithComma } from '../utils/format/number';
 
-interface SavingsFieldInputProps {
+interface LabeledAmountInputProps {
   label: string;
   placeholder: string;
+  unit: string;
   value: number;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function SavingsFieldInput({ label, placeholder, value, onChange }: SavingsFieldInputProps) {
+export default function LabeledAmountInput({ label, placeholder, unit, value, onChange }: LabeledAmountInputProps) {
   return (
     <TextField
       label={label}
       placeholder={placeholder}
-      suffix="원"
+      suffix={unit}
       value={formatNumberWithComma(value)}
       onChange={onChange}
     />
