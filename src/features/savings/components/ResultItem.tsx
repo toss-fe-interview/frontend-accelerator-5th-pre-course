@@ -1,12 +1,11 @@
 import { colors, ListRow } from 'tosslib';
-import { formatNumberWithComma } from '../utils/format/number';
 
-interface SavingsResultItemProps {
+interface ResultItemProps {
   label: string;
-  value: number;
+  value: string;
 }
 
-export default function SavingsResult({ label, value }: SavingsResultItemProps) {
+export default function ResultItem({ label, value }: ResultItemProps) {
   return (
     <ListRow
       contents={
@@ -14,7 +13,7 @@ export default function SavingsResult({ label, value }: SavingsResultItemProps) 
           type="2RowTypeA"
           top={label}
           topProps={{ color: colors.grey600 }}
-          bottom={`${formatNumberWithComma(value)}원`}
+          bottom={value}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }
