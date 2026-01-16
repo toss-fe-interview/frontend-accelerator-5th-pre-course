@@ -10,8 +10,12 @@ interface Props {
   children: (state: RecommendedProductsState) => React.ReactNode;
 }
 
+const MAX_RECOMMENDED_COUNT = 2;
+
 export function RecommendedProducts({ savingsProducts, filter, children }: Props) {
-  const recommendedProducts = filterSavingsProducts(savingsProducts, filter).sort(byAnnualRateDesc).slice(0, 2);
+  const recommendedProducts = filterSavingsProducts(savingsProducts, filter)
+    .sort(byAnnualRateDesc)
+    .slice(0, MAX_RECOMMENDED_COUNT);
 
   if (recommendedProducts.length === 0) {
     return children({ type: 'empty' });
