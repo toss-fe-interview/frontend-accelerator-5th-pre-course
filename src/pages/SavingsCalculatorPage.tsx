@@ -11,6 +11,7 @@ import { useTabState, Tab as TabType } from 'hooks/useTabState';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { roundToThousand } from 'util/number';
+import { EmptyMessage } from 'components/EmptyMessage';
 
 const productQueries = {
   all: () =>
@@ -105,9 +106,7 @@ export function SavingsCalculatorPage() {
         <>
           <Spacing size={8} />
 
-          {!selectedSavingsProduct ? (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-          ) : (
+          {selectedSavingsProduct ? (
             <>
               <ResultItem
                 label="예상 수익 금액"
@@ -129,6 +128,8 @@ export function SavingsCalculatorPage() {
                 )}
               />
             </>
+          ) : (
+            <EmptyMessage message="상품을 선택해주세요." />
           )}
 
           <Spacing size={8} />
