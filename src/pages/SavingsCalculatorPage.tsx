@@ -119,7 +119,7 @@ export function SavingsCalculatorPage() {
             <>
               <SavingsResultItem
                 label="예상 수익 금액"
-                value={calculateExpectedAmount({
+                amount={calculateExpectedAmount({
                   annualRate: selectedSavingsProduct.annualRate,
                   monthlyPayment: monthlyPayment ?? 0,
                   terms: terms ?? 0,
@@ -127,7 +127,7 @@ export function SavingsCalculatorPage() {
               />
               <SavingsResultItem
                 label="목표 금액과의 차이"
-                value={
+                amount={
                   (targetAmount ?? 0) -
                   calculateExpectedAmount({
                     annualRate: selectedSavingsProduct.annualRate,
@@ -138,7 +138,7 @@ export function SavingsCalculatorPage() {
               />
               <SavingsResultItem
                 label="추천 월 납입 금액"
-                value={calculateRecommendedMonthlyPayment({
+                amount={calculateRecommendedMonthlyPayment({
                   targetAmount: targetAmount ?? 0,
                   annualRate: selectedSavingsProduct.annualRate,
                   terms: terms ?? 0,

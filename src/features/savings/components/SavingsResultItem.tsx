@@ -3,10 +3,10 @@ import { formatPrice } from 'shared/utils/price';
 
 type SavingsResultItemProps = {
   label: string;
-  value: number;
+  amount: number;
 };
 
-export const SavingsResultItem = ({ label, value }: SavingsResultItemProps) => {
+export const SavingsResultItem = ({ label, amount }: SavingsResultItemProps) => {
   return (
     <ListRow
       contents={
@@ -14,7 +14,7 @@ export const SavingsResultItem = ({ label, value }: SavingsResultItemProps) => {
           type="2RowTypeA"
           top={label}
           topProps={{ color: colors.grey600 }}
-          bottom={`${formatPrice(value)}원`}
+          bottom={`${formatPrice(amount)}원`}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }
