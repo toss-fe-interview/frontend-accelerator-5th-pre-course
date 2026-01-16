@@ -1,6 +1,6 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Assets, Border, colors, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { Assets, Border, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
 import { AmountInputSection } from 'features/savings/components/AmountInputSection';
@@ -9,7 +9,7 @@ import { CalculationResultList } from 'features/savings/components/CalculationRe
 import { RecommendedProductList } from 'features/savings/components/RecommendedProductList';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
-import { formatPrice } from 'shared/utils/price';
+import { SavingProductItem } from 'features/savings/components/SavingProductItem';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -64,14 +64,12 @@ export function SavingsCalculatorPage() {
               <ListRow
                 key={product.id}
                 contents={
-                  <ListRow.Texts
-                    type="3RowTypeA"
-                    top={product.name}
-                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                    middle={`연 이자율: ${product.annualRate}%`}
-                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                    bottom={`${formatPrice(product.minMonthlyAmount)}원 ~ ${formatPrice(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                  <SavingProductItem
+                    name={product.name}
+                    annualRate={product.annualRate}
+                    minMonthlyAmount={product.minMonthlyAmount}
+                    maxMonthlyAmount={product.maxMonthlyAmount}
+                    availableTerms={product.availableTerms}
                   />
                 }
                 right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
