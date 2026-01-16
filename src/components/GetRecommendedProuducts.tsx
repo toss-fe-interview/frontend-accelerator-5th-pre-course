@@ -8,9 +8,11 @@ export const GetRecommendedProducts = ({ children }: { children: (products: Savi
   const { data: savingProducts } = useSuspenseQuery(savingsProductQueryOptions());
   const { monthlyAmount, term } = useWatch();
 
+  const sortDescendingByAnnualRate = (a: SavingProduct, b: SavingProduct) => b.annualRate - a.annualRate;
+
   const recommendedProducts = savingProducts
     .filter(product => filterSavingsProduct(product, term, monthlyAmount))
-    .sort((a, b) => b.annualRate - a.annualRate)
+    .sort(sortDescendingByAnnualRate)
     .slice(0, 2);
 
   return children(recommendedProducts);
