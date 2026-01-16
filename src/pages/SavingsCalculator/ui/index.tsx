@@ -1,7 +1,8 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { queries } from 'shared/api/queries';
 import { SavingsProduct } from 'shared/api/type';
 import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
-import { useGetSavingProducts } from '../hooks/useGetSavingProducts';
 import { useSavingForm } from '../hooks/useSavingForm';
 import { Products } from './Products';
 import { SavingsProducts } from './Products/SavingsProducts';
@@ -11,7 +12,8 @@ import { RecommendSavingProducts } from './Results/RecommendSavingProducts';
 import { SavingGoals } from './SavingGoals';
 
 export function SavingsCalculatorPage() {
-  const { savingProducts } = useGetSavingProducts();
+  const { data: savingProducts } = useSuspenseQuery({ ...queries.savingsProducts() });
+
   const { values, handlers } = useSavingForm();
 
   const [selectedAmount, setSelectedAmount] = useState<SavingsProduct | null>(null);
