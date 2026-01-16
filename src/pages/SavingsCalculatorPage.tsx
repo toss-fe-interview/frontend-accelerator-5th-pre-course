@@ -150,7 +150,7 @@ interface CalculationResultItemProps {
   unit: string;
 }
 
-export function CalculationResultItem({ name, price, unit }: CalculationResultItemProps) {
+function CalculationResultItem({ name, price, unit }: CalculationResultItemProps) {
   return (
     <ListRow
       contents={
@@ -165,3 +165,28 @@ export function CalculationResultItem({ name, price, unit }: CalculationResultIt
     />
   );
 }
+
+type Props = {
+  name: string;
+  interestRate: string; // 이자율
+  depositRange: string; // 적금납입가능액수
+  termMonths: string; // 적금납입기간
+};
+
+const SavingProduct = ({ name, interestRate, depositRange, termMonths }: Props) => {
+  return (
+    <ListRow.Texts
+      type="3RowTypeA"
+      top={name}
+      topProps={{
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: colors.grey900,
+      }}
+      middle={`연 이자율: ${interestRate}%`}
+      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+      bottom={`${depositRange} | ${termMonths}개월`}
+      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+    />
+  );
+};
