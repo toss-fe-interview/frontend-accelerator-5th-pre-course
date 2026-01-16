@@ -61,22 +61,25 @@ export function SavingsCalculatorPage() {
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
         <>
           {filteredSavingsProducts && filteredSavingsProducts.length > 0 ? (
-            filteredSavingsProducts.map(product => (
-              <ListRow
-                key={product.id}
-                contents={
-                  <SavingProductItem
-                    name={product.name}
-                    annualRate={product.annualRate}
-                    minMonthlyAmount={product.minMonthlyAmount}
-                    maxMonthlyAmount={product.maxMonthlyAmount}
-                    availableTerms={product.availableTerms}
-                  />
-                }
-                right={selectedProductId === product.id ? <GreenCheckCircleIcon /> : undefined}
-                onClick={() => setSelectedProductId(product.id)}
-              />
-            ))
+            filteredSavingsProducts.map(product => {
+              const selected = selectedProductId === product.id;
+              return (
+                <ListRow
+                  key={product.id}
+                  contents={
+                    <SavingProductItem
+                      name={product.name}
+                      annualRate={product.annualRate}
+                      minMonthlyAmount={product.minMonthlyAmount}
+                      maxMonthlyAmount={product.maxMonthlyAmount}
+                      availableTerms={product.availableTerms}
+                    />
+                  }
+                  right={selected ? <GreenCheckCircleIcon /> : undefined}
+                  onClick={() => setSelectedProductId(product.id)}
+                />
+              );
+            })
           ) : (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다." />} />
           )}
