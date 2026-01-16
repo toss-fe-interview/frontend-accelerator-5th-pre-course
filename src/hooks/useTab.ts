@@ -3,23 +3,23 @@ import { useState } from 'react';
 /**
  * Tab 같은 경우는 한 곳에서 관리하여 오히려 탭 을 수정해야할때 더 직관적이라 생각해서 합체
  */
-const TAB = {
-  PRODUCTS: 'products',
-  RESULTS: 'results',
-} as const;
+export const useTab = <T extends readonly string[]>(tabs: T) => {
+  type TabValue = T[number];
 
-type TabType = (typeof TAB)[keyof typeof TAB];
+  if (tabs.length === 0) {
+    throw new Error('tabs 배열이 비어있습니다.');
+  }
 
-export const useTab = () => {
-  const [currentTab, setCurrentTab] = useState<TabType>(TAB.PRODUCTS);
+  const [currentTab, setCurrentTab] = useState<TabValue>(tabs[0]);
 
   const handleTabChange = (value: string) => {
-    setCurrentTab(value as TabType);
+    if (tabs.includes(value as TabValue)) {
+      setCurrentTab(value as TabValue);
+    }
   };
 
   return {
     currentTab,
     handleTabChange,
-    TAB,
   };
 };

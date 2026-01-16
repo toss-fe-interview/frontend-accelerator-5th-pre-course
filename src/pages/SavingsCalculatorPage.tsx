@@ -9,6 +9,12 @@ import { useMemo, useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { filterSavingsProducts } from 'utils/savings-filter';
 
+const TAB = {
+  PRODUCTS: 'products',
+  RESULTS: 'results',
+} as const;
+type TabType = (typeof TAB)[keyof typeof TAB];
+
 export function SavingsCalculatorPage() {
   // 인풋 칸
   const [targetAmount, setTargetAmount] = useState<number | undefined>(undefined);
@@ -17,7 +23,7 @@ export function SavingsCalculatorPage() {
   // 선택한 적금 상품
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   // 탭
-  const { currentTab, handleTabChange, TAB } = useTab();
+  const { currentTab, handleTabChange } = useTab<TabType[]>([TAB.PRODUCTS, TAB.RESULTS]);
 
   const { savingsProducts, isLoading, isError } = useFetchSavingProducts();
   // 적금계산기를 통한 필터링
