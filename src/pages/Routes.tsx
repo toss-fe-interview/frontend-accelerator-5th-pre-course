@@ -1,15 +1,10 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { SavingsCalculatorPage } from './SavingsCalculatorPage';
-import { Suspense } from 'react';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <Suspense fallback={<div>Loading...</div>}>
-        <SavingsCalculatorPage />
-      </Suspense>
-    ),
+    element: <SavingsCalculatorPage />,
   },
   {
     path: '*',
