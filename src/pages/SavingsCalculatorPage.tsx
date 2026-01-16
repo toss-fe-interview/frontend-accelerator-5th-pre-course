@@ -1,6 +1,6 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Assets, Border, ListRow, NavigationBar, Spacing } from 'tosslib';
+import { Border, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
 import { SavingsProductTab } from 'features/savings/components/Tab';
 import { AmountInputSection } from 'features/savings/components/AmountInputSection';
@@ -10,6 +10,7 @@ import { RecommendedProductList } from 'features/savings/components/RecommendedP
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
+import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -72,7 +73,7 @@ export function SavingsCalculatorPage() {
                     availableTerms={product.availableTerms}
                   />
                 }
-                right={selectedProductId === product.id ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                right={selectedProductId === product.id ? <GreenCheckCircleIcon /> : undefined}
                 onClick={() => setSelectedProductId(product.id)}
               />
             ))
