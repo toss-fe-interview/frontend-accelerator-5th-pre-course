@@ -13,8 +13,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^7.1.1",
-    "tosslib": "file:./tosslib.tgz",
-    "zod": "^4.3.5"
+    "tosslib": "file:./tosslib.tgz"
   },
   "devDependencies": {
     "@hono/vite-dev-server": "^0.18.0",
