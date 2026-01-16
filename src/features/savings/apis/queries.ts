@@ -3,10 +3,9 @@ import { getSavingsProducts } from './apis';
 
 export const savingsProductQuery = {
   all: 'savings-product',
-  listKey: () => [savingsProductQuery.all, 'list'],
   listQuery: () =>
     queryOptions({
-      queryKey: savingsProductQuery.listKey(),
+      queryKey: [savingsProductQuery.all, 'list'],
       queryFn: getSavingsProducts,
     }),
 };
