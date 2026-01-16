@@ -31,8 +31,8 @@ export function SavingsCalculatorPage() {
     });
 
   const recommendedSavingsProducts = (() => {
-    const sorted = sortBy(availableSavingsProducts, product => product.annualRate, 'desc');
-    return takeFromHead(sorted, 2);
+    const sortedByDesc = sortBy(availableSavingsProducts, product => product.annualRate, 'desc');
+    return takeFromHead(sortedByDesc, 2);
   })();
 
   const selectedSavingsProduct = availableSavingsProducts.find(product => {
