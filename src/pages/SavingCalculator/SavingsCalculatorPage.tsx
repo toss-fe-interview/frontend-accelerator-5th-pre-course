@@ -1,7 +1,8 @@
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import SavingCalculatorInput from './components/SavingCalculatorInput';
 import SavingProductList from './components/SavingItemList';
-import SavingResult from './components/SavingResult';
+import { CalculationResult, NoProductSelected } from './components/CalculationResult';
+import { RecommendedProductList } from './components/RecommendedProductList';
 import { Suspense, useState } from 'react';
 import { SavingsProduct } from './api';
 import { useCalculatorInputs } from './hooks/useCalculatorInputs';
@@ -41,7 +42,18 @@ function SavingsCalculator() {
         />
       )}
       {selectedTab === 'results' && (
-        <SavingResult calculationResult={calculationResult} recommendedProducts={recommendedProducts} />
+        <>
+          {calculationResult ? (
+            <CalculationResult
+              expectedProfit={calculationResult.expectedProfit}
+              difference={calculationResult.difference}
+              recommendedMonthly={calculationResult.recommendedMonthly}
+            />
+          ) : (
+            <NoProductSelected />
+          )}
+          <RecommendedProductList products={recommendedProducts} />
+        </>
       )}
     </>
   );

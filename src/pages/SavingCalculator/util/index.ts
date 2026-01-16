@@ -1,6 +1,6 @@
 import { SavingsProduct } from '../api';
 import { CalculInputs } from '../components/SavingCalculatorInput';
-import { CalculationResult } from '../components/SavingResult';
+import { CalculationResultData } from '../components/CalculationResult';
 
 export function formatToKRW(amount: number): string {
   return amount.toLocaleString('ko-KR');
@@ -26,7 +26,7 @@ function calculateRecommendedMonthlyAmount(targetAmount: number, term: number, a
 export function calculateSavingResult(
   selectedProduct: SavingsProduct | null,
   calculInputs: CalculInputs
-): CalculationResult | null {
+): CalculationResultData | null {
   if (!selectedProduct) {
     return null;
   }

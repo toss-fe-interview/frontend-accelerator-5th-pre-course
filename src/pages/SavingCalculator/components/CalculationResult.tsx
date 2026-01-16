@@ -1,10 +1,22 @@
 import { colors, ListRow, Spacing } from 'tosslib';
 import { formatToKRW } from '../util';
 
-interface CalculationResultProps {
+export interface CalculationResultData {
   expectedProfit: number;
   difference: number;
   recommendedMonthly: number;
+}
+
+type CalculationResultProps = CalculationResultData;
+
+export function NoProductSelected() {
+  return (
+    <>
+      <Spacing size={8} />
+      <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+      <Spacing size={8} />
+    </>
+  );
 }
 
 export function CalculationResult({ expectedProfit, difference, recommendedMonthly }: CalculationResultProps) {
