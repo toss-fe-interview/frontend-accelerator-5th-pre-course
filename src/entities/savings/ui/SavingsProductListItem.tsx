@@ -7,13 +7,13 @@ import { formatAmount } from 'shared/lib/formatAmount';
 interface SavingsProductListItemProps {
   savingsProduct: SavingsProduct;
   isSelected: boolean;
-  handleSelectSavingsProduct: (savingsProduct: SavingsProduct | null) => void;
+  onSelectSavingsProduct: (savingsProduct: SavingsProduct | null) => void;
 }
 
 export function SavingsProductListItem({
   savingsProduct,
   isSelected,
-  handleSelectSavingsProduct,
+  onSelectSavingsProduct,
 }: SavingsProductListItemProps) {
   const { name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
   return (
@@ -30,7 +30,7 @@ export function SavingsProductListItem({
         />
       }
       right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
-      onClick={() => handleSelectSavingsProduct(isSelected ? null : savingsProduct)}
+      onClick={() => onSelectSavingsProduct(isSelected ? null : savingsProduct)}
     />
   );
 }

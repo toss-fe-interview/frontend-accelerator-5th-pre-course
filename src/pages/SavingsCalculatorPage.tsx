@@ -75,7 +75,7 @@ export function SavingsCalculatorPage() {
                 key={product.id}
                 savingsProduct={product}
                 isSelected={selectedProduct?.id === product.id}
-                handleSelectSavingsProduct={() => handleSelectProduct(product.id)}
+                onSelectSavingsProduct={() => handleSelectProduct(product.id)}
               />
             ))
           }
@@ -118,7 +118,7 @@ export function SavingsCalculatorPage() {
                   key={product.id}
                   savingsProduct={product}
                   isSelected={selectedProduct?.id === product.id}
-                  handleSelectSavingsProduct={() => handleSelectProduct(product.id)}
+                  onSelectSavingsProduct={() => handleSelectProduct(product.id)}
                 />
               ))
             }
