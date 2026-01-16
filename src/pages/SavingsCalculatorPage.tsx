@@ -70,19 +70,16 @@ export function SavingsCalculatorPage() {
                 <>
                   {savingsProducts.map(product => {
                     const isSavingsProductSelected = selectedSavingsProduct?.id === product.id;
-                    const handleSavingsProductClick = () => {
-                      if (isSavingsProductSelected) {
-                        setSelectedSavingsProduct(null);
-                      } else {
-                        setSelectedSavingsProduct(product);
-                      }
-                    };
 
                     return (
                       <SavingsProductItem
                         key={product.id}
                         product={product}
-                        onClick={handleSavingsProductClick}
+                        onClick={() =>
+                          isSavingsProductSelected
+                            ? setSelectedSavingsProduct(null)
+                            : setSelectedSavingsProduct(product)
+                        }
                         isSelected={isSavingsProductSelected}
                       />
                     );
