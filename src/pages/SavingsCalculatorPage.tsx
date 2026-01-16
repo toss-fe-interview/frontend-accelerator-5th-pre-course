@@ -3,7 +3,17 @@ import { ProductList } from 'components/ProductTabs/ProductList';
 import { Results } from 'components/ProductTabs/Results';
 import { ProductTabs, SavingsProduct } from 'components/ProductTabs/types';
 import { useEffect, useState } from 'react';
-import { NavigationBar, Spacing, Border, TextField, SelectBottomSheet, Tab } from 'tosslib';
+import {
+  NavigationBar,
+  Spacing,
+  Border,
+  TextField,
+  SelectBottomSheet,
+  Tab,
+  ListRow,
+  ListHeader,
+  colors,
+} from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState(0);
@@ -101,14 +111,73 @@ export function SavingsCalculatorPage() {
       {selectedTab === 'products' ? (
         <ProductList products={filteredProducts} selectedProduct={selectedProduct} onProductSelect={onProductSelect} />
       ) : (
-        <Results
-          selectedProduct={selectedProduct}
-          expectedProfit={expectedProfit}
-          diffAmount={diffAmount}
-          recommendMonthlyPayment={recommendMonthlyPayment}
-          filteredProducts={filteredProducts}
-          onProductSelect={onProductSelect}
-        />
+        <>
+          <ListRow
+            contents={
+              <ListRow.Texts
+                type="2RowTypeA"
+                top="예상 수익 금액"
+                topProps={{ color: colors.grey600 }}
+                bottom={`${expectedProfit.toLocaleString('ko-KR')}원`}
+                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+              />
+            }
+          />
+          <ListRow
+            contents={
+              <ListRow.Texts
+                type="2RowTypeA"
+                top="목표 금액과의 차이"
+                topProps={{ color: colors.grey600 }}
+                bottom={`${diffAmount.toLocaleString('ko-KR')}원`}
+                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+              />
+            }
+          />
+          <ListRow
+            contents={
+              <ListRow.Texts
+                type="2RowTypeA"
+                top="추천 월 납입 금액"
+                topProps={{ color: colors.grey600 }}
+                bottom={`${(recommendMonthlyPayment ?? 0).toLocaleString('ko-KR')}원`}
+                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+              />
+            }
+          />
+
+          <Border height={16} />
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+
+          {recommendedProducts.length > 0 ? (
+            recommendedProducts.map(product => {
+              const { annualRate, minMonthlyAmount, maxMonthlyAmount, id, name, availableTerms } = product;
+              const description = `${minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${availableTerms}개월`;
+
+              return (
+                <ListRow
+                  key={id}
+                  contents={
+                    <ListRow.Texts
+                      type="3RowTypeA"
+                      top={name}
+                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                      middle={`연 이자율: ${annualRate}%`}
+                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                      bottom={description}
+                      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                    />
+                  }
+                  right={selectedProduct?.id === id && <Assets.Icon name="icon-check-circle-green" />}
+                  onClick={() => onProductSelect(product)}
+                />
+              );
+            })
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 추천 상품이 없습니다." />} />
+          )}
+        </>
       )}
     </>
   );
