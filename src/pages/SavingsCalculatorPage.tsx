@@ -1,8 +1,9 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
-import { CalculationResultList } from 'features/savings/components/CalculationResultList';
+import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
+import { formatPrice } from 'shared/utils/price';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { useQuery } from '@tanstack/react-query';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
@@ -113,12 +114,64 @@ export function SavingsCalculatorPage() {
 
       {tab === SAVINGS_PRODUCT_TABS.RESULTS && (
         <>
-          <CalculationResultList
-            product={selectedSavingsProduct}
-            targetAmount={targetAmount ?? 0}
-            monthlyPayment={monthlyPayment ?? 0}
-            terms={parseInt(terms) || 0}
-          />
+          {selectedSavingsProduct ? (
+            <>
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="예상 수익 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${formatPrice(
+                      calculateExpectedAmount({
+                        annualRate: selectedSavingsProduct.annualRate,
+                        monthlyPayment: monthlyPayment ?? 0,
+                        terms: parseInt(terms) || 0,
+                      })
+                    )}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="목표 금액과의 차이"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${formatPrice(
+                      (targetAmount ?? 0) -
+                        calculateExpectedAmount({
+                          annualRate: selectedSavingsProduct.annualRate,
+                          monthlyPayment: monthlyPayment ?? 0,
+                          terms: parseInt(terms) || 0,
+                        })
+                    )}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="추천 월 납입 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${formatPrice(
+                      calculateRecommendedMonthlyPayment({
+                        targetAmount: targetAmount ?? 0,
+                        annualRate: selectedSavingsProduct.annualRate,
+                        terms: parseInt(terms) || 0,
+                      })
+                    )}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+            </>
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+          )}
           <Spacing size={8} />
           <Border height={16} />
           <Spacing size={8} />
