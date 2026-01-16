@@ -3,7 +3,7 @@ import { Border, ListRow, Spacing } from 'tosslib';
 import { savingsProductsQueries } from '../api/queries';
 import { useCalculatorParams } from '../hooks/useCalculatorParams';
 import { useSelectProductParams } from '../hooks/useSelectProductParams';
-import { matchesPaymentRange, matchesPeriod } from '../utils/productFIlters';
+import { matchesPaymentRange, matchesPeriod } from '../utils/productFilters';
 import CalculationSummary from './CalculationSummary';
 import RecommendedProductList from './RecommendProductList';
 

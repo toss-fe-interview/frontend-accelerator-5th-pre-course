@@ -3,7 +3,7 @@ import { ListRow } from 'tosslib';
 import { savingsProductsQueries } from '../api/queries';
 import { useCalculatorParams } from '../hooks/useCalculatorParams';
 import { useSelectProductParams } from '../hooks/useSelectProductParams';
-import { matchesPaymentRange, matchesPeriod } from '../utils/productFIlters';
+import { matchesPaymentRange, matchesPeriod } from '../utils/productFilters';
 import ProductList from './ProductList';
 
 export default function ProductListTab() {
