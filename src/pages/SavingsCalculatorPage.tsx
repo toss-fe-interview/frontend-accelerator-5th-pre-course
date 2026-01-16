@@ -1,6 +1,7 @@
 import { fetchSavingsProducts } from 'components/ProductTabs/api';
 import { ProductTabs, SavingsProduct } from 'components/ProductTabs/types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from 'react-query';
 import {
   NavigationBar,
   Spacing,
@@ -12,7 +13,7 @@ import {
   ListHeader,
   colors,
   Assets,
-  isHttpError,
+  HttpError,
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
@@ -20,8 +21,12 @@ export function SavingsCalculatorPage() {
   const [monthlyAmount, setMonthlyAmount] = useState(0);
   const [savingTerms, setSavingTerms] = useState(12);
   const [selectedTab, setSelectedTab] = useState<ProductTabs>('products');
-  const [products, setProducts] = useState<SavingsProduct[]>([]);
   const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
+
+  const { data: products = [] } = useQuery<SavingsProduct[], HttpError>({
+    queryKey: ['savings-products'],
+    queryFn: fetchSavingsProducts,
+  });
 
   const roundingNumber = (num: number) => {
     if (num >= 1000) {
@@ -59,21 +64,6 @@ export function SavingsCalculatorPage() {
     : products;
 
   const recommendedProducts = [...filteredProducts].sort((prev, curr) => curr.annualRate - prev.annualRate).slice(0, 2);
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const data = await fetchSavingsProducts();
-        setProducts(data);
-      } catch (e) {
-        if (isHttpError(e)) {
-          console.error('Failed to fetch products:', e);
-        }
-      }
-    };
-
-    loadProducts();
-  }, []);
 
   return (
     <>
