@@ -11,8 +11,12 @@ import {
 } from 'tosslib';
 import { useState } from 'react';
 
-import { formatCurrency, parseNumberInput } from 'utils/format';
-import { calculateSavings } from 'utils/calculateSavings';
+import { formatCurrency, parseNumberInput, percentageToDecimal } from 'utils/format';
+import {
+  calculateExpectedProfit,
+  calculateDifferenceProfit,
+  calculateRecommendedMonthlyAmount,
+} from 'utils/calculateSavings';
 import { SavingsProduct } from 'types/savings';
 import { getSavingsProductsQueryOptions } from 'api/savings-products';
 import { ErrorBoundary, Suspense } from '@suspensive/react';
@@ -99,8 +103,18 @@ export function SavingsCalculatorPage() {
                         return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
                       }
 
-                      const { expectedProfit, differenceProfit, recommendedMonthlyAmount } = calculateSavings({
+                      const expectedProfit = calculateExpectedProfit({
                         monthlyAmount: monthlyAmount ?? 0,
+                        savingsTerm: savingsTerm ?? 1,
+                        annualRate: selectedProduct.annualRate,
+                      });
+
+                      const differenceProfit = calculateDifferenceProfit({
+                        targetAmount: targetAmount ?? 0,
+                        expectedProfit,
+                      });
+
+                      const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount({
                         targetAmount: targetAmount ?? 0,
                         savingsTerm: savingsTerm ?? 1,
                         annualRate: selectedProduct.annualRate,

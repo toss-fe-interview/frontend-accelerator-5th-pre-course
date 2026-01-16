@@ -7,28 +7,30 @@ interface SavingsCalculationParams {
   annualRate: number;
 }
 
-interface SavingsCalculationResult {
-  expectedProfit: number;
-  differenceProfit: number;
-  recommendedMonthlyAmount: number;
-}
-
-export function calculateSavings({
+export const calculateExpectedProfit = ({
   monthlyAmount,
   savingsTerm,
-  targetAmount,
   annualRate,
-}: SavingsCalculationParams): SavingsCalculationResult {
+}: Pick<SavingsCalculationParams, 'monthlyAmount' | 'savingsTerm' | 'annualRate'>) => {
   const rate = percentageToDecimal(annualRate);
-  const interestMultiplier = 1 + rate * 0.5;
+  return monthlyAmount * savingsTerm * (1 + rate * 0.5);
+};
 
-  const expectedProfit = monthlyAmount * savingsTerm * interestMultiplier;
-  const differenceProfit = targetAmount - expectedProfit;
-  const recommendedMonthlyAmount = targetAmount / (savingsTerm * interestMultiplier);
+export const calculateDifferenceProfit = ({
+  targetAmount,
+  expectedProfit,
+}: {
+  targetAmount: number;
+  expectedProfit: number;
+}) => {
+  return targetAmount - expectedProfit;
+};
 
-  return {
-    expectedProfit,
-    differenceProfit,
-    recommendedMonthlyAmount,
-  };
-}
+export const calculateRecommendedMonthlyAmount = ({
+  targetAmount,
+  savingsTerm,
+  annualRate,
+}: Pick<SavingsCalculationParams, 'targetAmount' | 'savingsTerm' | 'annualRate'>) => {
+  const rate = percentageToDecimal(annualRate);
+  return Math.round(targetAmount / (savingsTerm * (1 + rate * 0.5)));
+};
