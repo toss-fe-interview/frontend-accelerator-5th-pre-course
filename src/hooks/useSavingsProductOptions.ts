@@ -13,18 +13,32 @@ export function useSavingsProductOptions({
   term,
   selectedProductId,
 }: SavingsProductOptionsParams) {
-  const depositAmount = Number(monthlyDeposit.replace(/,/g, '')) || 0;
+  const depositAmount = parseAmount(monthlyDeposit);
 
-  const availableProducts = products.filter(product => {
+  const availableProducts = filterByUserCriteria(products, term, depositAmount);
+  const selectedProduct = findById(products, selectedProductId);
+  const recommendedProducts = getTopByInterestRate(availableProducts, 2);
+
+  return { availableProducts, selectedProduct, recommendedProducts };
+}
+
+function parseAmount(value: string): number {
+  return Number(value.replace(/,/g, '')) || 0;
+}
+
+function filterByUserCriteria(products: SavingsProduct[], term: number, depositAmount: number): SavingsProduct[] {
+  return products.filter(product => {
     const termMatch = product.availableTerms === term;
     const depositMatch =
       depositAmount === 0 || (depositAmount > product.minMonthlyAmount && depositAmount < product.maxMonthlyAmount);
     return termMatch && depositMatch;
   });
-
-  const selectedProduct = products.find(product => product.id === selectedProductId) ?? null;
-  const recommendedProducts = [...availableProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-
-  return { availableProducts, selectedProduct, recommendedProducts };
 }
 
+function findById(products: SavingsProduct[], id: string | null): SavingsProduct | null {
+  return products.find(product => product.id === id) ?? null;
+}
+
+function getTopByInterestRate(products: SavingsProduct[], count: number): SavingsProduct[] {
+  return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, count);
+}
