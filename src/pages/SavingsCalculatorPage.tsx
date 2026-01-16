@@ -156,17 +156,29 @@ export function SavingsCalculatorPage() {
                   <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
                 ) : (
                   <>
-                    <ResultItem
-                      label="예상 수익 금액"
-                      value={`${formatNumberWithComma(savingsCalculations.estimatedEarnings)}원`}
+                    <ListRow
+                      contents={
+                        <ResultItem
+                          label="예상 수익 금액"
+                          value={`${formatNumberWithComma(savingsCalculations.estimatedEarnings)}원`}
+                        />
+                      }
                     />
-                    <ResultItem
-                      label="목표 금액과의 차이"
-                      value={`${formatNumberWithComma(savingsCalculations.diffWithTargetAmount)}원`}
+                    <ListRow
+                      contents={
+                        <ResultItem
+                          label="목표 금액과의 차이"
+                          value={`${formatNumberWithComma(savingsCalculations.diffWithTargetAmount)}원`}
+                        />
+                      }
                     />
-                    <ResultItem
-                      label="추천 월 납입 금액"
-                      value={`${formatNumberWithComma(savingsCalculations.recommendedMonthlyPayment)}원`}
+                    <ListRow
+                      contents={
+                        <ResultItem
+                          label="추천 월 납입 금액"
+                          value={`${formatNumberWithComma(savingsCalculations.recommendedMonthlyPayment)}원`}
+                        />
+                      }
                     />
                   </>
                 )}
