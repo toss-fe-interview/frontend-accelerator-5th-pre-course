@@ -2,7 +2,7 @@ import { SelectBottomSheet } from 'tosslib';
 
 type Option = {
   value: string;
-  text: string;
+  label: string;
 };
 
 type SelectProps = {
@@ -18,7 +18,7 @@ export const Select = ({ label, title, value, options, onChange }: SelectProps) 
     <SelectBottomSheet label={label} title={title} value={value} onChange={onChange}>
       {options.map(option => (
         <SelectBottomSheet.Option key={option.value} value={option.value}>
-          {option.text}
+          {option.label}
         </SelectBottomSheet.Option>
       ))}
     </SelectBottomSheet>

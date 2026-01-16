@@ -63,9 +63,9 @@ export function SavingsCalculatorPage() {
         title="저축 기간을 선택해주세요"
         value={terms}
         options={[
-          { value: '6', text: '6개월' },
-          { value: '12', text: '12개월' },
-          { value: '24', text: '24개월' },
+          { value: '6', label: '6개월' },
+          { value: '12', label: '12개월' },
+          { value: '24', label: '24개월' },
         ]}
         onChange={setTerms}
       />
