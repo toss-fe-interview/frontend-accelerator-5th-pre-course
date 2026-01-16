@@ -4,9 +4,6 @@ import z from 'zod';
 
 export const fetchSavingsProducts = async (): Promise<SavingsProduct[]> => {
   try {
-    setTimeout(() => {
-      console.log('1초 지연.');
-    }, 10000);
     const response = await http.get<SavingsProduct[]>('/api/savings-products');
 
     const validated = z.array(savingsProductSchema).parse(response);

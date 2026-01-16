@@ -33,11 +33,28 @@ export function SavingsCalculatorPage() {
   );
 
   const selectedProduct = filteredSavingsProducts.find(product => product.id === selectedProductId);
-  const isProductNotSelected = !selectedProductId || !selectedProduct;
 
-  const changeSelectedProduct = (newValue: string) => {
-    setSelectedProductId(newValue);
-  };
+  const savingsCalculations = (() => {
+    if (!selectedProduct) return null;
+
+    const estimatedEarnings = calculateEstimatedEaringsAmount(
+      savingsValues.monthlyPaymentAmount,
+      savingsValues.savingsPeriod,
+      selectedProduct.annualRate
+    );
+
+    const diffWithTargetAmount = calculateDifferenceWithTargetAmount(savingsValues.targetAmount, estimatedEarnings);
+
+    const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment(
+      savingsValues.targetAmount,
+      savingsValues.savingsPeriod,
+      selectedProduct.annualRate
+    );
+
+    return { estimatedEarnings, diffWithTargetAmount, recommendedMonthlyPayment };
+  })();
+
+  const isProductNotSelected = !selectedProductId || !selectedProduct || !savingsCalculations;
 
   return (
     <>
@@ -118,7 +135,7 @@ export function SavingsCalculatorPage() {
                   contents={<SavingsProductItem savingsProduct={savingsProduct} />}
                   right={isProductSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                   onClick={() => {
-                    changeSelectedProduct(savingsProduct.id);
+                    setSelectedProductId(savingsProduct.id);
                   }}
                 />
               );
@@ -132,33 +149,9 @@ export function SavingsCalculatorPage() {
                   <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
                 ) : (
                   <>
-                    <SavingsResult
-                      label="예상 수익 금액"
-                      value={calculateEstimatedEaringsAmount(
-                        savingsValues.monthlyPaymentAmount,
-                        savingsValues.savingsPeriod,
-                        selectedProduct.annualRate
-                      )}
-                    />
-                    <SavingsResult
-                      label="목표 금액과의 차이"
-                      value={calculateDifferenceWithTargetAmount(
-                        savingsValues.targetAmount,
-                        calculateEstimatedEaringsAmount(
-                          savingsValues.monthlyPaymentAmount,
-                          savingsValues.savingsPeriod,
-                          selectedProduct.annualRate
-                        )
-                      )}
-                    />
-                    <SavingsResult
-                      label="추천 월 납입 금액"
-                      value={calculateRecommendedMonthlyPayment(
-                        savingsValues.targetAmount,
-                        savingsValues.savingsPeriod,
-                        selectedProduct.annualRate
-                      )}
-                    />
+                    <SavingsResult label="예상 수익 금액" value={savingsCalculations.estimatedEarnings} />
+                    <SavingsResult label="목표 금액과의 차이" value={savingsCalculations.diffWithTargetAmount} />
+                    <SavingsResult label="추천 월 납입 금액" value={savingsCalculations.recommendedMonthlyPayment} />
                   </>
                 )}
               </>
@@ -173,7 +166,7 @@ export function SavingsCalculatorPage() {
               <Spacing size={12} />
 
               <>
-                {recommendSavings(filteredSavingsProducts).map(savingsProduct => {
+                {recommendSavings(filteredSavingsProducts, 2).map(savingsProduct => {
                   const isProductSelected = savingsProduct.id === selectedProductId;
 
                   return (
