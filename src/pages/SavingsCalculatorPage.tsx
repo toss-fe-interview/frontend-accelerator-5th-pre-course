@@ -1,6 +1,4 @@
 import { fetchSavingsProducts } from 'components/ProductTabs/api';
-import { ProductList } from 'components/ProductTabs/ProductList';
-import { Results } from 'components/ProductTabs/Results';
 import { ProductTabs, SavingsProduct } from 'components/ProductTabs/types';
 import { useEffect, useState } from 'react';
 import {
@@ -13,6 +11,7 @@ import {
   ListRow,
   ListHeader,
   colors,
+  Assets,
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
@@ -21,15 +20,31 @@ export function SavingsCalculatorPage() {
   const [savingTerms, setSavingTerms] = useState(12);
   const [selectedTab, setSelectedTab] = useState<ProductTabs>('products');
   const [products, setProducts] = useState<SavingsProduct[]>([]);
-  // const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
+  const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
 
-  // const expectedProfit = calculateExpectedProfit(monthlyAmount, savingTerms, selectedSavingProduct?.annualRate ?? 0);
-  // const diffAmount = Number(targetAmount ?? 0) - expectedProfit;
-  // const recommendMonthlyPayment = calculateRecommendMonthlyPayment(
-  //   targetAmount,
-  //   savingTerms,
-  //   selectedSavingProduct?.annualRate ?? 0
-  // );
+  const roundingNumber = (num: number) => {
+    if (num >= 1000) {
+      const rounded = Math.round(num / 1000);
+      return rounded * 1000;
+    }
+    return 0;
+  };
+
+  const calculateExpectedProfit = (monthlyAmount: number, savingTerms: number, annualRate: number) => {
+    return monthlyAmount * savingTerms * (1 + annualRate * 0.5);
+  };
+
+  const calculateRecommendMonthlyPayment = (targetAmount: number, savingTerms: number, annualRate: number) => {
+    return roundingNumber(targetAmount) / (savingTerms * (1 + annualRate * 0.5));
+  };
+
+  const expectedProfit = calculateExpectedProfit(monthlyAmount, savingTerms, selectedSavingProduct?.annualRate ?? 0);
+  const diffAmount = Number(targetAmount ?? 0) - expectedProfit;
+  const recommendMonthlyPayment = calculateRecommendMonthlyPayment(
+    targetAmount,
+    savingTerms,
+    selectedSavingProduct?.annualRate ?? 0
+  );
 
   const hasAllValues = targetAmount && monthlyAmount && savingTerms;
   const filteredProducts = hasAllValues
@@ -41,6 +56,8 @@ export function SavingsCalculatorPage() {
         );
       })
     : products;
+
+  const recommendedProducts = [...filteredProducts].sort((prev, curr) => curr.annualRate - prev.annualRate).slice(0, 2);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -99,7 +116,7 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={value => setSelectedTab(value as ProductTabsType)}>
+      <Tab onChange={value => setSelectedTab(value as ProductTabs)}>
         <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
         </Tab.Item>
@@ -109,7 +126,30 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {selectedTab === 'products' ? (
-        <ProductList products={filteredProducts} selectedProduct={selectedProduct} onProductSelect={onProductSelect} />
+        <>
+          {filteredProducts.map(product => {
+            const description = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`;
+
+            return (
+              <ListRow
+                key={product.id}
+                contents={
+                  <ListRow.Texts
+                    type="3RowTypeA"
+                    top={product.name}
+                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                    middle={`연 이자율: ${product.annualRate}%`}
+                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                    bottom={description}
+                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                  />
+                }
+                right={selectedSavingProduct?.id === product.id && <Assets.Icon name="icon-check-circle-green" />}
+                onClick={() => setSelectedSavingProduct(product)}
+              />
+            );
+          })}
+        </>
       ) : (
         <>
           <ListRow
@@ -152,25 +192,24 @@ export function SavingsCalculatorPage() {
 
           {recommendedProducts.length > 0 ? (
             recommendedProducts.map(product => {
-              const { annualRate, minMonthlyAmount, maxMonthlyAmount, id, name, availableTerms } = product;
-              const description = `${minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${availableTerms}개월`;
+              const description = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`;
 
               return (
                 <ListRow
-                  key={id}
+                  key={product.id}
                   contents={
                     <ListRow.Texts
                       type="3RowTypeA"
-                      top={name}
+                      top={product.name}
                       topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                      middle={`연 이자율: ${annualRate}%`}
+                      middle={`연 이자율: ${product.annualRate}%`}
                       middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
                       bottom={description}
                       bottomProps={{ fontSize: 13, color: colors.grey600 }}
                     />
                   }
-                  right={selectedProduct?.id === id && <Assets.Icon name="icon-check-circle-green" />}
-                  onClick={() => onProductSelect(product)}
+                  right={selectedSavingProduct?.id === product.id && <Assets.Icon name="icon-check-circle-green" />}
+                  onClick={() => setSelectedSavingProduct(product)}
                 />
               );
             })
