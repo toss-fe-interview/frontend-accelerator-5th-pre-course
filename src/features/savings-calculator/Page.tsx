@@ -107,8 +107,10 @@ export default function SavingsCalculatorPage() {
                 <Spacing size={40} />
               </>
             );
-          default:
-            return null;
+          default: {
+            const _exhaustiveCheck: never = currentTab;
+            return _exhaustiveCheck;
+          }
         }
       })()}
     </>
