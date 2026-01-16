@@ -7,8 +7,8 @@ export function useProductSelection(products: SavingsProduct[]) {
 
   const selectedProduct = products.find(product => product.id === selectedProductId);
 
-  const handleSelectProduct = (id: string) => {
-    setSelectedProductId(id);
+  const handleSelectProduct = (product: SavingsProduct | null) => {
+    setSelectedProductId(product?.id ?? null);
   };
 
   return {
