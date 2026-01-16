@@ -1,8 +1,4 @@
 import { fetchProducts } from 'domains/Savings/api/fetchProducts';
-import { CalculationResultItem } from 'domains/Savings/components/CalculationResultItem';
-import { Divider } from 'domains/Savings/components/Divider';
-import { SavingProduct } from 'domains/Savings/components/SavingProduct';
-import { SavingsTabNavigation } from 'domains/Savings/components/SavingsTabNavigation';
 import type { SavingsProduct, SavingsTabValue } from 'domains/Savings/types';
 import {
   calculateExpectedProfit,
