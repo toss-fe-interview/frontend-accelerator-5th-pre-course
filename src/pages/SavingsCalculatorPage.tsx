@@ -1,16 +1,17 @@
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { useTab } from 'shared/hooks/useTab';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
 import { SavingsResultItem } from 'features/savings/components/SavingsResultItem';
 import { savingsProductQuery } from 'features/savings/apis/queries';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
 import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
 import { Select } from 'shared/components/Select';
 import { NumberInput } from 'shared/components/NumberInput';
 import { EmptyMessage } from 'shared/components/EmptyMessage';
+import { ErrorBoundary } from 'shared/components/ErrorBoundary';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -18,22 +19,6 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
   const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
   const [terms, setTerms] = useState<number | null>(null);
-
-  const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
-
-  const filteredSavingsProducts =
-    monthlyPayment === null
-      ? savingsProducts
-      : savingsProducts?.filter(
-          product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
-        );
-
-  const baseProducts = filteredSavingsProducts?.length ? filteredSavingsProducts : savingsProducts;
-  const recommendedProducts = [...(baseProducts ?? [])].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-
-  const selectedSavingsProduct = savingsProducts?.find(product => product.id === selectedProductId);
-
-  const hasFilteredProducts = filteredSavingsProducts && filteredSavingsProducts.length > 0;
 
   return (
     <>
@@ -83,6 +68,57 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
+      <ErrorBoundary fallback={<EmptyMessage message="오류가 발생했습니다." />}>
+        <Suspense fallback={<EmptyMessage message="로딩 중..." />}>
+          <SavingsTabContent
+            tab={tab}
+            selectedProductId={selectedProductId}
+            onSelectProduct={setSelectedProductId}
+            targetAmount={targetAmount}
+            monthlyPayment={monthlyPayment}
+            terms={terms}
+          />
+        </Suspense>
+      </ErrorBoundary>
+    </>
+  );
+}
+
+type SavingsTabContentProps = {
+  tab: string;
+  selectedProductId: string | null;
+  onSelectProduct: (id: string) => void;
+  targetAmount: number | null;
+  monthlyPayment: number | null;
+  terms: number | null;
+};
+
+function SavingsTabContent({
+  tab,
+  selectedProductId,
+  onSelectProduct,
+  targetAmount,
+  monthlyPayment,
+  terms,
+}: SavingsTabContentProps) {
+  const { data: savingsProducts } = useSuspenseQuery(savingsProductQuery.listQuery());
+
+  const filteredSavingsProducts =
+    monthlyPayment === null
+      ? savingsProducts
+      : savingsProducts.filter(
+          product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
+        );
+
+  const baseProducts = filteredSavingsProducts.length ? filteredSavingsProducts : savingsProducts;
+  const recommendedProducts = [...baseProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+
+  const selectedSavingsProduct = savingsProducts.find(product => product.id === selectedProductId);
+
+  const hasFilteredProducts = filteredSavingsProducts.length > 0;
+
+  return (
+    <>
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
         <>
           {hasFilteredProducts ? (
@@ -101,7 +137,7 @@ export function SavingsCalculatorPage() {
                     />
                   }
                   right={selected ? <GreenCheckCircleIcon /> : undefined}
-                  onClick={() => setSelectedProductId(product.id)}
+                  onClick={() => onSelectProduct(product.id)}
                 />
               );
             })
@@ -168,7 +204,7 @@ export function SavingsCalculatorPage() {
                   />
                 }
                 right={selected ? <GreenCheckCircleIcon /> : undefined}
-                onClick={() => setSelectedProductId(product.id)}
+                onClick={() => onSelectProduct(product.id)}
               />
             );
           })}
