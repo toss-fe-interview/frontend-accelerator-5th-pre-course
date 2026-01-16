@@ -7,7 +7,9 @@ export interface CalculationResultData {
   recommendedMonthly: number;
 }
 
-type CalculationResultProps = CalculationResultData;
+interface CalculationResultProps {
+  result: CalculationResultData;
+}
 
 export function NoProductSelected() {
   return (
@@ -19,7 +21,7 @@ export function NoProductSelected() {
   );
 }
 
-export function CalculationResult({ expectedProfit, difference, recommendedMonthly }: CalculationResultProps) {
+export function CalculationResult({ result }: CalculationResultProps) {
   return (
     <>
       <Spacing size={8} />
@@ -29,7 +31,7 @@ export function CalculationResult({ expectedProfit, difference, recommendedMonth
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatToKRW(expectedProfit)}원`}
+            bottom={`${formatToKRW(result.expectedProfit)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -40,7 +42,7 @@ export function CalculationResult({ expectedProfit, difference, recommendedMonth
             type="2RowTypeA"
             top="목표 금액과의 차이"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatToKRW(difference)}원`}
+            bottom={`${formatToKRW(result.difference)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
@@ -51,7 +53,7 @@ export function CalculationResult({ expectedProfit, difference, recommendedMonth
             type="2RowTypeA"
             top="추천 월 납입 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatToKRW(recommendedMonthly)}원`}
+            bottom={`${formatToKRW(result.recommendedMonthly)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }

@@ -43,15 +43,7 @@ function SavingsCalculator() {
       )}
       {selectedTab === 'results' && (
         <>
-          {calculationResult ? (
-            <CalculationResult
-              expectedProfit={calculationResult.expectedProfit}
-              difference={calculationResult.difference}
-              recommendedMonthly={calculationResult.recommendedMonthly}
-            />
-          ) : (
-            <NoProductSelected />
-          )}
+          {calculationResult ? <CalculationResult result={calculationResult} /> : <NoProductSelected />}
           <RecommendedProductList products={recommendedProducts} />
         </>
       )}
