@@ -1,4 +1,3 @@
-import { conforms, filter } from 'es-toolkit/compat';
 import { flow } from 'es-toolkit/function';
 import { useState } from 'react';
 import { SavingsProduct } from 'shared/api/type';
@@ -25,13 +24,15 @@ export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsP
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
   const [selectedTab, setSelectedTab] = useState<TabType>('products');
 
-  const conditions = conforms({
-    minMonthlyAmount: (min: number) => min <= 월납입액,
-    maxMonthlyAmount: (max: number) => max >= 월납입액,
-    availableTerms: (terms: number) => terms === 저축기간,
-  });
+  const filteredProducts = savingProducts.filter(
+    product =>
+      product.minMonthlyAmount <= 월납입액 &&
+      product.maxMonthlyAmount >= 월납입액 &&
+      product.availableTerms === 저축기간
+  );
 
-  const filteredProducts = filter(savingProducts, conditions);
+  const sortByHighRate = (products: SavingsProduct[]) => products.toSorted((a, b) => b.annualRate - a.annualRate);
+  const takeTop2 = (products: SavingsProduct[]) => products.slice(0, 2);
   const getBestProducts = flow(sortByHighRate, takeTop2);
 
   return (
@@ -213,7 +214,3 @@ const toKRW = (amount: number) => amount.toLocaleString('ko-KR');
 export const amountToNumber = (value: string) => {
   return Number(value.replace(/,/g, '')) || 0;
 };
-
-const sortByHighRate = (products: SavingsProduct[]) => products.toSorted((a, b) => b.annualRate - a.annualRate);
-
-const takeTop2 = (products: SavingsProduct[]) => products.slice(0, 2);
