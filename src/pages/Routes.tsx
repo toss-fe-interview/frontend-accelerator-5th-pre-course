@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
-import { SavingsCalculatorPage } from './SavingsCalculator/ui';
+import { SavingsCalculatorPage } from './SavingsCalculator';
 
 const router = createBrowserRouter([
   {
