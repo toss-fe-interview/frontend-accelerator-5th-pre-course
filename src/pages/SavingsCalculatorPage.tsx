@@ -3,8 +3,9 @@ import { Controller } from 'react-hook-form';
 import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { useSavingsCalculatorForm } from 'features/savings-calculator/model/useSavingsCalculatorForm';
 import type { SavingsProduct } from 'features/savings-calculator/api/savings';
-import { CalculationResults, ProductList, ProductListItem, useSavingsCalculation } from 'features/savings-calculator';
+import { CalculationResults, ProductList, ProductListItem } from 'features/savings-calculator';
 import { Tabs } from 'shared/ui/Tabs';
+import { SavingsCalculation } from 'shared/utils/savings-calculation';
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | undefined>(undefined);
@@ -12,7 +13,7 @@ export function SavingsCalculatorPage() {
 
   const { targetAmount, monthlyAmount, availableTerms } = form.watch();
 
-  const { expectedAmount, difference, recommendedMonthlyAmount } = useSavingsCalculation({
+  const { expectedAmount, difference, recommendedMonthlyAmount } = SavingsCalculation.getSummaryResults({
     targetAmount,
     monthlyAmount,
     availableTerms,
