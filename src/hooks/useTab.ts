@@ -11,10 +11,10 @@ export const useTab = <T extends readonly string[]>(tabs: T) => {
   }
 
   const [currentTab, setCurrentTab] = useState<TabValue>(tabs[0]);
-
-  const handleTabChange = (value: string) => {
-    if (tabs.includes(value as TabValue)) {
-      setCurrentTab(value as TabValue);
+  const handleTabChange = (value: TabValue) => {
+    const isValueIncluded = tabs.includes(value as TabValue);
+    if (isValueIncluded) {
+      setCurrentTab(value);
     }
   };
 

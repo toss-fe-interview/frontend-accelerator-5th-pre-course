@@ -32,7 +32,8 @@ interface ExpectedProfitProps extends UserInputs {
 }
 
 export const ExpectedProfit = ({ label, monthlyAmount, term, selectedSavingsProduct }: ExpectedProfitProps) => {
-  if (!monthlyAmount || !selectedSavingsProduct) {
+  const unableToCalculate = !monthlyAmount || !selectedSavingsProduct;
+  if (unableToCalculate) {
     return null;
   }
 
@@ -69,7 +70,8 @@ export const TargetDifference = ({
   term,
   selectedSavingsProduct,
 }: TargetDifferenceProps) => {
-  if (!targetAmount || !monthlyAmount || !selectedSavingsProduct) {
+  const unableToCalculate = !targetAmount || !monthlyAmount || !selectedSavingsProduct;
+  if (unableToCalculate) {
     return null;
   }
 
@@ -106,7 +108,8 @@ export const RecommendedMonthlyAmount = ({
   term,
   selectedSavingsProduct,
 }: RecommendedMonthlyAmountProps) => {
-  if (!targetAmount || !selectedSavingsProduct) {
+  const unableToCalculate = !targetAmount || !selectedSavingsProduct;
+  if (unableToCalculate) {
     return null;
   }
 

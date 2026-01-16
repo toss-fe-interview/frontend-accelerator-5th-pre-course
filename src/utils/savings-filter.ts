@@ -5,11 +5,13 @@ import type { SavingsProduct } from 'api/savings-products';
  */
 export const filterSavingsProducts = (savingsProducts: SavingsProduct[], term: number, monthlyAmount?: number) => {
   return savingsProducts.filter(product => {
-    if (product.availableTerms !== term) {
+    const isTermInvalid = product.availableTerms !== term;
+    if (isTermInvalid) {
       return false;
     }
 
-    if (monthlyAmount === undefined) {
+    const isMonthlyAmountUndefined = monthlyAmount === undefined;
+    if (isMonthlyAmountUndefined) {
       return true;
     }
 
