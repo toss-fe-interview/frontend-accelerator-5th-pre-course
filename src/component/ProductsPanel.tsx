@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { Assets, colors, ListRow } from 'tosslib';
 import { ProductSelection } from 'types/calculator';
 
-const ProductsTab = ({ selectedProductId, setSelectedProductId }: ProductSelection) => {
+const ProductsPanel = ({ selectedProductId, setSelectedProductId }: ProductSelection) => {
   // 데이터 페칭
   const { data: products, isLoading, isError } = useSavingsProducts();
   const { watch } = useFormContext();
@@ -52,4 +52,4 @@ const ProductsTab = ({ selectedProductId, setSelectedProductId }: ProductSelecti
   );
 };
 
-export default ProductsTab;
+export default ProductsPanel;

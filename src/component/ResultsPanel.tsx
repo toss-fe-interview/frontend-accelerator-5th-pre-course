@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { Assets, Border, colors, ListHeader, ListRow, Spacing } from 'tosslib';
 import { ProductSelection } from 'types/calculator';
 
-const ResultsTab = ({ selectedProductId, setSelectedProductId }: ProductSelection) => {
+const ResultsPanel = ({ selectedProductId, setSelectedProductId }: ProductSelection) => {
   const { watch } = useFormContext();
 
   // 데이터 페칭
@@ -110,4 +110,4 @@ const ResultsTab = ({ selectedProductId, setSelectedProductId }: ProductSelectio
   );
 };
 
-export default ResultsTab;
+export default ResultsPanel;

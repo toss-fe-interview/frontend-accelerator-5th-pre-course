@@ -1,6 +1,6 @@
 import CalculatorForm from 'component/CalculatorForm';
-import ProductsTab from 'component/ProductsTab';
-import ResultsTab from 'component/ResultsTab';
+import ProductsPanel from 'component/ProductsPanel';
+import ResultsPanel from 'component/ResultsPanel';
 import Tabs from 'component/Tabs';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -38,12 +38,12 @@ export function SavingsCalculatorPage() {
 
       {/* 적금 상품 탭 */}
       {selectedTab === 'products' && (
-        <ProductsTab selectedProductId={selectedProductId} setSelectedProductId={setSelectedProductId} />
+        <ProductsPanel selectedProductId={selectedProductId} setSelectedProductId={setSelectedProductId} />
       )}
 
       {/* 계산 결과 탭 */}
       {selectedTab === 'results' && (
-        <ResultsTab selectedProductId={selectedProductId} setSelectedProductId={setSelectedProductId} />
+        <ResultsPanel selectedProductId={selectedProductId} setSelectedProductId={setSelectedProductId} />
       )}
     </FormProvider>
   );
