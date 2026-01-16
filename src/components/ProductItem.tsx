@@ -4,7 +4,7 @@ import { Assets, colors, ListRow } from 'tosslib';
 interface ProductItemProps {
   product: SavingsProduct;
   isSelected: boolean;
-  onSelect: (productId: string) => void;
+  onSelect: (productId: string | null) => void;
 }
 export function ProductItem({ product, isSelected, onSelect }: ProductItemProps) {
   return (
@@ -20,7 +20,7 @@ export function ProductItem({ product, isSelected, onSelect }: ProductItemProps)
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
-      onClick={() => onSelect(product.id)}
+      onClick={() => onSelect(isSelected ? null : product.id)}
       right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
     />
   );
