@@ -1,4 +1,4 @@
-import { Assets, colors, ListRow, Spacing } from 'tosslib';
+import { Assets, colors, ListRow } from 'tosslib';
 import { SavingsProduct } from 'hooks/queries/types';
 import { formatNumber } from 'utils/format';
 
@@ -6,25 +6,9 @@ interface ProductListProps {
   products: SavingsProduct[];
   selectedProductId: string | null;
   onProductSelect: (id: string) => void;
-  emptyMessage?: string;
 }
 
-export function ProductList({
-  products,
-  selectedProductId,
-  onProductSelect,
-  emptyMessage = '조회 결과가 없어요',
-}: ProductListProps) {
-  if (products.length === 0) {
-    return (
-      <>
-        <Spacing size={40} />
-        <div style={{ textAlign: 'center', color: colors.grey500, fontSize: 14 }}>{emptyMessage}</div>
-        <Spacing size={40} />
-      </>
-    );
-  }
-
+export function ProductList({ products, selectedProductId, onProductSelect }: ProductListProps) {
   return (
     <>
       {products.map(product => (

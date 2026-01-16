@@ -5,6 +5,7 @@ import { useFilteredProducts } from 'hooks/useFilteredProducts';
 import { useSavingsGoalEstimate } from 'hooks/useSavingsGoalEstimate';
 import { ProductList, CalculationResultSection } from 'components/savings';
 import { PageStatus } from 'components/common/PageStatus';
+import { EmptyMessage } from 'components/common/EmptyMessage';
 import { CurrencyInput } from 'components/common/CurrencyInput';
 import { TermSelect } from 'components/common/TermSelect';
 
@@ -78,14 +79,16 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {activeTab === TAB_VALUES.PRODUCTS && (
-        <ProductList
-          products={filteredProducts}
-          selectedProductId={selectedProductId}
-          onProductSelect={setSelectedProductId}
-          emptyMessage="조회 결과가 없어요"
-        />
-      )}
+      {activeTab === TAB_VALUES.PRODUCTS &&
+        (filteredProducts.length === 0 ? (
+          <EmptyMessage message="조회 결과가 없어요" />
+        ) : (
+          <ProductList
+            products={filteredProducts}
+            selectedProductId={selectedProductId}
+            onProductSelect={setSelectedProductId}
+          />
+        ))}
 
       {activeTab === TAB_VALUES.RESULTS && (
         <>
@@ -98,12 +101,15 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          <ProductList
-            products={recommendedProducts}
-            selectedProductId={selectedProductId}
-            onProductSelect={setSelectedProductId}
-            emptyMessage="추천 상품이 없어요"
-          />
+          {recommendedProducts.length === 0 ? (
+            <EmptyMessage message="추천 상품이 없어요" />
+          ) : (
+            <ProductList
+              products={recommendedProducts}
+              selectedProductId={selectedProductId}
+              onProductSelect={setSelectedProductId}
+            />
+          )}
 
           <Spacing size={40} />
         </>
