@@ -3,9 +3,10 @@ import { usePrefetchQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Border, NavigationBar, Spacing, Tab } from 'tosslib';
 import { savingsProductsQueries } from './api/queries';
-import CalculationResultTab from './components/CalculationResultTab';
+import CalculationResult from './components/CalculationResult';
 import { MonthlyAmountInput, SavingTermsSelect, TargetAmountInput } from './components/CalculatorFields';
 import ProductListTab from './components/ProductListTab';
+import RecommendedProductList from './components/RecommendProductList';
 import { useCalculatorParams } from './hooks/useCalculatorParams';
 
 const TABS_CONFIG = {
@@ -51,7 +52,6 @@ export default function SavingsCalculatorPage() {
           </Tab.Item>
         ))}
       </Tab>
-
       {currentTab === 'products' && (
         <ErrorBoundary fallback={<div>상품 목록을 불러오는 중 에러가 발생했습니다.</div>}>
           <Suspense fallback={<div>상품 목록을 불러오는 중입니다...</div>}>
@@ -62,7 +62,11 @@ export default function SavingsCalculatorPage() {
       {currentTab === 'results' && (
         <ErrorBoundary fallback={<div>계산 결과를 불러오는 중 에러가 발생했습니다.</div>}>
           <Suspense fallback={<div>계산 결과를 불러오는 중입니다...</div>}>
-            <CalculationResultTab />
+            <CalculationResult />
+            <Spacing size={8} />
+            <Border height={16} />
+            <Spacing size={8} />
+            <RecommendedProductList />
           </Suspense>
         </ErrorBoundary>
       )}

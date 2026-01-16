@@ -7,3 +7,5 @@ export const matchesPaymentRange = (amount: number | null) => (product: SavingsP
 export const matchesPeriod = (period: number | null) => (product: SavingsProduct) => {
   return period == null || product.availableTerms === period;
 };
+
+export const byHighestAnnualRate = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
