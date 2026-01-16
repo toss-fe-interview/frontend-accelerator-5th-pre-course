@@ -13,20 +13,17 @@ import { NumberInput } from 'shared/components/NumberInput';
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [targetAmount, setTargetAmount] = useState<string>('');
-  const [monthlyPayment, setMonthlyPayment] = useState<string>('');
+  const [targetAmount, setTargetAmount] = useState<number | null>(null);
+  const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
   const [terms, setTerms] = useState<string>('');
 
   const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
 
-  const monthlyPaymentNumber = parseInt(monthlyPayment) || 0;
-
   const filteredSavingsProducts =
-    monthlyPaymentNumber === 0
+    monthlyPayment === null
       ? savingsProducts
       : savingsProducts?.filter(
-          product =>
-            monthlyPaymentNumber >= product.minMonthlyAmount && monthlyPaymentNumber <= product.maxMonthlyAmount
+          product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
         );
 
   const baseProducts = filteredSavingsProducts?.length ? filteredSavingsProducts : savingsProducts;
@@ -118,8 +115,8 @@ export function SavingsCalculatorPage() {
         <>
           <CalculationResultList
             product={selectedSavingsProduct}
-            targetAmount={parseInt(targetAmount) || 0}
-            monthlyPayment={monthlyPaymentNumber}
+            targetAmount={targetAmount ?? 0}
+            monthlyPayment={monthlyPayment ?? 0}
             terms={parseInt(terms) || 0}
           />
           <Spacing size={8} />
