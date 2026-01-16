@@ -14,15 +14,18 @@ import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [targetAmount, setTargetAmount] = useState<number>(0);
-  const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
+  const [targetAmount, setTargetAmount] = useState<number | null>(null);
+  const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
   const [terms, setTerms] = useState<string>('');
 
   const { data: savingsProducts } = useQuery(savingsProductQuery.listQuery());
 
-  const filteredSavingsProducts = savingsProducts?.filter(
-    product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
-  );
+  const filteredSavingsProducts =
+    monthlyPayment === null
+      ? savingsProducts
+      : savingsProducts?.filter(
+          product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
+        );
 
   const baseProducts = filteredSavingsProducts?.length ? filteredSavingsProducts : savingsProducts;
   const recommendedProducts = [...(baseProducts ?? [])].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
@@ -87,8 +90,8 @@ export function SavingsCalculatorPage() {
         <>
           <CalculationResultList
             product={selectedSavingsProduct}
-            targetAmount={targetAmount}
-            monthlyPayment={monthlyPayment}
+            targetAmount={targetAmount ?? 0}
+            monthlyPayment={monthlyPayment ?? 0}
             terms={parseInt(terms) || 0}
           />
           <Spacing size={8} />
