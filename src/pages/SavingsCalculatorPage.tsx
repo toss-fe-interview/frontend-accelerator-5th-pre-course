@@ -2,17 +2,15 @@ import { useState } from 'react';
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 
 import { CalculationResultItem } from 'components/CalculationResultItem';
-import { SavingsProductListItem } from 'components/SavingsProductListItem';
+import { CalculationResultSection } from 'components/CalculationResultSection';
 import { EmptyListItem } from 'components/common/EmptyListItem';
+import { RecommendedProductSection } from 'components/RecommendedProductSection';
 import { AmountInput } from 'components/savings-calculator/AmountInput';
 import { SavingsTermSelect } from 'components/savings-calculator/SavingsTermSelect';
+import { SavingsProductListItem } from 'components/SavingsProductListItem';
+import { SavingsProductListSection } from 'components/SavingsProductListSection';
 import { useSavingsProducts } from 'hooks/queries/useSavingsProducts';
 import { SavingsCalculatorFormState } from 'types/SavingsCalculatorFormState';
-import {
-  calculateDifferenceAmount,
-  calculateFinalAmount,
-  calculateRecommendedMonthlyAmount,
-} from 'utils/calculationUtil';
 import { filterSavingsProduct } from 'utils/filterSavingsProduct';
 
 export function SavingsCalculatorPage() {
@@ -28,10 +26,6 @@ export function SavingsCalculatorPage() {
   const filteredSavingsProducts = savingsProducts.filter(savingsProduct =>
     filterSavingsProduct({ savingsProduct, formState })
   );
-
-  const recommendedSavingsProducts = [...filteredSavingsProducts]
-    .sort((a, b) => b.annualRate - a.annualRate)
-    .slice(0, 2);
 
   const selectedSavingsProduct = filteredSavingsProducts.find(
     savingsProduct => savingsProduct.id === selectedSavingsProductId
@@ -70,7 +64,6 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      {/* Tab 버튼 영역 */}
       <Tab onChange={tab => setSelectedTab(tab as 'products' | 'results')}>
         <Tab.Item value="products" selected={selectedTab === 'products'}>
           적금 상품
@@ -80,58 +73,42 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {/* 적금 상품 리스트 영역 */}
       {selectedTab === 'products' && (
-        <>
-          {filteredSavingsProducts.length > 0 ? (
-            <>
-              {filteredSavingsProducts.map(savingsProduct => {
-                const isSelected = selectedSavingsProductId === savingsProduct.id;
-                return (
-                  <SavingsProductListItem
-                    key={savingsProduct.id}
-                    savingsProduct={savingsProduct}
-                    isSelected={isSelected}
-                    handleSelectSavingsProduct={savingsProduct =>
-                      setSelectedSavingsProductId(savingsProduct?.id || null)
-                    }
-                  />
-                );
-              })}
-            </>
-          ) : (
-            <EmptyListItem message="적합한 적금 상품이 없습니다." />
-          )}
-        </>
+        <SavingsProductListSection
+          products={filteredSavingsProducts}
+          emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
+        >
+          {products =>
+            products.map(product => (
+              <SavingsProductListItem
+                key={product.id}
+                savingsProduct={product}
+                isSelected={selectedSavingsProductId === product.id}
+                handleSelectSavingsProduct={p => setSelectedSavingsProductId(p?.id || null)}
+              />
+            ))
+          }
+        </SavingsProductListSection>
       )}
 
-      {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {selectedTab === 'results' && (
         <>
           <Spacing size={8} />
 
-          {selectedSavingsProduct ? (
-            (() => {
-              const { targetAmount, monthlyAmount, term } = formState;
-              const annualRate = selectedSavingsProduct.annualRate;
-              const finalAmount = calculateFinalAmount({ monthlyAmount, term, annualRate });
-              const differenceAmount = calculateDifferenceAmount({ targetAmount, finalAmount });
-              const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount({
-                targetAmount,
-                term,
-                annualRate,
-              });
-              return (
-                <>
-                  <CalculationResultItem label="예상 수익 금액" amount={finalAmount} />
-                  <CalculationResultItem label="목표 금액과의 차이" amount={differenceAmount} />
-                  <CalculationResultItem label="추천 월 납입 금액" amount={recommendedMonthlyAmount} />
-                </>
-              );
-            })()
-          ) : (
-            <EmptyListItem message="상품을 선택해주세요." />
-          )}
+          <CalculationResultSection
+            product={selectedSavingsProduct || null}
+            investment={{ monthlyAmount: formState.monthlyAmount, term: formState.term }}
+            goal={{ targetAmount: formState.targetAmount }}
+            emptyFallback={<EmptyListItem message="상품을 선택해주세요." />}
+          >
+            {({ finalAmount, differenceAmount, recommendedMonthlyAmount }) => (
+              <>
+                <CalculationResultItem label="예상 수익 금액" amount={finalAmount} />
+                <CalculationResultItem label="목표 금액과의 차이" amount={differenceAmount} />
+                <CalculationResultItem label="추천 월 납입 금액" amount={recommendedMonthlyAmount} />
+              </>
+            )}
+          </CalculationResultSection>
 
           <Spacing size={8} />
           <Border height={16} />
@@ -140,25 +117,21 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {recommendedSavingsProducts.length > 0 ? (
-            <>
-              {recommendedSavingsProducts.map(savingsProduct => {
-                const isSelected = selectedSavingsProductId === savingsProduct.id;
-                return (
-                  <SavingsProductListItem
-                    key={savingsProduct.id}
-                    savingsProduct={savingsProduct}
-                    isSelected={isSelected}
-                    handleSelectSavingsProduct={savingsProduct =>
-                      setSelectedSavingsProductId(savingsProduct?.id || null)
-                    }
-                  />
-                );
-              })}
-            </>
-          ) : (
-            <EmptyListItem message="적합한 추천 상품이 없습니다." />
-          )}
+          <RecommendedProductSection
+            candidateProducts={filteredSavingsProducts}
+            emptyFallback={<EmptyListItem message="적합한 추천 상품이 없습니다." />}
+          >
+            {recommendedProducts =>
+              recommendedProducts.map(product => (
+                <SavingsProductListItem
+                  key={product.id}
+                  savingsProduct={product}
+                  isSelected={selectedSavingsProductId === product.id}
+                  handleSelectSavingsProduct={p => setSelectedSavingsProductId(p?.id || null)}
+                />
+              ))
+            }
+          </RecommendedProductSection>
 
           <Spacing size={40} />
         </>
