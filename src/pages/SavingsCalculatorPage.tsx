@@ -1,10 +1,16 @@
-import { useState } from 'react';
-import { NavigationBar, Spacing, Border, TextField, SelectBottomSheet } from 'tosslib';
+import { fetchSavingsProducts } from 'components/ProductTabs/api';
+import { ProductList } from 'components/ProductTabs/ProductList';
+import { Results } from 'components/ProductTabs/Results';
+import { ProductTabs, SavingsProduct } from 'components/ProductTabs/types';
+import { useEffect, useState } from 'react';
+import { NavigationBar, Spacing, Border, TextField, SelectBottomSheet, Tab } from 'tosslib';
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState(0);
   const [monthlyAmount, setMonthlyAmount] = useState(0);
   const [savingTerms, setSavingTerms] = useState(12);
+  const [selectedTab, setSelectedTab] = useState<ProductTabs>('products');
+  const [products, setProducts] = useState<SavingsProduct[]>([]);
   // const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
 
   // const expectedProfit = calculateExpectedProfit(monthlyAmount, savingTerms, selectedSavingProduct?.annualRate ?? 0);
@@ -14,6 +20,30 @@ export function SavingsCalculatorPage() {
   //   savingTerms,
   //   selectedSavingProduct?.annualRate ?? 0
   // );
+
+  const hasAllValues = targetAmount && monthlyAmount && savingTerms;
+  const filteredProducts = hasAllValues
+    ? products.filter(product => {
+        return (
+          product.availableTerms === savingTerms &&
+          Number(monthlyAmount) <= product.maxMonthlyAmount &&
+          Number(monthlyAmount) >= product.minMonthlyAmount
+        );
+      })
+    : products;
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await fetchSavingsProducts();
+        setProducts(data);
+      } catch (e) {
+        console.error('Failed to fetch products:', e);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   return (
     <>
@@ -59,16 +89,27 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      {/* <ProductTabs
-        targetAmount={targetAmount}
-        monthlyAmount={monthlyAmount}
-        savingTerms={savingTerms}
-        selectedProduct={selectedSavingProduct}
-        onProductSelect={setSelectedSavingProduct}
-        expectedProfit={expectedProfit}
-        diffAmount={diffAmount}
-        recommendMonthlyPayment={recommendMonthlyPayment}
-      /> */}
+      <Tab onChange={value => setSelectedTab(value as ProductTabsType)}>
+        <Tab.Item value="products" selected={selectedTab === 'products'}>
+          적금 상품
+        </Tab.Item>
+        <Tab.Item value="results" selected={selectedTab === 'results'}>
+          계산 결과
+        </Tab.Item>
+      </Tab>
+
+      {selectedTab === 'products' ? (
+        <ProductList products={filteredProducts} selectedProduct={selectedProduct} onProductSelect={onProductSelect} />
+      ) : (
+        <Results
+          selectedProduct={selectedProduct}
+          expectedProfit={expectedProfit}
+          diffAmount={diffAmount}
+          recommendMonthlyPayment={recommendMonthlyPayment}
+          filteredProducts={filteredProducts}
+          onProductSelect={onProductSelect}
+        />
+      )}
     </>
   );
 }
