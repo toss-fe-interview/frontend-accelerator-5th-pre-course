@@ -10,6 +10,7 @@ import { SavingProductItem } from 'features/savings/components/SavingProductItem
 import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
 import { Select } from 'shared/components/Select';
 import { NumberInput } from 'shared/components/NumberInput';
+import { EmptyMessage } from 'shared/components/EmptyMessage';
 
 export function SavingsCalculatorPage() {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -105,7 +106,7 @@ export function SavingsCalculatorPage() {
               );
             })
           ) : (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다." />} />
+            <EmptyMessage message="상품이 존재하지 않습니다." />
           )}
         </>
       )}
@@ -145,7 +146,7 @@ export function SavingsCalculatorPage() {
               />
             </>
           ) : (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+            <EmptyMessage message="상품을 선택해주세요." />
           )}
           <Spacing size={8} />
           <Border height={16} />
