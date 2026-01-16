@@ -3,7 +3,7 @@ import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 import { useFilteredProducts } from 'hooks/useFilteredProducts';
 import { useSavingsGoalEstimate } from 'hooks/useSavingsGoalEstimate';
-import { ProductList, CalculationResultSection } from 'components/savings';
+import { SelectableProductList, CalculationResultSection } from 'components/savings';
 import { PageStatus } from 'components/common/PageStatus';
 import { EmptyMessage } from 'components/common/EmptyMessage';
 import { CurrencyInput } from 'components/common/CurrencyInput';
@@ -83,7 +83,7 @@ export function SavingsCalculatorPage() {
         (filteredProducts.length === 0 ? (
           <EmptyMessage message="조회 결과가 없어요" />
         ) : (
-          <ProductList
+          <SelectableProductList
             products={filteredProducts}
             selectedProductId={selectedProductId}
             onProductSelect={setSelectedProductId}
@@ -104,7 +104,7 @@ export function SavingsCalculatorPage() {
           {recommendedProducts.length === 0 ? (
             <EmptyMessage message="추천 상품이 없어요" />
           ) : (
-            <ProductList
+            <SelectableProductList
               products={recommendedProducts}
               selectedProductId={selectedProductId}
               onProductSelect={setSelectedProductId}

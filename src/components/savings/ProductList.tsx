@@ -8,7 +8,7 @@ interface ProductListProps {
   onProductSelect: (id: string) => void;
 }
 
-export function ProductList({ products, selectedProductId, onProductSelect }: ProductListProps) {
+export function SelectableProductList({ products, selectedProductId, onProductSelect }: ProductListProps) {
   return (
     <>
       {products.map(product => (
