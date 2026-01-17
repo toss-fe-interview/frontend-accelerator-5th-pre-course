@@ -6,5 +6,3 @@ export interface SavingsProduct {
   maxMonthlyAmount: number;
   availableTerms: number;
 }
-
-export type Tabs = 'products' | 'results';
