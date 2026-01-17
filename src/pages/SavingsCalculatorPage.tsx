@@ -10,13 +10,13 @@ import {
   Tab,
   ListRow,
   ListHeader,
-  colors,
   Assets,
   HttpError,
 } from 'tosslib';
-import SavingsProductItem from 'features/savings-product-item/ui/SavingsProductItem';
-import { ProductTabs, SavingsProduct } from 'features/savings-products/model/types';
-import { savingsProductsApi } from 'features/savings-products/api/savings-products';
+import { ProductTabs, SavingsProduct } from 'features/savings/model/types';
+import { savingsProductsApi } from 'features/savings/api/savings-products';
+import SavingsProductItem from 'features/savings/ui/SavingsProductItem';
+import CalculatedResultItem from 'features/savings/ui/CalculatedResultItem';
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
@@ -68,7 +68,7 @@ export function SavingsCalculatorPage() {
       <>
         <TextField
           label="목표 금액"
-          placeholder="목표 금액을 입력하세요"
+          placeholder="${label}을 입력하세요"
           suffix="원"
           value={targetAmount?.toString()}
           onChange={e => {
@@ -140,42 +140,9 @@ export function SavingsCalculatorPage() {
         </>
       ) : (
         <>
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="예상 수익 금액"
-                bottom={`${expectedProfit.toLocaleString('ko-KR')}원`}
-                // HOW
-                topProps={{ color: colors.grey600 }}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
-          />
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="목표 금액과의 차이"
-                bottom={`${diffAmount.toLocaleString('ko-KR')}원`}
-                // HOW
-                topProps={{ color: colors.grey600 }}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
-          />
-          <ListRow
-            contents={
-              <ListRow.Texts
-                type="2RowTypeA"
-                top="추천 월 납입 금액"
-                bottom={`${(recommendMonthlyPayment ?? 0).toLocaleString('ko-KR')}원`}
-                // HOW
-                topProps={{ color: colors.grey600 }}
-                bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-              />
-            }
-          />
+          <ListRow contents={<CalculatedResultItem label={'예상 수익 금액'} amount={diffAmount} />} />
+          <ListRow contents={<CalculatedResultItem label={'목표 금액'} amount={expectedProfit} />} />
+          <ListRow contents={<CalculatedResultItem label={'추천 월 납입 금액'} amount={recommendMonthlyPayment} />} />
 
           <Border height={16} />
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
