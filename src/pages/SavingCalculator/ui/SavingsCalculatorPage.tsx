@@ -164,7 +164,7 @@ export function SavingsCalculatorPage() {
 
                           return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                         })
-                        .sort(sortByAnnualRateDesc)
+                        .sort(annualRateDesc)
                         .slice(0, TOP_RECOMMENDATION_COUNT)
                     }
                   >
@@ -193,4 +193,4 @@ export function SavingsCalculatorPage() {
   );
 }
 
-const sortByAnnualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
+const annualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
