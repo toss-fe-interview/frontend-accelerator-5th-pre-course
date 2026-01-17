@@ -1,2 +1,2 @@
-export { SelectableProductList } from './SelectableProductList';
+export { SavingsProductRow } from './SavingsProductRow';
 export { CalculationResultSection } from './CalculationResultSection';

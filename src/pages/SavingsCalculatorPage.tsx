@@ -3,7 +3,7 @@ import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useSavingsProducts } from 'hooks/queries';
 import { useSavingsProductOptions } from 'hooks/useSavingsProductOptions';
 import { useSavingsGoalEstimate } from 'hooks/useSavingsGoalEstimate';
-import { SelectableProductList, CalculationResultSection } from 'components/savings';
+import { SavingsProductRow, CalculationResultSection } from 'components/savings';
 import { PageStatus } from 'components/common/PageStatus';
 import { EmptyMessage } from 'components/common/EmptyMessage';
 import { CurrencyInput } from 'components/common/CurrencyInput';
@@ -83,11 +83,14 @@ export function SavingsCalculatorPage() {
         (availableProducts.length === 0 ? (
           <EmptyMessage message="조회 결과가 없어요" />
         ) : (
-          <SelectableProductList
-            products={availableProducts}
-            selectedProductId={selectedProductId}
-            onProductSelect={setSelectedProductId}
-          />
+          availableProducts.map(product => (
+            <SavingsProductRow
+              key={product.id}
+              product={product}
+              isSelected={selectedProductId === product.id}
+              onSelect={() => setSelectedProductId(product.id)}
+            />
+          ))
         ))}
 
       {activeTab === TAB_VALUES.RESULTS && (
@@ -104,11 +107,14 @@ export function SavingsCalculatorPage() {
           {recommendedProducts.length === 0 ? (
             <EmptyMessage message="추천 상품이 없어요" />
           ) : (
-            <SelectableProductList
-              products={recommendedProducts}
-              selectedProductId={selectedProductId}
-              onProductSelect={setSelectedProductId}
-            />
+            recommendedProducts.map(product => (
+              <SavingsProductRow
+                key={product.id}
+                product={product}
+                isSelected={selectedProductId === product.id}
+                onSelect={() => setSelectedProductId(product.id)}
+              />
+            ))
           )}
 
           <Spacing size={40} />
