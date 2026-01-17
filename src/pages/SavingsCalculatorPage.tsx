@@ -81,35 +81,27 @@ export function SavingsCalculatorPage() {
       {(() => {
         switch (tab) {
           case 'products':
-            return savingsProducts
-              .filter(product => {
-                const isAboveMinPayment = product.minMonthlyAmount < monthlyPayment;
-                const isBelowMaxPayment = product.maxMonthlyAmount > monthlyPayment;
-                const matchesSavingPeriod = product.availableTerms === savingPeriod;
-
-                return isAboveMinPayment && isBelowMaxPayment && matchesSavingPeriod;
-              })
-              .map(product => {
-                const isSelected = selectedSavingsProduct?.id === product.id;
-                return (
-                  <ListRow
-                    key={product.id}
-                    contents={
-                      <Product
-                        name={product.name}
-                        annualRate={product.annualRate}
-                        minMonthlyAmount={product.minMonthlyAmount}
-                        maxMonthlyAmount={product.maxMonthlyAmount}
-                        availableTerms={product.availableTerms}
-                      />
-                    }
-                    right={isSelected ? <CheckCircleIcon /> : null}
-                    onClick={() => {
-                      setSelectedSavingsProduct(product);
-                    }}
-                  />
-                );
-              });
+            return filterSavingsProducts(savingsProducts, monthlyPayment, savingPeriod).map(product => {
+              const isSelected = selectedSavingsProduct?.id === product.id;
+              return (
+                <ListRow
+                  key={product.id}
+                  contents={
+                    <Product
+                      name={product.name}
+                      annualRate={product.annualRate}
+                      minMonthlyAmount={product.minMonthlyAmount}
+                      maxMonthlyAmount={product.maxMonthlyAmount}
+                      availableTerms={product.availableTerms}
+                    />
+                  }
+                  right={isSelected ? <CheckCircleIcon /> : null}
+                  onClick={() => {
+                    setSelectedSavingsProduct(product);
+                  }}
+                />
+              );
+            });
 
           case 'results':
             return (
@@ -148,14 +140,7 @@ export function SavingsCalculatorPage() {
                 />
                 <Spacing size={12} />
 
-                {savingsProducts
-                  .filter(product => {
-                    const isAboveMinPayment = product.minMonthlyAmount < monthlyPayment;
-                    const isBelowMaxPayment = product.maxMonthlyAmount > monthlyPayment;
-                    const matchesSavingPeriod = product.availableTerms === savingPeriod;
-
-                    return isAboveMinPayment && isBelowMaxPayment && matchesSavingPeriod;
-                  })
+                {filterSavingsProducts(savingsProducts, monthlyPayment, savingPeriod)
                   .sort((a, b) => b.annualRate - a.annualRate)
                   .slice(0, 2)
                   .map(product => {
@@ -189,3 +174,13 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
+
+const filterSavingsProducts = (products: SavingsProduct[], monthlyPayment: number, savingPeriod: number) => {
+  return products.filter(product => {
+    const isAboveMinPayment = product.minMonthlyAmount < monthlyPayment;
+    const isBelowMaxPayment = product.maxMonthlyAmount > monthlyPayment;
+    const matchesSavingPeriod = product.availableTerms === savingPeriod;
+
+    return isAboveMinPayment && isBelowMaxPayment && matchesSavingPeriod;
+  });
+};
