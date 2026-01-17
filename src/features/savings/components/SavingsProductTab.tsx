@@ -1,12 +1,11 @@
 import { Suspense, useState } from 'react';
-import { Border, ListHeader, ListRow, Spacing, Tab } from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, Spacing, Tab } from 'tosslib';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
 import { SavingsResultItem } from 'features/savings/components/SavingsResultItem';
-import { GreenCheckCircleIcon } from 'shared/icons/GreenCheckCircleIcon';
 import { EmptyMessage } from 'shared/components/EmptyMessage';
 import { ErrorBoundary } from 'shared/components/ErrorBoundary';
 import { useTab } from 'shared/hooks/useTab';
@@ -112,7 +111,7 @@ function SavingsTabContent({
                       availableTerms={product.availableTerms}
                     />
                   }
-                  right={selected ? <GreenCheckCircleIcon /> : undefined}
+                  right={selected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                   onClick={() => onSelectProduct(product.id)}
                 />
               );
@@ -155,7 +154,7 @@ function SavingsTabContent({
                     availableTerms={product.availableTerms}
                   />
                 }
-                right={selected ? <GreenCheckCircleIcon /> : undefined}
+                right={selected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                 onClick={() => onSelectProduct(product.id)}
               />
             );
