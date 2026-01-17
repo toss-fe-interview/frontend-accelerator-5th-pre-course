@@ -28,7 +28,7 @@ export function SavingsCalculatorPage() {
 
   const [selectedProduct, setSelectedProduct] = useState<SavingsProductType | null>(null);
 
-  const findMatchingProducts = (product: SavingsProductType) => {
+  const validateMatchedProduct = (product: SavingsProductType) => {
     const 저축_기간이_일치함 = product.availableTerms === term;
     const 월_납입한도_내에_있음 = rangeIn(monthlyPayment, {
       min: product.minMonthlyAmount,
@@ -40,7 +40,7 @@ export function SavingsCalculatorPage() {
 
   const { data: matchingProducts = [] } = useQuery(
     SavingsQuery.getSavingsProducts({
-      select: data => data.filter(findMatchingProducts),
+      select: data => data.filter(validateMatchedProduct),
     })
   );
 
