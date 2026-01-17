@@ -8,16 +8,19 @@ import { Product } from 'components/Product';
 import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
 import { useTabState, Tab as TabType } from 'hooks/useTabState';
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
+import { queryOptions } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { roundToThousand } from 'util/number';
 import { EmptyMessage } from 'components/EmptyMessage';
 import { eq, gt, lt } from 'es-toolkit/compat';
+import { SuspenseQuery } from '@suspensive/react-query';
+import { ErrorBoundary, Suspense } from '@suspensive/react';
 
 const productQueries = {
-  all: () =>
+  all: 'savingsProducts',
+  list: () =>
     queryOptions({
-      queryKey: ['savingsProducts'],
+      queryKey: [productQueries.all, 'list'],
       queryFn: getSavingsProducts,
     }),
 };
@@ -40,8 +43,6 @@ export function SavingsCalculatorPage() {
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   const { tab, setTab } = useTabState();
 
-  const { data: savingsProducts } = useSuspenseQuery(productQueries.all());
-
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -54,7 +55,7 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
       <SavingPeriodSelect
         value={savingPeriod}
-        onSelect={v => setValue('savingPeriod', v)}
+        onSelect={value => setValue('savingPeriod', value)}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
@@ -82,36 +83,42 @@ export function SavingsCalculatorPage() {
       {(() => {
         switch (tab) {
           case 'products':
-            return savingsProducts
-              .filter(
-                product =>
-                  gt(product.minMonthlyAmount, monthlyPayment) &&
-                  lt(product.maxMonthlyAmount, monthlyPayment) &&
-                  eq(product.availableTerms, savingPeriod)
-              )
-              .map(product => {
-                const isSelected = selectedSavingsProduct?.id === product.id;
-
-                return (
-                  <ListRow
-                    key={product.id}
-                    contents={
-                      <Product
-                        name={product.name}
-                        annualRate={product.annualRate}
-                        minMonthlyAmount={product.minMonthlyAmount}
-                        maxMonthlyAmount={product.maxMonthlyAmount}
-                        availableTerms={product.availableTerms}
-                      />
+            return (
+              <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
+                <Suspense fallback={'loading...'}>
+                  <SuspenseQuery
+                    {...productQueries.list()}
+                    select={data =>
+                      data.filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
                     }
-                    right={isSelected ? <CheckCircleIcon /> : null}
-                    onClick={() => {
-                      setSelectedSavingsProduct(product);
-                    }}
-                  />
-                );
-              });
-
+                  >
+                    {({ data: products }) =>
+                      products.map(product => {
+                        const isSelected = selectedSavingsProduct?.id === product.id;
+                        return (
+                          <ListRow
+                            key={product.id}
+                            contents={
+                              <Product
+                                name={product.name}
+                                annualRate={product.annualRate}
+                                minMonthlyAmount={product.minMonthlyAmount}
+                                maxMonthlyAmount={product.maxMonthlyAmount}
+                                availableTerms={product.availableTerms}
+                              />
+                            }
+                            right={isSelected ? <CheckCircleIcon /> : null}
+                            onClick={() => {
+                              setSelectedSavingsProduct(product);
+                            }}
+                          />
+                        );
+                      })
+                    }
+                  </SuspenseQuery>
+                </Suspense>
+              </ErrorBoundary>
+            );
           case 'results':
             return (
               <>
@@ -149,37 +156,43 @@ export function SavingsCalculatorPage() {
                 />
                 <Spacing size={12} />
 
-                {savingsProducts
-                  .filter(
-                    product =>
-                      gt(product.minMonthlyAmount, monthlyPayment) &&
-                      lt(product.maxMonthlyAmount, monthlyPayment) &&
-                      eq(product.availableTerms, savingPeriod)
-                  )
-                  .sort((a, b) => b.annualRate - a.annualRate)
-                  .slice(0, 2)
-                  .map(product => {
-                    const isSelected = selectedSavingsProduct?.id === product.id;
-
-                    return (
-                      <ListRow
-                        key={product.id}
-                        contents={
-                          <Product
-                            name={product.name}
-                            annualRate={product.annualRate}
-                            minMonthlyAmount={product.minMonthlyAmount}
-                            maxMonthlyAmount={product.maxMonthlyAmount}
-                            availableTerms={product.availableTerms}
-                          />
-                        }
-                        right={isSelected ? <CheckCircleIcon /> : null}
-                        onClick={() => {
-                          setSelectedSavingsProduct(product);
-                        }}
-                      />
-                    );
-                  })}
+                <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
+                  <Suspense fallback={'loading...'}>
+                    <SuspenseQuery
+                      {...productQueries.list()}
+                      select={data =>
+                        data
+                          .filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
+                          .sort(sortByAnnualRateDesc)
+                          .slice(0, 2)
+                      }
+                    >
+                      {({ data: products }) =>
+                        products.map(product => {
+                          const isSelected = selectedSavingsProduct?.id === product.id;
+                          return (
+                            <ListRow
+                              key={product.id}
+                              contents={
+                                <Product
+                                  name={product.name}
+                                  annualRate={product.annualRate}
+                                  minMonthlyAmount={product.minMonthlyAmount}
+                                  maxMonthlyAmount={product.maxMonthlyAmount}
+                                  availableTerms={product.availableTerms}
+                                />
+                              }
+                              right={isSelected ? <CheckCircleIcon /> : null}
+                              onClick={() => {
+                                setSelectedSavingsProduct(product);
+                              }}
+                            />
+                          );
+                        })
+                      }
+                    </SuspenseQuery>
+                  </Suspense>
+                </ErrorBoundary>
 
                 <Spacing size={40} />
               </>
@@ -189,3 +202,16 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
+
+const filterSavingsProducts = (
+  product: SavingsProduct,
+  { monthlyPayment, savingPeriod }: { monthlyPayment: number; savingPeriod: number }
+) => {
+  return (
+    gt(product.minMonthlyAmount, monthlyPayment) &&
+    lt(product.maxMonthlyAmount, monthlyPayment) &&
+    eq(product.availableTerms, savingPeriod)
+  );
+};
+
+const sortByAnnualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
