@@ -87,7 +87,15 @@ export function SavingsCalculatorPage() {
                 <Suspense fallback={'loading...'}>
                   <SuspenseQuery
                     {...savingsProductsQueyOptions()}
-                    select={products => products.filter(product => filterSavingsProducts(product, filters))}
+                    select={products =>
+                      products.filter(product => {
+                        const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
+                        const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
+                        const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
+
+                        return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
+                      })
+                    }
                   >
                     {({ data: products }) =>
                       products.map(product => {
@@ -162,7 +170,13 @@ export function SavingsCalculatorPage() {
                       {...savingsProductsQueyOptions()}
                       select={products =>
                         products
-                          .filter(product => filterSavingsProducts(product, filters))
+                          .filter(product => {
+                            const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
+                            const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
+                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
+
+                            return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
+                          })
                           .sort(sortByAnnualRateDesc)
                           .slice(0, TOP_RECOMMENDATION_COUNT)
                       }
@@ -202,16 +216,5 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
-
-const filterSavingsProducts = (
-  product: SavingsProduct,
-  filters: { targetAmount: number; monthlyPayment: number; savingPeriod: number }
-) => {
-  return (
-    gt(product.minMonthlyAmount, filters.monthlyPayment) &&
-    lt(product.maxMonthlyAmount, filters.monthlyPayment) &&
-    eq(product.availableTerms, filters.savingPeriod)
-  );
-};
 
 const sortByAnnualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
