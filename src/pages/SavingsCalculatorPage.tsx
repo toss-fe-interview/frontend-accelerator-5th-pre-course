@@ -1,18 +1,10 @@
 import { SavingsProduct } from 'api/savings-products/types';
 import { useSavingsProducts } from 'api/savings-products/useSavingsProducts';
+import CalculattionResultListItem from 'components/savings-products/CalculationResultListItem';
 import SavingsProductItem from 'components/savings-products/SavingsProductItem';
 import { useMemo, useState } from 'react';
-import {
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { calculateExpectedProfit, calculateSuggestMonthlyPayment, diff } from 'utils/calculate';
 import { formatNumberToKo } from 'utils/formatting';
 import { parseFormattedNumber } from 'utils/parse';
 import { filterSavingsProducts } from 'utils/savings-filter';
@@ -109,41 +101,50 @@ export function SavingsCalculatorPage() {
       {tabValue === 'results' && (
         <>
           {selectedSavingsProduct && targetAmount && monthlyPayment ? (
-            <>
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="예상 수익 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${formatNumberToKo(monthlyPayment * selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5))}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+            (() => {
+              const expoectedProfit = calculateExpectedProfit({
+                availableTerms: selectedSavingsProduct.availableTerms,
+                annualRate: selectedSavingsProduct.annualRate,
+                monthlyPayment,
+              });
+
+              const diffFromTargetAmount = diff(targetAmount, expoectedProfit);
+
+              const suggestMonthlyPayment = calculateSuggestMonthlyPayment({
+                availableTerms: selectedSavingsProduct.availableTerms,
+                annualRate: selectedSavingsProduct.annualRate,
+                targetAmount,
+              });
+
+              return (
+                <>
+                  <ListRow
+                    contents={
+                      <CalculattionResultListItem
+                        listLabel={'예상 수익 금액'}
+                        calculationResult={`${expoectedProfit.toLocaleString('ko-KR')}원`}
+                      />
+                    }
                   />
-                }
-              />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="목표 금액과의 차이"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${formatNumberToKo(targetAmount - monthlyPayment * selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5))}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  <ListRow
+                    contents={
+                      <CalculattionResultListItem
+                        listLabel={'목표 금액과의 차이'}
+                        calculationResult={`${diffFromTargetAmount.toLocaleString('ko-KR')}원`}
+                      />
+                    }
                   />
-                }
-              />
-              <ListRow
-                contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="추천 월 납입 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${formatNumberToKo(Math.round(targetAmount / (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) / 1000) * 1000)}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  <ListRow
+                    contents={
+                      <CalculattionResultListItem
+                        listLabel={'추천 월 납입 금액'}
+                        calculationResult={`${suggestMonthlyPayment.toLocaleString('ko-KR')}원`}
+                      />
+                    }
                   />
-                }
-              />
-            </>
+                </>
+              );
+            })()
           ) : (
             <>
               <Spacing size={10} />
