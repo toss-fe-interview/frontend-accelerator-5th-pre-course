@@ -13,6 +13,8 @@ import { NumberInput } from 'shared/ui/NumberField';
 import { AsyncBoundary } from 'shared/ui/AsyncBoundary';
 import { flow, orderBy, take } from 'es-toolkit';
 
+const TOP_RECOMMENDATION_COUNT = 2;
+
 type Tab = 'products' | 'results';
 
 const savingsProductsQueyOptions = () =>
@@ -159,8 +161,8 @@ export function SavingsCalculatorPage() {
 
                             return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                           }),
-                        sortByAnnualRateDesc,
-                        takeTopProducts
+                        (products: SavingsProduct[]) => orderBy(products, ['annualRate'], ['desc']),
+                        (products: SavingsProduct[]) => take(products, TOP_RECOMMENDATION_COUNT)
                       );
 
                       return getRecommendedProducts(products);
@@ -190,9 +192,3 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
-
-const sortByAnnualRateDesc = (products: SavingsProduct[]) => orderBy(products, ['annualRate'], ['desc']);
-const takeTopProducts = (products: SavingsProduct[]) => {
-  const TOP_RECOMMENDATION_COUNT = 2;
-  return take(products, TOP_RECOMMENDATION_COUNT);
-};
