@@ -11,6 +11,7 @@ import { eq, gt, lt } from 'es-toolkit/compat';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { NumberInput } from 'shared/ui/NumberField';
 import { AsyncBoundary } from 'shared/ui/AsyncBoundary';
+import { flow, orderBy, take } from 'es-toolkit';
 
 type Tab = 'products' | 'results';
 
@@ -152,18 +153,22 @@ export function SavingsCalculatorPage() {
                 <AsyncBoundary>
                   <SuspenseQuery
                     {...savingsProductsQueyOptions()}
-                    select={products =>
-                      products
-                        .filter(product => {
-                          const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
-                          const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
-                          const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
+                    select={products => {
+                      const getRecommendedProducts = flow(
+                        (products: SavingsProduct[]) =>
+                          products.filter(product => {
+                            const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
+                            const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
+                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
 
-                          return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
-                        })
-                        .sort(annualRateDesc)
-                        .slice(0, TOP_RECOMMENDATION_COUNT)
-                    }
+                            return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
+                          }),
+                        sortByAnnualRateDesc,
+                        takeTop
+                      );
+
+                      return getRecommendedProducts(products);
+                    }}
                   >
                     {({ data: products }) =>
                       products.map(product => {
@@ -190,4 +195,5 @@ export function SavingsCalculatorPage() {
   );
 }
 
-const annualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
+const sortByAnnualRateDesc = (products: SavingsProduct[]) => orderBy(products, ['annualRate'], ['desc']);
+const takeTop = (products: SavingsProduct[]) => take(products, TOP_RECOMMENDATION_COUNT);
