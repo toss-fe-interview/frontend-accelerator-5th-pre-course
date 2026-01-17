@@ -16,10 +16,17 @@ export interface CalculInputs {
   term: number;
 }
 
+export interface CalcSavingResult {
+  expectedProfit: number;
+  difference: number;
+  recommendedMonthly: number;
+}
+
+const SelectableMonth = [6, 12, 24];
+
 function SavingsCalculator() {
   const [selectedTab, setSelectedTab] = useState<SelectedTab>('products');
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
-  const selectableMonth = [6, 12, 24];
 
   const { calcInputs, setCalcInputs, deferredInputs } = useCalculatorInputs();
   const { filteredProducts, recommendedProducts } = useSavingsProducts(deferredInputs);
@@ -52,7 +59,7 @@ function SavingsCalculator() {
         value={calcInputs.term}
         onChange={value => setCalcInputs({ ...calcInputs, term: value })}
       >
-        {selectableMonth.map(month => (
+        {SelectableMonth.map(month => (
           <SelectBottomSheet.Option key={month} value={month}>
             {month}개월
           </SelectBottomSheet.Option>
@@ -88,9 +95,21 @@ function SavingsCalculator() {
             if (calculationResult === null) {
               return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
             }
-            return Object.entries(calculationResult).map(([key, value]) => (
-              <ListRow key={key} contents={<CalculationResultItem label={value.label} value={value.value} />} />
-            ));
+            return (
+              <>
+                <ListRow
+                  contents={<CalculationResultItem label="예상 수익 금액" value={calculationResult.expectedProfit} />}
+                />
+                <ListRow
+                  contents={<CalculationResultItem label="목표 금액과의 차이" value={calculationResult.difference} />}
+                />
+                <ListRow
+                  contents={
+                    <CalculationResultItem label="추천 월 납입액" value={calculationResult.recommendedMonthly} />
+                  }
+                />
+              </>
+            );
           })()}
           <Spacing size={8} />
           <Border height={16} />

@@ -1,6 +1,5 @@
 import { SavingsProduct } from '../api';
-import { CalculationResultData } from '../components/CalculationResultItem';
-import { CalculInputs } from '../SavingsCalculatorPage';
+import { CalcSavingResult, CalculInputs } from '../SavingsCalculatorPage';
 
 export function formatToKRW(amount: number): string {
   return amount.toLocaleString('ko-KR');
@@ -31,7 +30,7 @@ function calculateRecommendedMonthlyAmount(targetAmount: number, term: number, a
 export function calculateSavingResult(
   selectedProduct: SavingsProduct | null,
   calcInputs: CalculInputs
-): CalculationResultData | null {
+): CalcSavingResult | null {
   if (!selectedProduct) {
     return null;
   }
@@ -45,17 +44,8 @@ export function calculateSavingResult(
   );
 
   return {
-    expectedProfit: {
-      label: '예상 수익 금액',
-      value: expectedProfit,
-    },
-    difference: {
-      label: '목표 금액과의 차이',
-      value: difference,
-    },
-    recommendedMonthly: {
-      label: '추천 월 납입 금액',
-      value: recommendedMonthly,
-    },
+    expectedProfit,
+    difference,
+    recommendedMonthly,
   };
 }
