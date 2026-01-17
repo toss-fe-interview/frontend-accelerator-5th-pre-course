@@ -86,12 +86,23 @@ export default function SavingsCalculatorPage() {
 
             const 예상만기금액 =
               selectedProduct && savingTerms
-                ? get_예상만기금액(monthlyAmount ?? 0, savingTerms, selectedProduct.annualRate)
+                ? get_예상만기금액({
+                    월납입액: monthlyAmount ?? 0,
+                    저축기간: savingTerms,
+                    연이자율: selectedProduct.annualRate,
+                  })
                 : 0;
-            const 목표금액과의차이 = get_목표금액과의차이(targetAmount ?? 0, 예상만기금액);
+            const 목표금액과의차이 = get_목표금액과의차이({
+              목표금액: targetAmount ?? 0,
+              예상만기금액,
+            });
             const 추천월납입금액 =
               selectedProduct && savingTerms
-                ? get_추천월납입금액(targetAmount ?? 0, savingTerms, selectedProduct.annualRate)
+                ? get_추천월납입금액({
+                    목표금액: targetAmount ?? 0,
+                    저축기간: savingTerms,
+                    연이자율: selectedProduct.annualRate,
+                  })
                 : 0;
 
             return (
@@ -174,15 +185,31 @@ function ResultRow({ label, value }: { label: string; value: string }) {
 
 const 평균적립기간비율 = 0.5;
 
-const get_예상만기금액 = (월납입액: number, 저축기간: number, 연이자율: number) => {
+const get_예상만기금액 = ({
+  월납입액,
+  저축기간,
+  연이자율,
+}: {
+  월납입액: number;
+  저축기간: number;
+  연이자율: number;
+}) => {
   return 월납입액 * 저축기간 * (1 + (연이자율 / 100) * 평균적립기간비율);
 };
 
-const get_목표금액과의차이 = (목표금액: number, 예상만기금액: number) => {
+const get_목표금액과의차이 = ({ 목표금액, 예상만기금액 }: { 목표금액: number; 예상만기금액: number }) => {
   return 목표금액 - 예상만기금액;
 };
 
-const get_추천월납입금액 = (목표금액: number, 저축기간: number, 연이자율: number) => {
+const get_추천월납입금액 = ({
+  목표금액,
+  저축기간,
+  연이자율,
+}: {
+  목표금액: number;
+  저축기간: number;
+  연이자율: number;
+}) => {
   const value = 목표금액 / (저축기간 * (1 + (연이자율 / 100) * 평균적립기간비율));
   return roundToThousand(value);
 };
