@@ -7,7 +7,7 @@ import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct'
 import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
 import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
 import TermField from 'domains/savingsCalculator/components/form/TermField';
-import { rangeIn } from 'domains/savingsCalculator/utils/filter';
+import { rangeIn, sortByAnnualRateDesc } from 'domains/savingsCalculator/utils/filter';
 import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
 
 import SavingsQuery from 'shared/query/saving';
@@ -149,7 +149,7 @@ export function SavingsCalculatorPage() {
                 <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
               ) : (
                 matchingProducts
-                  .sort((a, b) => a.annualRate - b.annualRate)
+                  .sort(sortByAnnualRateDesc)
                   .slice(0, 2)
                   .map(product => {
                     const isSelected = selectedProduct?.id === product.id;
