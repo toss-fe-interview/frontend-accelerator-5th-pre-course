@@ -126,6 +126,7 @@ export function SavingsCalculatorPage() {
         <>
           {filteredProducts.map(product => {
             const isSelected = selectedSavingProduct?.id === product.id;
+            const depositRequirement = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`;
 
             return (
               <ListRow
@@ -134,7 +135,7 @@ export function SavingsCalculatorPage() {
                   <ProductListRowTexts
                     productName={product.name}
                     productAnnualRate={product.annualRate}
-                    productInfoSummaryText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`}
+                    depositRequirement={depositRequirement}
                   />
                 }
                 right={isSelected && <CheckedIcon />}
@@ -189,6 +190,7 @@ export function SavingsCalculatorPage() {
           {recommendedProducts.length > 0 ? (
             recommendedProducts.map(product => {
               const isSelected = selectedSavingProduct?.id === product.id;
+              const depositRequirement = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`;
 
               return (
                 <ListRow
@@ -197,7 +199,7 @@ export function SavingsCalculatorPage() {
                     <ProductListRowTexts
                       productName={product.name}
                       productAnnualRate={product.annualRate}
-                      productInfoSummaryText={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`}
+                      depositRequirement={depositRequirement}
                     />
                   }
                   right={isSelected && <CheckedIcon />}
@@ -222,18 +224,18 @@ const CheckedIcon = () => {
 const ProductListRowTexts = ({
   productName,
   productAnnualRate,
-  productInfoSummaryText,
+  depositRequirement,
 }: {
   productName: string;
   productAnnualRate: number;
-  productInfoSummaryText: string;
+  depositRequirement: string;
 }) => {
   return (
     <ListRow.Texts
       type="3RowTypeA"
       top={productName}
       middle={`연 이자율: ${productAnnualRate}%`}
-      bottom={productInfoSummaryText}
+      bottom={depositRequirement}
       topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
       middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
       bottomProps={{ fontSize: 13, color: colors.grey600 }}
