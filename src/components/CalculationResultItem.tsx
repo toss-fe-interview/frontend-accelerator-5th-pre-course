@@ -13,7 +13,7 @@ export function CalculationResultItem({ label, value }: CalculationResultItemPro
           type="2RowTypeA"
           top={label}
           topProps={{ color: colors.grey600 }}
-          bottom={`${value.toLocaleString()}원`}
+          bottom={`${value.toLocaleString('ko-KR')}원`}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }

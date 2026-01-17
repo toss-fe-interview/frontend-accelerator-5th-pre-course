@@ -16,7 +16,7 @@ export const Product = ({ name, annualRate, minMonthlyAmount, maxMonthlyAmount, 
       topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
       middle={`연 이자율: ${annualRate}%`}
       middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-      bottom={`${minMonthlyAmount.toLocaleString()}원 ~ ${maxMonthlyAmount.toLocaleString()}원 | ${availableTerms}개월`}
+      bottom={`${minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${availableTerms}개월`}
       bottomProps={{ fontSize: 13, color: colors.grey600 }}
     />
   );
