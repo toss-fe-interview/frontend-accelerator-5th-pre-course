@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { SavingsProduct } from 'entities/savings/model/types';
 
@@ -7,9 +7,9 @@ export const useProductSelection = (products: SavingsProduct[]) => {
 
   const selectedProduct = products.find(product => product.id === selectedProductId);
 
-  const handleSelectProduct = (product: SavingsProduct | null) => {
+  const handleSelectProduct = useCallback((product: SavingsProduct | null) => {
     setSelectedProductId(product?.id ?? null);
-  };
+  }, []);
 
   return {
     selectedProduct,

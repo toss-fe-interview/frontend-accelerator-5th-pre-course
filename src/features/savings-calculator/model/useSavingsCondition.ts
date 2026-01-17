@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { SavingsCondition } from 'features/savings-calculator/model/types';
 
@@ -9,17 +9,17 @@ export const useSavingsCondition = () => {
     term: 12,
   });
 
-  const handleTargetAmountChange = (targetAmount: number) => {
+  const handleTargetAmountChange = useCallback((targetAmount: number) => {
     setCondition(prev => ({ ...prev, targetAmount }));
-  };
+  }, []);
 
-  const handleMonthlyAmountChange = (monthlyAmount: number) => {
+  const handleMonthlyAmountChange = useCallback((monthlyAmount: number) => {
     setCondition(prev => ({ ...prev, monthlyAmount }));
-  };
+  }, []);
 
-  const handleTermChange = (term: number) => {
+  const handleTermChange = useCallback((term: number) => {
     setCondition(prev => ({ ...prev, term }));
-  };
+  }, []);
 
   return {
     condition,
