@@ -1,13 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { ProductList, savingsProductsQueryOptions } from 'components/ProductList';
-import type { SavingsTabValue } from 'domains/Savings/types';
-import {
-  calculateExpectedProfit,
-  calculateGoalDifference,
-  calculateRecommendedDeposit,
-  filterSavingsProducts,
-  getTopRateProducts,
-} from 'domains/Savings/utils/savings';
+import { ProductList, savingsProductsQueryOptions } from 'domains/Savings/components/ProductList';
+import { SavingsTabValue } from 'domains/Savings/types';
+import { 적금상품필터링, 추천상품필터링 } from 'domains/Savings/utils/calculator';
 import React, { Suspense, useState } from 'react';
 import {
   Spacing,
@@ -24,8 +18,8 @@ import {
 
 export function SavingsCalculatorPage() {
   // 계산기 상태
-  const [goalAmount, setGoalAmount] = useState('');
-  const [monthlyDeposit, setMonthlyDeposit] = useState('');
+  const [goalAmount, setGoalAmount] = useState(0);
+  const [monthlyDeposit, setMonthlyDeposit] = useState(0);
   const [savingsPeriod, setSavingsPeriod] = useState(12);
 
   // 상품 상태
@@ -37,12 +31,6 @@ export function SavingsCalculatorPage() {
   const selectedProduct = products.find(p => p.id === selectedProductId);
   const hasProduct = !selectedProduct;
   const annualRate = selectedProduct?.annualRate ?? 0;
-  // 예상 수익 금액 : 최종 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
-  const expectedProfit = calculateExpectedProfit(Number(monthlyDeposit) || 0, savingsPeriod, annualRate);
-  // 목표 금액과의 차이 : 목표 금액과의 차이 = 목표 금액 - 예상 수익 금액
-  const goalDifference = calculateGoalDifference(Number(goalAmount) || 0, expectedProfit);
-  // 추천 월 납입 금액 : 월 납입액 = 목표 금액 ÷ (저축 기간 * (1 + 연이자율 * 0.5))
-  const recommendedDeposit = calculateRecommendedDeposit(Number(goalAmount) || 0, savingsPeriod, annualRate);
 
   return (
     // 계산기의 본질. 숫자를 입력, 결과를 보여준다.
@@ -53,8 +41,8 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={goalAmount.toLocaleString('ko-KR')}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoalAmount(e.target.value)}
+        value={goalAmount ? Number(goalAmount).toLocaleString() : ''}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoalAmount(e.target.value.replace(/,/g, ''))}
         // 콤마처리 숫자입력할때 보여질 필요가 없으니, 추상화한다.
       />
       <Spacing size={16} />
@@ -63,8 +51,8 @@ export function SavingsCalculatorPage() {
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={monthlyDeposit.toLocaleString('ko-KR')}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMonthlyDeposit(e.target.value)}
+        value={monthlyDeposit ? Number(monthlyDeposit).toLocaleString() : ''}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMonthlyDeposit(e.target.value.replace(/,/g, ''))}
       />
       <Spacing size={16} />
 
@@ -94,7 +82,7 @@ export function SavingsCalculatorPage() {
         <Suspense fallback={<div>로딩 중...</div>}>
           <ProductList
             select={products =>
-              filterSavingsProducts(products, {
+              적금상품필터링(products, {
                 monthlyDeposit: Number(monthlyDeposit),
                 period: savingsPeriod,
               })
@@ -119,11 +107,20 @@ export function SavingsCalculatorPage() {
           {hasProduct ? (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요" />} />
           ) : (
-            <>
-              <CalculationResultItem name="예상 수익 금액" price={expectedProfit} unit="원" />
-              <CalculationResultItem name="목표 금액과의 차이" price={goalDifference} unit="원" />
-              <CalculationResultItem name="추천 월 납입 금액" price={recommendedDeposit} unit="원" />
-            </>
+            (() => {
+              const 예상수익금액 = monthlyDeposit * savingsPeriod * (1 + annualRate * 0.5);
+              const 목표금액과의차이 = goalAmount - 예상수익금액;
+              const rawAmount = goalAmount / (savingsPeriod * (1 + annualRate * 0.5));
+              const 추천월납입금액 = Math.round(rawAmount / 1000) * 1000;
+
+              return (
+                <>
+                  <CalculationResultItem name="예상 수익 금액" price={예상수익금액} unit="원" />
+                  <CalculationResultItem name="목표 금액과의 차이" price={목표금액과의차이} unit="원" />
+                  <CalculationResultItem name="추천 월 납입 금액" price={추천월납입금액} unit="원" />
+                </>
+              );
+            })()
           )}
           <Divider spacing={8} />
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
@@ -131,7 +128,7 @@ export function SavingsCalculatorPage() {
 
           <Suspense fallback={<div>로딩 중...</div>}>
             <ProductList
-              select={products => getTopRateProducts(products, 2)}
+              select={products => 추천상품필터링(products)}
               renderProps={product => {
                 const isSelected = selectedProductId === product.id;
                 return (
