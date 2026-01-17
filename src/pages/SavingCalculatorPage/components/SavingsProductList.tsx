@@ -1,12 +1,14 @@
 import styled from "@emotion/styled";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { commaizeNumber } from "@toss/utils";
-import { useAtomValue } from "jotai";
-import { ListRow, colors } from "tosslib";
+import { useAtom, useAtomValue } from "jotai";
+import { Assets, ListRow, colors } from "tosslib";
 import { monthlyPaymentAtom, savingsPeriodAtom } from "../atoms/savingsCaculationInputs";
+import { selectedSavingsProductIdAtom } from "../atoms/selectedSavingsProductId";
 import { savingsProductsQueryOptions } from "../remotes/savingsProducts";
 
 export function SavingsProductList() {
+  const [selectedSavingsProductId, setSelectedSavingsProductId] = useAtom(selectedSavingsProductIdAtom);
   const monthlyPayment = useAtomValue(monthlyPaymentAtom);
   const savingsPeriod = useAtomValue(savingsPeriodAtom);
 
@@ -21,12 +23,19 @@ export function SavingsProductList() {
       ),
   });
 
+  const handleSelectSavingsProduct = (savingsProductId: string) => {
+    setSelectedSavingsProductId(savingsProductId);
+  };
+
   return (
     <Container>
       {savingsProducts.map((savingsProduct) => {
+        const isSelected = selectedSavingsProductId === savingsProduct.id;
+
         return (
           <ListRow
             key={savingsProduct.id}
+            onClick={() => handleSelectSavingsProduct(savingsProduct.id)}
             contents={
               <ListRow.Texts
                 type="3RowTypeA"
@@ -38,6 +47,7 @@ export function SavingsProductList() {
                 bottomProps={{ fontSize: 13, color: colors.grey600 }}
               />
             }
+            right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
           />
         )
       })}
