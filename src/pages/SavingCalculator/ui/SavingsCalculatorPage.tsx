@@ -23,9 +23,9 @@ const savingsProductsQueyOptions = () =>
 
 export function SavingsCalculatorPage() {
   const [filters, setFilters] = useState({
-    targetAmount: 0,
-    monthlyPayment: 0,
-    terms: 12,
+    목표_금액: 0,
+    월_납입액: 0,
+    저축_기간: 12,
   });
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   const [tab, setTab] = useState<Tab>('products');
@@ -39,21 +39,21 @@ export function SavingsCalculatorPage() {
       <NumberInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
-        value={filters.targetAmount}
-        onChange={value => setFilters(prev => ({ ...prev, targetAmount: value }))}
+        value={filters.목표_금액}
+        onChange={value => setFilters(prev => ({ ...prev, 목표_금액: value }))}
       />
       <Spacing size={16} />
       <NumberInput
         label="월 납입액"
         placeholder="월 납입액을 입력하세요"
-        value={filters.monthlyPayment}
-        onChange={value => setFilters(prev => ({ ...prev, monthlyPayment: value }))}
+        value={filters.월_납입액}
+        onChange={value => setFilters(prev => ({ ...prev, 월_납입액: value }))}
       />
       <Spacing size={16} />
       <TermsSelect
         title="저축 기간"
-        value={filters.terms}
-        onSelect={value => setFilters(prev => ({ ...prev, terms: value }))}
+        value={filters.저축_기간}
+        onSelect={value => setFilters(prev => ({ ...prev, 저축_기간: value }))}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
@@ -87,9 +87,9 @@ export function SavingsCalculatorPage() {
                   {...savingsProductsQueyOptions()}
                   select={products =>
                     products.filter(product => {
-                      const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
-                      const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
-                      const isMatchingAvailableTerms = eq(product.availableTerms, filters.terms);
+                      const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.월_납입액);
+                      const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.월_납입액);
+                      const isMatchingAvailableTerms = eq(product.availableTerms, filters.저축_기간);
 
                       return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                     })
@@ -118,20 +118,18 @@ export function SavingsCalculatorPage() {
 
                 {selectedSavingsProduct ? (
                   (() => {
-                    const interestMultiplier = 1 + selectedSavingsProduct.annualRate * 0.5;
-                    const totalPrincipal = filters.monthlyPayment * filters.terms;
+                    const 이자율_승수 = 1 + selectedSavingsProduct.annualRate * 0.5;
+                    const 총_납입_원금 = filters.월_납입액 * filters.저축_기간;
 
-                    const expectedTotalAmount = totalPrincipal * interestMultiplier;
-                    const differenceFromTarget = filters.targetAmount - expectedTotalAmount;
-                    const recommendedMonthlyPayment = roundToThousand(
-                      filters.targetAmount / (filters.terms * interestMultiplier)
-                    );
+                    const 예상_수익_금액 = 총_납입_원금 * 이자율_승수;
+                    const 목표_금액과의_차이 = filters.목표_금액 - 예상_수익_금액;
+                    const 추천_월_납입_금액 = roundToThousand(filters.목표_금액 / (filters.저축_기간 * 이자율_승수));
 
                     return (
                       <>
-                        <CalculationResultItem name="예상 수익 금액" amount={expectedTotalAmount} />
-                        <CalculationResultItem name="목표 금액과의 차이" amount={differenceFromTarget} />
-                        <CalculationResultItem name="추천 월 납입 금액" amount={recommendedMonthlyPayment} />
+                        <CalculationResultItem name="예상 수익 금액" amount={예상_수익_금액} />
+                        <CalculationResultItem name="목표 금액과의 차이" amount={목표_금액과의_차이} />
+                        <CalculationResultItem name="추천 월 납입 금액" amount={추천_월_납입_금액} />
                       </>
                     );
                   })()
@@ -155,9 +153,9 @@ export function SavingsCalculatorPage() {
                       const getRecommendedProducts = flow(
                         (products: SavingsProduct[]) =>
                           products.filter(product => {
-                            const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
-                            const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
-                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.terms);
+                            const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.월_납입액);
+                            const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.월_납입액);
+                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.저축_기간);
 
                             return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                           }),
