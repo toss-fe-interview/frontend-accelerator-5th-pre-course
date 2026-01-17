@@ -1,5 +1,4 @@
-import { fetchSavingsProducts } from 'components/ProductTabs/api';
-import { ProductTabs, SavingsProduct } from 'components/ProductTabs/types';
+import { calculateExpectedProfit, calculateRecommendMonthlyPayment } from 'utils/calculate';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import {
@@ -15,6 +14,9 @@ import {
   Assets,
   HttpError,
 } from 'tosslib';
+import SavingsProductItem from 'features/savings-product-item/ui/SavingsProductItem';
+import { ProductTabs, SavingsProduct } from 'features/savings-products/model/types';
+import { savingsProductsApi } from 'features/savings-products/api/savings-products';
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
@@ -25,7 +27,7 @@ export function SavingsCalculatorPage() {
 
   const { data: products = [], error } = useQuery<SavingsProduct[], HttpError>({
     queryKey: ['savings-products'],
-    queryFn: fetchSavingsProducts,
+    queryFn: savingsProductsApi,
   });
 
   const expectedProfit = calculateExpectedProfit(
@@ -46,8 +48,8 @@ export function SavingsCalculatorPage() {
     ? products.filter(product => {
         return (
           product.availableTerms === savingTerms &&
-          Number(monthlyAmount) <= product.maxMonthlyAmount &&
-          Number(monthlyAmount) >= product.minMonthlyAmount
+          monthlyAmount <= product.maxMonthlyAmount &&
+          monthlyAmount >= product.minMonthlyAmount
         );
       })
     : products;
@@ -119,16 +121,15 @@ export function SavingsCalculatorPage() {
         <>
           {filteredProducts.map(product => {
             const isSelected = selectedSavingProduct?.id === product.id;
-            const depositRequirement = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`;
 
             return (
               <ListRow
                 key={product.id}
                 contents={
-                  <ProductListRowTexts
-                    productName={product.name}
-                    productAnnualRate={product.annualRate}
-                    depositRequirement={depositRequirement}
+                  <SavingsProductItem
+                    상품이름={product.name}
+                    상품이율={product.annualRate}
+                    납입조건={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`}
                   />
                 }
                 right={isSelected && <CheckedIcon />}
@@ -183,16 +184,15 @@ export function SavingsCalculatorPage() {
           {recommendedProducts.length > 0 ? (
             recommendedProducts.map(product => {
               const isSelected = selectedSavingProduct?.id === product.id;
-              const depositRequirement = `${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`;
 
               return (
                 <ListRow
                   key={product.id}
                   contents={
-                    <ProductListRowTexts
-                      productName={product.name}
-                      productAnnualRate={product.annualRate}
-                      depositRequirement={depositRequirement}
+                    <SavingsProductItem
+                      상품이름={product.name}
+                      상품이율={product.annualRate}
+                      납입조건={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}`}
                     />
                   }
                   right={isSelected && <CheckedIcon />}
@@ -211,44 +211,4 @@ export function SavingsCalculatorPage() {
 
 const CheckedIcon = () => {
   return <Assets.Icon name="icon-check-circle-green" />;
-};
-
-// WHAT은 props로 받아서 본질을 명확히 하기
-const ProductListRowTexts = ({
-  productName,
-  productAnnualRate,
-  depositRequirement,
-}: {
-  productName: string;
-  productAnnualRate: number;
-  depositRequirement: string;
-}) => {
-  return (
-    <ListRow.Texts
-      type="3RowTypeA"
-      top={productName}
-      middle={`연 이자율: ${productAnnualRate}%`}
-      bottom={depositRequirement}
-      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-      bottomProps={{ fontSize: 13, color: colors.grey600 }}
-    />
-  );
-};
-
-// 계산 기능을 가진 유틸 함수
-const roundingNumber = (num: number) => {
-  if (num >= 1000) {
-    const rounded = Math.round(num / 1000);
-    return rounded * 1000;
-  }
-  return 0;
-};
-
-const calculateExpectedProfit = (monthlyAmount: number, savingTerms: number, annualRate: number) => {
-  return monthlyAmount * savingTerms * (1 + annualRate * 0.5);
-};
-
-const calculateRecommendMonthlyPayment = (targetAmount: number, savingTerms: number, annualRate: number) => {
-  return roundingNumber(targetAmount) / (savingTerms * (1 + annualRate * 0.5));
 };
