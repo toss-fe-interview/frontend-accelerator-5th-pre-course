@@ -17,8 +17,8 @@ import {
 } from 'tosslib';
 
 export function SavingsCalculatorPage() {
-  const [targetAmount, setTargetAmount] = useState(0);
-  const [monthlyAmount, setMonthlyAmount] = useState(0);
+  const [targetAmount, setTargetAmount] = useState<number | null>(null);
+  const [monthlyAmount, setMonthlyAmount] = useState<number | null>(null);
   const [savingTerms, setSavingTerms] = useState(12);
   const [selectedTab, setSelectedTab] = useState<ProductTabs>('products');
   const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
@@ -28,26 +28,15 @@ export function SavingsCalculatorPage() {
     queryFn: fetchSavingsProducts,
   });
 
-  const roundingNumber = (num: number) => {
-    if (num >= 1000) {
-      const rounded = Math.round(num / 1000);
-      return rounded * 1000;
-    }
-    return 0;
-  };
+  const expectedProfit = calculateExpectedProfit(
+    monthlyAmount ?? 0,
+    savingTerms,
+    selectedSavingProduct?.annualRate ?? 0
+  );
 
-  const calculateExpectedProfit = (monthlyAmount: number, savingTerms: number, annualRate: number) => {
-    return monthlyAmount * savingTerms * (1 + annualRate * 0.5);
-  };
-
-  const calculateRecommendMonthlyPayment = (targetAmount: number, savingTerms: number, annualRate: number) => {
-    return roundingNumber(targetAmount) / (savingTerms * (1 + annualRate * 0.5));
-  };
-
-  const expectedProfit = calculateExpectedProfit(monthlyAmount, savingTerms, selectedSavingProduct?.annualRate ?? 0);
-  const diffAmount = targetAmount - expectedProfit;
+  const diffAmount = (targetAmount ?? 0) - expectedProfit;
   const recommendMonthlyPayment = calculateRecommendMonthlyPayment(
-    targetAmount,
+    targetAmount ?? 0,
     savingTerms,
     selectedSavingProduct?.annualRate ?? 0
   );
@@ -79,10 +68,12 @@ export function SavingsCalculatorPage() {
           label="목표 금액"
           placeholder="목표 금액을 입력하세요"
           suffix="원"
-          value={targetAmount.toString()}
+          value={targetAmount?.toString()}
           onChange={e => {
-            const num = Number(e.target.value);
-            setTargetAmount(num);
+            const value = e.target.value;
+            if (value.length > 13) return;
+            const onlyNumber = e.target.value.replace(/[^0-9]/g, '');
+            setTargetAmount(Number(onlyNumber));
           }}
         />
         <Spacing size={16} />
@@ -90,10 +81,12 @@ export function SavingsCalculatorPage() {
           label="월 납입액"
           placeholder="희망 월 납입액을 입력하세요"
           suffix="원"
-          value={monthlyAmount.toString()}
+          value={monthlyAmount?.toString()}
           onChange={e => {
-            const num = Number(e.target.value);
-            setMonthlyAmount(num);
+            const value = e.target.value;
+            if (value.length > 13) return;
+            const onlyNumber = e.target.value.replace(/[^0-9]/g, '');
+            setMonthlyAmount(Number(onlyNumber));
           }}
         />
         <Spacing size={16} />
@@ -151,8 +144,8 @@ export function SavingsCalculatorPage() {
               <ListRow.Texts
                 type="2RowTypeA"
                 top="예상 수익 금액"
-                // HOW
                 bottom={`${expectedProfit.toLocaleString('ko-KR')}원`}
+                // HOW
                 topProps={{ color: colors.grey600 }}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
@@ -163,8 +156,8 @@ export function SavingsCalculatorPage() {
               <ListRow.Texts
                 type="2RowTypeA"
                 top="목표 금액과의 차이"
-                // HOW
                 bottom={`${diffAmount.toLocaleString('ko-KR')}원`}
+                // HOW
                 topProps={{ color: colors.grey600 }}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
@@ -175,8 +168,8 @@ export function SavingsCalculatorPage() {
               <ListRow.Texts
                 type="2RowTypeA"
                 top="추천 월 납입 금액"
-                // HOW
                 bottom={`${(recommendMonthlyPayment ?? 0).toLocaleString('ko-KR')}원`}
+                // HOW
                 topProps={{ color: colors.grey600 }}
                 bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
               />
@@ -241,4 +234,21 @@ const ProductListRowTexts = ({
       bottomProps={{ fontSize: 13, color: colors.grey600 }}
     />
   );
+};
+
+// 계산 기능을 가진 유틸 함수
+const roundingNumber = (num: number) => {
+  if (num >= 1000) {
+    const rounded = Math.round(num / 1000);
+    return rounded * 1000;
+  }
+  return 0;
+};
+
+const calculateExpectedProfit = (monthlyAmount: number, savingTerms: number, annualRate: number) => {
+  return monthlyAmount * savingTerms * (1 + annualRate * 0.5);
+};
+
+const calculateRecommendMonthlyPayment = (targetAmount: number, savingTerms: number, annualRate: number) => {
+  return roundingNumber(targetAmount) / (savingTerms * (1 + annualRate * 0.5));
 };
