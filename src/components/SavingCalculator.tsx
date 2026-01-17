@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react';
 import { Border, SelectBottomSheet, Spacing, Tab, TextField, ListRow } from 'tosslib';
 import CalculationResult from './CalculationResult';
 import ProductList from './ProductList';
-import { ProductItem } from 'types/products';
 import { CalculatorForm } from 'types/calculate';
 import { getNumericStringOnly } from 'utils/number';
 import useProducts from 'hooks/useProducts';
 import Product from './ProductItem';
 import RecommendProductList from './RecommendProductList';
+import { createSavingCalculator, getFilterProductsByInputValue } from 'feature/product';
 
 type Tabs = (typeof TABS)[keyof typeof TABS];
 
@@ -41,7 +41,7 @@ export default function SavingCalculator() {
   );
 
   const selectedProduct = filteredProducts.find(product => product.isSelected);
-  const calculator = savingCalculator(calculatingData, selectedProduct);
+  const savingCalculator = createSavingCalculator(calculatingData, selectedProduct);
   const recommendedProducts = filteredProducts.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
@@ -102,7 +102,7 @@ export default function SavingCalculator() {
       {tab === TABS.PRODUCT && (
         <ProductList
           items={filteredProducts}
-          renderItem={product => (
+          renderComponent={product => (
             <Product
               product={product}
               isActive={product.isSelected}
@@ -118,9 +118,9 @@ export default function SavingCalculator() {
         <>
           {selectedProduct ? (
             <CalculationResult
-              예상수익금액={calculator.getExpectedReturnAmount()}
-              목표금액과의차이={calculator.getTargetGapAmount()}
-              추천월납입금액={calculator.getRecommendedMonthlyContribution()}
+              예상수익금액={savingCalculator.calculate('ExpectedReturnAmount')}
+              목표금액과의차이={savingCalculator.calculate('TargetGapAmount')}
+              추천월납입금액={savingCalculator.calculate('RecommendedMonthlyContribution')}
             />
           ) : (
             <EmptyContent text="상품을 선택해주세요." />
@@ -131,7 +131,7 @@ export default function SavingCalculator() {
           <Spacing size={40} />
           <RecommendProductList
             items={recommendedProducts}
-            renderItem={recommendedProducts => (
+            renderComponent={recommendedProducts => (
               <Product
                 product={recommendedProducts}
                 isActive={recommendedProducts.isSelected}
@@ -145,47 +145,6 @@ export default function SavingCalculator() {
       )}
     </>
   );
-}
-
-function getFilterProductsByInputValue(products: ProductItem[], userInput: CalculatorForm) {
-  if (products.length === 0) {
-    return [];
-  }
-
-  return products
-    .filter(product => product.minMonthlyAmount < Number(userInput.monthlyPayment))
-    .filter(product => product.maxMonthlyAmount > Number(userInput.monthlyPayment))
-    .filter(product => product.availableTerms === userInput.savingPeriod);
-}
-
-function savingCalculator(userInput: CalculatorForm, targetProduct?: ProductItem) {
-  if (!targetProduct) {
-    return {
-      getExpectedReturnAmount() {
-        return 0;
-      },
-      getTargetGapAmount() {
-        return 0;
-      },
-      getRecommendedMonthlyContribution() {
-        return 0;
-      },
-    };
-  }
-  return {
-    // 최종 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
-    getExpectedReturnAmount() {
-      return Number(userInput.monthlyPayment) * userInput.savingPeriod * (1 + targetProduct.annualRate * 0.5);
-    },
-    // 목표 금액과의 차이 = 목표 금액 - 예상 수익 금액
-    getTargetGapAmount() {
-      return Number(userInput.targetAmount) - this.getExpectedReturnAmount();
-    },
-    // 월 납입액 = 목표 금액 ÷ (저축 기간 * (1 + 연이자율 * 0.5))
-    getRecommendedMonthlyContribution() {
-      return Number(userInput.targetAmount) / (userInput.savingPeriod * (1 + targetProduct.annualRate * 0.5));
-    },
-  };
 }
 
 function EmptyContent({ text }: { text: string }) {

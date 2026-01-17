@@ -3,14 +3,14 @@ import { ProductItem } from 'types/products';
 
 interface ProductListProps {
   items: ProductItem[];
-  renderItem: (product: ProductItem) => JSX.Element;
+  renderComponent: (product: ProductItem) => JSX.Element;
 }
 
-export default function ProductList({ items, renderItem }: ProductListProps) {
+export default function ProductList({ items, renderComponent }: ProductListProps) {
   return (
     <>
       {items.map(item => (
-        <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
+        <React.Fragment key={item.id}>{renderComponent(item)}</React.Fragment>
       ))}
     </>
   );
