@@ -2,8 +2,6 @@ import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tossli
 import { useState } from 'react';
 import { getSavingsProducts, SavingsProduct } from 'api/product';
 import { CheckCircleIcon } from 'components/CheckCircleIcon';
-import { GoalAmountInput } from 'components/GoalAmountInput';
-import { MonthlyPaymentInput } from 'components/MonthlyPaymentInput';
 import { Product } from 'components/Product';
 import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
@@ -14,6 +12,7 @@ import { EmptyMessage } from 'components/EmptyMessage';
 import { eq, gt, lt } from 'es-toolkit/compat';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { ErrorBoundary, Suspense } from '@suspensive/react';
+import { NumberInput } from 'components/NumberField';
 
 type Tab = 'products' | 'results';
 
@@ -47,9 +46,19 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <GoalAmountInput value={targetAmount} onChange={value => setValue('targetAmount', value)} />
+      <NumberInput
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        value={targetAmount}
+        onChange={value => setValue('targetAmount', value)}
+      />
       <Spacing size={16} />
-      <MonthlyPaymentInput value={monthlyPayment} onChange={value => setValue('monthlyPayment', value)} />
+      <NumberInput
+        label="월 납입액"
+        placeholder="월 납입액을 입력하세요"
+        value={monthlyPayment}
+        onChange={value => setValue('monthlyPayment', value)}
+      />
       <Spacing size={16} />
       <SavingPeriodSelect
         value={savingPeriod}
