@@ -1,7 +1,7 @@
-import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 import { getSavingsProducts, SavingsProduct } from 'pages/SavingCalculator/api/product';
-import { SavingsProductItem } from 'pages/SavingCalculator/ui/SavingsProductItem';
+import { SavingsProductListRow } from 'pages/SavingCalculator/ui/SavingsProductItem';
 import { CalculationResultItem } from 'pages/SavingCalculator/ui/CalculationResultItem';
 import { SavingPeriodSelect } from 'pages/SavingCalculator/ui/SavingPeriodSelect';
 import { queryOptions } from '@tanstack/react-query';
@@ -101,21 +101,11 @@ export function SavingsCalculatorPage() {
                       products.map(product => {
                         const isSelected = selectedSavingsProduct?.id === product.id;
                         return (
-                          <ListRow
+                          <SavingsProductListRow
                             key={product.id}
-                            contents={
-                              <SavingsProductItem
-                                name={product.name}
-                                annualRate={product.annualRate}
-                                minMonthlyAmount={product.minMonthlyAmount}
-                                maxMonthlyAmount={product.maxMonthlyAmount}
-                                availableTerms={product.availableTerms}
-                              />
-                            }
-                            right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
-                            onClick={() => {
-                              setSelectedSavingsProduct(product);
-                            }}
+                            product={product}
+                            isSelected={isSelected}
+                            onClick={() => setSelectedSavingsProduct(product)}
                           />
                         );
                       })
@@ -185,21 +175,11 @@ export function SavingsCalculatorPage() {
                         products.map(product => {
                           const isSelected = selectedSavingsProduct?.id === product.id;
                           return (
-                            <ListRow
+                            <SavingsProductListRow
                               key={product.id}
-                              contents={
-                                <SavingsProductItem
-                                  name={product.name}
-                                  annualRate={product.annualRate}
-                                  minMonthlyAmount={product.minMonthlyAmount}
-                                  maxMonthlyAmount={product.maxMonthlyAmount}
-                                  availableTerms={product.availableTerms}
-                                />
-                              }
-                              right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
-                              onClick={() => {
-                                setSelectedSavingsProduct(product);
-                              }}
+                              product={product}
+                              isSelected={isSelected}
+                              onClick={() => setSelectedSavingsProduct(product)}
                             />
                           );
                         })
