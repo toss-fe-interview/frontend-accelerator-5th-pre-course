@@ -1,4 +1,5 @@
 import { colors, ListRow } from 'tosslib';
+import { commaizeNumber } from 'utils/commaizeNumber';
 
 interface CalculationResultRowProps {
   label: string;
@@ -21,7 +22,7 @@ export function CalculationResultRow({ label, amount }: CalculationResultRowProp
           type="2RowTypeA"
           top={label}
           topProps={{ color: colors.grey600 }}
-          bottom={`${amount.toLocaleString()}원`}
+          bottom={`${commaizeNumber(amount)}원`}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }

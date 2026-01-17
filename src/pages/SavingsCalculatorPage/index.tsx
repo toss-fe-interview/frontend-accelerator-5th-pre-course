@@ -1,62 +1,32 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Border, http, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import { AmountField } from './components/AmountField';
 import { SavingsProductItem } from './components/SavingsProductItem';
 import { CalculationResultRow } from './components/CalculationResultRow';
-
-type SavingsTerm = 6 | 12 | 24;
+import { getSavingsProducts } from './api';
+import {
+  SavingsProduct,
+  SavingsTerm,
+  matchesMonthlyAmountAndTerm,
+  calculateExpectedRevenue,
+  calculateDifference,
+  calculateRecommendedAmount,
+} from './domain';
+import { toNumber } from 'utils/toNumber';
 
 const SAVINGS_TERM_OPTIONS = [6, 12, 24] as const satisfies readonly SavingsTerm[];
 
 type TabValue = 'products' | 'results';
-
-interface SavingsProduct {
-  id: string;
-  name: string;
-  annualRate: number;
-  minMonthlyAmount: number;
-  maxMonthlyAmount: number;
-  availableTerms: SavingsTerm;
-}
-
-const toNumber = (value: string): number => {
-  const parsed = Number(value);
-  return isNaN(parsed) ? 0 : parsed;
-};
-
-const matchesMonthlyAmountAndTerm = (product: SavingsProduct, monthlyAmount: number, savingsTerm: SavingsTerm) => {
-  if (monthlyAmount === 0) {
-    return product.availableTerms === savingsTerm;
-  }
-
-  return (
-    monthlyAmount >= product.minMonthlyAmount &&
-    monthlyAmount <= product.maxMonthlyAmount &&
-    product.availableTerms === savingsTerm
-  );
-};
-
-const calculateExpectedRevenue = (monthlyAmount: number, savingsTerm: SavingsTerm, annualRate: number) => {
-  return monthlyAmount * savingsTerm * (1 + (annualRate / 100) * 0.5);
-};
-
-const calculateDifference = (targetAmount: number, expectedRevenue: number) => {
-  return targetAmount - expectedRevenue;
-};
-
-const calculateRecommendedAmount = (targetAmount: number, savingsTerm: SavingsTerm, annualRate: number) => {
-  return Math.round(targetAmount / (savingsTerm * (1 + (annualRate / 100) * 0.5)) / 1000) * 1000;
-};
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState('');
   const [monthlyAmount, setMonthlyAmount] = useState('');
   const [savingsTerm, setSavingsTerm] = useState<SavingsTerm>(12);
 
-  const { data: filteredProducts = [] } = useQuery({
+  const { data: savingsProducts = [] } = useQuery({
     queryKey: ['savings-products', monthlyAmount, savingsTerm],
-    queryFn: () => http.get<SavingsProduct[]>('/api/savings-products'),
+    queryFn: getSavingsProducts,
     select: products =>
       products.filter(product => matchesMonthlyAmountAndTerm(product, toNumber(monthlyAmount), savingsTerm)),
   });
@@ -120,7 +90,7 @@ export function SavingsCalculatorPage() {
       {/* SavingsProductItem: 적금 상품의 이름, 연이자율, 월납입 범위, 기간을 행으로 보여주고 선택할 수 있다 */}
       {selectedTab === 'products' && (
         <>
-          {filteredProducts.map(product => {
+          {savingsProducts.map(product => {
             const isSelected = selectedProduct?.id === product.id;
 
             return (
@@ -173,7 +143,7 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {filteredProducts
+          {savingsProducts
             .sort((a, b) => b.annualRate - a.annualRate)
             .slice(0, 2)
             .map(product => {

@@ -1,13 +1,15 @@
 import { Assets, colors, ListRow } from 'tosslib';
+import { commaizeNumber } from 'utils/commaizeNumber';
+import { SavingsProduct, SavingsTerm } from '../domain/types';
 
 interface SavingsProductItemProps {
-  name: string;
-  annualRate: number;
+  name: SavingsProduct['name'];
+  annualRate: SavingsProduct['annualRate'];
   monthlyRange: {
-    min: number;
-    max: number;
+    min: SavingsProduct['minMonthlyAmount'];
+    max: SavingsProduct['maxMonthlyAmount'];
   };
-  term: number;
+  term: SavingsTerm;
   selected: boolean;
   onSelect: () => void;
 }
@@ -32,7 +34,7 @@ export function SavingsProductItem({ name, annualRate, monthlyRange, term, selec
           topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
           middle={`연 이자율: ${annualRate}%`}
           middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-          bottom={`${monthlyRange.min.toLocaleString()}원 ~ ${monthlyRange.max.toLocaleString()}원 | ${term}개월`}
+          bottom={`${commaizeNumber(monthlyRange.min)}원 ~ ${commaizeNumber(monthlyRange.max)}원 | ${term}개월`}
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
