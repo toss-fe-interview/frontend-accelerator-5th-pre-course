@@ -3,10 +3,13 @@ import MatchCase from 'common/components/MatchCase';
 import { savingsProductsQueryOptions } from 'product/queries';
 import { SavingProduct } from 'product/type/internal';
 import { getFilteredProducts } from 'product/utils/getFilteredProducts';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { ListRow, Tab } from 'tosslib';
 import SavingProducts from './SavingProducts';
 import SavingResults from './SavingResults';
+import RecommendedProducts from './RecommendedProducts';
+import { get예상수익금액, get목표금액과의차이, get추천월납입금액 } from 'product/utils/getResults';
+import ErrorBoundary from 'common/components/ErrorBoundary';
 
 interface Props {
   price: string;
@@ -60,12 +63,27 @@ const ResultSection = ({ price, monthlyPayment, term }: Props) => {
             }
 
             return (
-              <SavingResults
-                selectedProduct={selectedProduct}
-                price={price}
-                monthlyPayment={monthlyPayment}
-                term={term}
-              />
+              <>
+                <SavingResults
+                  results={{
+                    예상수익금액: get예상수익금액(monthlyPayment, term, selectedProduct.annualRate),
+                    목표금액과의차이: get목표금액과의차이(
+                      price,
+                      get예상수익금액(monthlyPayment, term, selectedProduct.annualRate)
+                    ),
+                    추천월납입금액: get추천월납입금액(price, term, selectedProduct.annualRate),
+                  }}
+                />
+                <ErrorBoundary>
+                  <Suspense>
+                    <RecommendedProducts
+                      monthlyPayment={monthlyPayment}
+                      term={term}
+                      selectedProduct={selectedProduct}
+                    />
+                  </Suspense>
+                </ErrorBoundary>
+              </>
             );
           },
         }}
