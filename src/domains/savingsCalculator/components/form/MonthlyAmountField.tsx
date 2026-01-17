@@ -1,4 +1,4 @@
-import { formatCurrency, toNumber } from 'shared/utils/format';
+import { toCurrency, toNumber } from 'shared/utils/format';
 import { TextField } from 'tosslib';
 
 interface MonthlyAmountFieldProps {
@@ -13,7 +13,7 @@ export default function MonthlyAmountField({ value, label, onChange }: MonthlyAm
       label={label}
       placeholder="희망 월 납입액을 입력하세요"
       suffix="원"
-      value={formatCurrency(value)}
+      value={toCurrency(value)}
       onChange={e => onChange(toNumber(e.target.value))}
     />
   );

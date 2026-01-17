@@ -1,4 +1,4 @@
-import { formatCurrency } from 'shared/utils/format';
+import { toCurrencyWon } from 'shared/utils/format';
 import { colors, ListRow } from 'tosslib';
 
 interface CalculationResultProps {
@@ -12,7 +12,7 @@ export default function CalculationResult({ label, value }: CalculationResultPro
       type="2RowTypeA"
       top={label}
       topProps={{ color: colors.grey600 }}
-      bottom={`${formatCurrency(value)}원`}
+      bottom={toCurrencyWon(value)}
       bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
     />
   );
