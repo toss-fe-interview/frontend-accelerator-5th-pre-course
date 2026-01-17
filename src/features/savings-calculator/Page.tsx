@@ -71,7 +71,16 @@ export default function SavingsCalculatorPage() {
                 return (
                   <ListRow
                     key={product.id}
-                    contents={<SavingsProductInfo product={product} />}
+                    contents={
+                      <SavingsProductInfo
+                        상품명={product.name}
+                        가입조건={{
+                          금리: product.annualRate,
+                          납입범위: { min: product.minMonthlyAmount, max: product.maxMonthlyAmount },
+                          가입기간: product.availableTerms,
+                        }}
+                      />
+                    }
                     right={isSelected ? <CheckedCircleIcon /> : null}
                     onClick={() => setSelectedProductId(product.id)}
                   />
@@ -84,43 +93,40 @@ export default function SavingsCalculatorPage() {
             const recommendedProducts = filteredProducts.sort(byHighestAnnualRate).slice(0, 2);
             const selectedProduct = products.find(product => product.id === selectedProductId);
 
-            const 예상만기금액 =
-              selectedProduct && savingTerms
-                ? get_예상만기금액({
-                    월납입액: monthlyAmount ?? 0,
-                    저축기간: savingTerms,
-                    연이자율: selectedProduct.annualRate,
-                  })
-                : 0;
-            const 목표금액과의차이 = get_목표금액과의차이({
-              목표금액: targetAmount ?? 0,
-              예상만기금액,
-            });
-            const 추천월납입금액 =
-              selectedProduct && savingTerms
-                ? get_추천월납입금액({
-                    목표금액: targetAmount ?? 0,
-                    저축기간: savingTerms,
-                    연이자율: selectedProduct.annualRate,
-                  })
-                : 0;
-
             return (
               <>
                 <Spacing size={8} />
-                {selectedProduct ? (
-                  savingTerms ? (
+                {(() => {
+                  if (!selectedProduct) {
+                    return <EmptyMessage message="상품을 선택해주세요." />;
+                  }
+                  if (!savingTerms) {
+                    return <EmptyMessage message="저축 기간을 선택해주세요." />;
+                  }
+
+                  const 예상만기금액 = get_예상만기금액({
+                    월납입액: monthlyAmount ?? 0,
+                    저축기간: savingTerms,
+                    연이자율: selectedProduct.annualRate,
+                  });
+                  const 목표금액과의차이 = get_목표금액과의차이({
+                    목표금액: targetAmount ?? 0,
+                    예상만기금액,
+                  });
+                  const 추천월납입금액 = get_추천월납입금액({
+                    목표금액: targetAmount ?? 0,
+                    저축기간: savingTerms,
+                    연이자율: selectedProduct.annualRate,
+                  });
+
+                  return (
                     <>
                       <ResultRow label="예상 수익 금액" value={`${formatNumber(예상만기금액)}원`} />
                       <ResultRow label="목표 금액과의 차이" value={`${formatNumber(목표금액과의차이)}원`} />
                       <ResultRow label="추천 월 납입 금액" value={`${formatNumber(추천월납입금액)}원`} />
                     </>
-                  ) : (
-                    <EmptyMessage message="저축 기간을 선택해주세요." />
-                  )
-                ) : (
-                  <EmptyMessage message="상품을 선택해주세요." />
-                )}
+                  );
+                })()}
 
                 <Spacing size={8} />
                 <Border height={16} />
@@ -136,7 +142,16 @@ export default function SavingsCalculatorPage() {
                     return (
                       <ListRow
                         key={product.id}
-                        contents={<SavingsProductInfo product={product} />}
+                        contents={
+                          <SavingsProductInfo
+                            상품명={product.name}
+                            가입조건={{
+                              금리: product.annualRate,
+                              납입범위: { min: product.minMonthlyAmount, max: product.maxMonthlyAmount },
+                              가입기간: product.availableTerms,
+                            }}
+                          />
+                        }
                         right={isSelected ? <CheckedCircleIcon /> : null}
                         onClick={() => setSelectedProductId(product.id)}
                       />
