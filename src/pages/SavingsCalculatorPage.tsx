@@ -39,7 +39,7 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={goalAmount ? Number(goalAmount).toLocaleString() : ''}
+        value={goalAmount ? goalAmount.toLocaleString() : ''}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setGoalAmount(Number(e.target.value.replace(/,/g, '')) || 0)
         }
@@ -50,7 +50,7 @@ export function SavingsCalculatorPage() {
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={monthlyDeposit ? Number(monthlyDeposit).toLocaleString() : ''}
+        value={monthlyDeposit ? monthlyDeposit.toLocaleString() : ''}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setMonthlyDeposit(Number(e.target.value.replace(/,/g, '')) || 0)
         }
