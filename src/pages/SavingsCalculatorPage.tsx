@@ -1,7 +1,6 @@
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 import { getSavingsProducts, SavingsProduct } from 'api/product';
-import { CheckCircleIcon } from 'components/CheckCircleIcon';
 import { SavingsProductItem } from 'components/SavingsProductItem';
 import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
@@ -115,7 +114,7 @@ export function SavingsCalculatorPage() {
                                 availableTerms={product.availableTerms}
                               />
                             }
-                            right={isSelected ? <CheckCircleIcon /> : null}
+                            right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
                             onClick={() => {
                               setSelectedSavingsProduct(product);
                             }}
@@ -190,7 +189,7 @@ export function SavingsCalculatorPage() {
                                   availableTerms={product.availableTerms}
                                 />
                               }
-                              right={isSelected ? <CheckCircleIcon /> : null}
+                              right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
                               onClick={() => {
                                 setSelectedSavingsProduct(product);
                               }}
