@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { formatCurrency } from './lib/formatCurrency';
 import { extractNumbers } from './lib/extractNumbers';
 import { SavingsCalculationSummary } from './components/SavingsCalculationSummary';
+import { SavingsProductItem } from './components/SavingsProductItem';
 import {
   calculateDifference,
   calculateExpectedAmount,
@@ -12,7 +13,7 @@ import {
 } from './utils/savingsCalculations';
 import { isProductMatchingInput } from './utils/savingsProductFilters';
 import { getTopProductsByRate } from './utils/productSorting';
-import { SavingResultList } from './components/SavingResultList';
+import { useSavingsProducts } from './hooks/useSavingsProducts';
 
 export function SavingsCalculatorPage() {
   const [savingsInput, setSavingsInput] = useState({
@@ -22,6 +23,8 @@ export function SavingsCalculatorPage() {
   });
   const [savingsProductTab, setSavingsProductTab] = useState<'products' | 'results'>('products');
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
+
+  const { data: savingsProducts = [] } = useSavingsProducts();
 
   return (
     <>
@@ -71,17 +74,19 @@ export function SavingsCalculatorPage() {
 
       {savingsProductTab === 'products' && (
         <>
-          <SavingResultList
-            filterLogic={(products: SavingsProduct[]) =>
-              products.filter(product => {
-                return isProductMatchingInput(product, savingsInput);
-              })
-            }
-            selectedSavingsProduct={selectedSavingsProduct}
-            handleSelectedSavingsProduct={product => {
-              setSelectedSavingsProduct(product);
-            }}
-          />
+          {savingsProducts
+            .filter(product => isProductMatchingInput(product, savingsInput))
+            .map(product => {
+              const isSelected = selectedSavingsProduct?.id === product.id;
+              return (
+                <SavingsProductItem
+                  key={product.id}
+                  product={product}
+                  onClick={() => setSelectedSavingsProduct(isSelected ? null : product)}
+                  isSelected={isSelected}
+                />
+              );
+            })}
         </>
       )}
 
@@ -126,13 +131,20 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          <SavingResultList
-            filterLogic={getTopProductsByRate}
-            selectedSavingsProduct={selectedSavingsProduct}
-            handleSelectedSavingsProduct={product => {
-              setSelectedSavingsProduct(product);
-            }}
-          />
+          {getTopProductsByRate(
+            savingsProducts.filter(product => isProductMatchingInput(product, savingsInput)),
+            2
+          ).map(product => {
+            const isSelected = selectedSavingsProduct?.id === product.id;
+            return (
+              <SavingsProductItem
+                key={product.id}
+                product={product}
+                onClick={() => setSelectedSavingsProduct(isSelected ? null : product)}
+                isSelected={isSelected}
+              />
+            );
+          })}
 
           <Spacing size={40} />
         </>
