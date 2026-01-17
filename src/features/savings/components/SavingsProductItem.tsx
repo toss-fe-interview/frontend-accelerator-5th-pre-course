@@ -1,7 +1,7 @@
 import { formatPrice } from 'shared/utils/price';
 import { ListRow, colors } from 'tosslib';
 
-type SavingProductItemProps = {
+type SavingsProductItemProps = {
   name: string;
   annualRate: number;
   minMonthlyAmount: number;
@@ -9,13 +9,13 @@ type SavingProductItemProps = {
   availableTerms: number;
 };
 
-export const SavingProductItem = ({
+export const SavingsProductItem = ({
   name,
   annualRate,
   minMonthlyAmount,
   maxMonthlyAmount,
   availableTerms,
-}: SavingProductItemProps) => {
+}: SavingsProductItemProps) => {
   const 납입범위 = `${formatPrice(minMonthlyAmount)}원 ~ ${formatPrice(maxMonthlyAmount)}원`;
   const 저축기간 = `${availableTerms}개월`;
   return (

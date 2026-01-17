@@ -5,7 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
-import { SavingProductItem } from 'features/savings/components/SavingProductItem';
+import { SavingsProductItem } from 'features/savings/components/SavingsProductItem';
 import { SavingsResultItem } from 'features/savings/components/SavingsResultItem';
 import { SavingsProduct } from 'features/savings/types';
 import { useTab } from 'shared/hooks/useTab';
@@ -109,7 +109,7 @@ export function SavingsCalculatorPage() {
                       <ListRow
                         key={product.id}
                         contents={
-                          <SavingProductItem
+                          <SavingsProductItem
                             name={product.name}
                             annualRate={product.annualRate}
                             minMonthlyAmount={product.minMonthlyAmount}
@@ -186,7 +186,7 @@ export function SavingsCalculatorPage() {
                       <ListRow
                         key={product.id}
                         contents={
-                          <SavingProductItem
+                          <SavingsProductItem
                             name={product.name}
                             annualRate={product.annualRate}
                             minMonthlyAmount={product.minMonthlyAmount}
