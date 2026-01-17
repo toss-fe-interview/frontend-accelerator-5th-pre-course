@@ -78,6 +78,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.14.8, @babel/runtime@npm:^7.21.0":
+  version: 7.28.6
+  resolution: "@babel/runtime@npm:7.28.6"
+  checksum: 10c0/358cf2429992ac1c466df1a21c1601d595c46930a13c1d4662fde908d44ee78ec3c183aaff513ecb01ef8c55c3624afe0309eeeb34715672dbfadb7feedb2c0d
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.27.2":
   version: 7.27.2
   resolution: "@babel/template@npm:7.27.2"
@@ -959,6 +966,42 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/query-core@npm:5.90.18":
+  version: 5.90.18
+  resolution: "@tanstack/query-core@npm:5.90.18"
+  checksum: 10c0/af71bf6863b0ca51f0a8344b61e4da18c4f1ad10123ce2e9ca59d459bf2775cfbca6b8d508ab897dd320478073465beabd84ac60f5cc579980816e6cf06dbc22
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.90.18":
+  version: 5.90.18
+  resolution: "@tanstack/react-query@npm:5.90.18"
+  dependencies:
+    "@tanstack/query-core": "npm:5.90.18"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/61610ec867c2291e69f46363c2c66757a8404e185d78db672a4274a3620ea417d96d248e7281a8c958b14648d33489eac21449afb926c909df0cfad1247c8421
+  languageName: node
+  linkType: hard
+
+"@toss/utility-types@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@toss/utility-types@npm:1.2.1"
+  checksum: 10c0/03323f3ff7a3b4ef97fd6b02f8c6ff01252e8f78b9888fea8ff1c1dc3615d945f02a12d5c7585ee9debba5e394bb63ca1dbe3e8cd843c7fce30935c72ea3797d
+  languageName: node
+  linkType: hard
+
+"@toss/utils@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@toss/utils@npm:1.6.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.14.8"
+    "@toss/utility-types": "npm:^1.2.1"
+    date-fns: "npm:^2.25.0"
+  checksum: 10c0/3869e9f420344159ffe6e2dd612d95c9978d66f106a401c4ba2f6df7403311406eef41e0da68030b93be149d82f153d588fc1568d354cb1c2eca5878bcd36620
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.8":
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
@@ -1589,6 +1632,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"date-fns@npm:^2.25.0":
+  version: 2.30.0
+  resolution: "date-fns@npm:2.30.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.21.0"
+  checksum: 10c0/e4b521fbf22bc8c3db332bbfb7b094fd3e7627de0259a9d17c7551e2d2702608a7307a449206065916538e384f37b181565447ce2637ae09828427aed9cb5581
+  languageName: node
+  linkType: hard
+
 "debug@npm:4, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.4":
   version: 4.4.3
   resolution: "debug@npm:4.4.3"
@@ -1869,6 +1921,18 @@ __metadata:
     is-date-object: "npm:^1.0.5"
     is-symbol: "npm:^1.0.4"
   checksum: 10c0/c7e87467abb0b438639baa8139f701a06537d2b9bc758f23e8622c3b42fd0fdb5bde0f535686119e446dd9d5e4c0f238af4e14960f4771877cf818d023f6730b
+  languageName: node
+  linkType: hard
+
+"es-toolkit@npm:^1.44.0":
+  version: 1.44.0
+  resolution: "es-toolkit@npm:1.44.0"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+  checksum: 10c0/b80ff52ddc85ba26914cda57c9d4e46379ccc38c60dc097ef0d065cc0b20f95a16cf8d537969eea600b51c6687b5900a6cce67489db16d5ccc14d47597a29c34
   languageName: node
   linkType: hard
 
@@ -3014,6 +3078,27 @@ __metadata:
     "@pkgjs/parseargs":
       optional: true
   checksum: 10c0/6acc10d139eaefdbe04d2f679e6191b3abf073f111edf10b1de5302c97ec93fffeb2fdd8681ed17f16268aa9dd4f8c588ed9d1d3bffbbfa6e8bf897cbb3149b9
+  languageName: node
+  linkType: hard
+
+"jotai@npm:^2.16.2":
+  version: 2.16.2
+  resolution: "jotai@npm:2.16.2"
+  peerDependencies:
+    "@babel/core": ">=7.0.0"
+    "@babel/template": ">=7.0.0"
+    "@types/react": ">=17.0.0"
+    react: ">=17.0.0"
+  peerDependenciesMeta:
+    "@babel/core":
+      optional: true
+    "@babel/template":
+      optional: true
+    "@types/react":
+      optional: true
+    react:
+      optional: true
+  checksum: 10c0/d3458edd5047c7399002399e9e000cdc1511d10b012b42a8fae2e76e0ef74de759078dbb4951fc01a13fdb75224f823a68a8603242d0fc5f38f4f273e96888eb
   languageName: node
   linkType: hard
 
@@ -4392,11 +4477,14 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
     "@hono/vite-dev-server": "npm:^0.18.0"
+    "@tanstack/react-query": "npm:^5.90.18"
+    "@toss/utils": "npm:^1.6.1"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8.18.2"
     "@typescript-eslint/parser": "npm:^8.18.2"
     "@vitejs/plugin-react-swc": "npm:^3.7.2"
+    es-toolkit: "npm:^1.44.0"
     eslint: "npm:^8.57.1"
     eslint-config-prettier: "npm:^8.10.0"
     eslint-plugin-import: "npm:^2.31.0"
@@ -4404,6 +4492,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.3"
     eslint-plugin-react-hooks: "npm:^5.1.0"
     hono: "npm:^4.6.16"
+    jotai: "npm:^2.16.2"
     prettier: "npm:^3.4.2"
     react: "npm:^18"
     react-dom: "npm:^18"
