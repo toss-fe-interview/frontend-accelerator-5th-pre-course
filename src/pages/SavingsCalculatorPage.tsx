@@ -88,8 +88,8 @@ export function SavingsCalculatorPage() {
                 <Suspense fallback={'loading...'}>
                   <SuspenseQuery
                     {...productQueries.list()}
-                    select={data =>
-                      data.filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
+                    select={products =>
+                      products.filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
                     }
                   >
                     {({ data: products }) =>
@@ -160,8 +160,8 @@ export function SavingsCalculatorPage() {
                   <Suspense fallback={'loading...'}>
                     <SuspenseQuery
                       {...productQueries.list()}
-                      select={data =>
-                        data
+                      select={products =>
+                        products
                           .filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
                           .sort(sortByAnnualRateDesc)
                           .slice(0, 2)
