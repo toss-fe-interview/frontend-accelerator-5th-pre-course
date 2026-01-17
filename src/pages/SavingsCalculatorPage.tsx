@@ -63,7 +63,7 @@ export function SavingsCalculatorPage() {
       }
       bottomTabs={[
         {
-          value: 'products',
+          id: 'products',
           label: '적금 상품',
           contents: (
             <>
@@ -99,7 +99,7 @@ export function SavingsCalculatorPage() {
           ),
         },
         {
-          value: 'results',
+          id: 'results',
           label: '계산 결과',
           contents: (
             <>
@@ -159,7 +159,6 @@ export function SavingsCalculatorPage() {
                         key={product.id}
                         contents={<SavingsProduct product={product} />}
                         right={isSelected ? <IconCheckCircle /> : undefined}
-                        onClick={() => setSelectedProduct(product)}
                       />
                     );
                   })

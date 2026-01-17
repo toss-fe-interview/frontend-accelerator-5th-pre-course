@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Border, Spacing, Tab } from 'tosslib';
 
 interface Tab {
-  value: string;
+  id: string;
   label: string;
   contents: React.ReactNode;
 }
@@ -14,13 +14,13 @@ interface TabScreenProps {
 }
 
 export default function TabScreen({ headers, topContents, bottomTabs }: TabScreenProps) {
-  const [selectedTabValue, setSelectedTabValue] = useState(() => bottomTabs[0].value);
+  const [selectedTabId, setSelectedTabId] = useState(() => bottomTabs[0].id);
 
-  const handleTabChange = (value: string) => {
-    setSelectedTabValue(value);
+  const handleTabChange = (id: string) => {
+    setSelectedTabId(id);
   };
 
-  const selectedTab = bottomTabs.find(tab => tab.value === selectedTabValue) ?? bottomTabs[0];
+  const selectedTab = bottomTabs.find(tab => tab.id === selectedTabId) ?? bottomTabs[0];
 
   return (
     <>
@@ -34,7 +34,7 @@ export default function TabScreen({ headers, topContents, bottomTabs }: TabScree
 
       <Tab onChange={handleTabChange}>
         {bottomTabs.map(tab => (
-          <Tab.Item key={tab.value} value={tab.value} selected={selectedTab.value === tab.value}>
+          <Tab.Item key={tab.id} value={tab.id} selected={selectedTab.id === tab.id}>
             {tab.label}
           </Tab.Item>
         ))}
