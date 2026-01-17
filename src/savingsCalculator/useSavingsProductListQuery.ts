@@ -6,7 +6,7 @@ type SavingsProductResponse = {
   annualRate: number;
   minMonthlyAmount: number;
   maxMonthlyAmount: number;
-  availableTerms: number;
+  availableTerms: 6 | 12 | 24;
 };
 
 async function getSavingsProductList(): Promise<SavingsProductResponse[]> {

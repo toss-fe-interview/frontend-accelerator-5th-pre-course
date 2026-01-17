@@ -4,5 +4,7 @@ export type SavingsProduct = {
   annualRate: number;
   minMonthlyAmount: number;
   maxMonthlyAmount: number;
-  availableTerms: number;
+  availableTerms: Term;
 };
+
+export type Term = 6 | 12 | 24;
