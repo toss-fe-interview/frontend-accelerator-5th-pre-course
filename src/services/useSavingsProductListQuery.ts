@@ -20,9 +20,14 @@ async function getSavingsProductList(): Promise<SavingsProductResponse[]> {
   }
 }
 
-export function useSavingsProductListQuery() {
+export function useSavingsProductListQuery({
+  select,
+}: {
+  select?: (savingsProducts: SavingsProductResponse[]) => SavingsProductResponse[];
+}) {
   return useQuery({
     queryKey: ['savings-products'],
     queryFn: getSavingsProductList,
+    select,
   });
 }

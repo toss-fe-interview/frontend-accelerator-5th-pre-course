@@ -4,10 +4,11 @@ import { SavingsProduct } from 'types';
 
 type Props = {
   children: (savingsProducts: SavingsProduct[]) => ReactNode;
+  select?: (savingsProducts: SavingsProduct[]) => SavingsProduct[];
 };
 
-export default function GetSavingsProducts({ children }: Props) {
-  const { data, isLoading, error } = useSavingsProductListQuery();
+export default function GetSavingsProducts({ children, select }: Props) {
+  const { data, isLoading, error } = useSavingsProductListQuery({ select });
 
   if (isLoading || data === undefined) {
     return <div>Loading...</div>;
