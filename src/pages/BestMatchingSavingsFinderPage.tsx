@@ -1,8 +1,13 @@
 import AmountInput from 'components/AmountInput';
-import CalculationResultListRowTexts from 'components/CalculationResultListRowTexts';
 import SavingsProductListRowTexts from 'components/SavingsProductListRowTexts';
 import TabContent from 'components/TabContent';
-import { useSavingsProducts } from 'hook/useSavingsProducts';
+import {
+  calculateExpectedProfit,
+  calculateRecommendedMonthlyAmount,
+  calculateTargetAmountDifference,
+} from 'domain/calculateSavingResult';
+import { savingsProductsQueryOptions } from 'hook/useSavingsProducts';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 
@@ -38,7 +43,7 @@ export function BestMatchingSavingsFinderPage() {
 
   // 외부 데이터
   // 1. 적금 상품 목록 - SavingsProductListData -> 외부 데이터
-  const { data: savingsProductListData } = useSavingsProducts();
+  const { data: savingsProductListData } = useQuery(savingsProductsQueryOptions());
 
   // 가공해야하는 데이터
   // 1. 적금 상품 목록을 필터링한 데이터
@@ -48,8 +53,7 @@ export function BestMatchingSavingsFinderPage() {
     const 월납입액범위내 = (product: SavingsProduct) => {
       if (!savingInputs.monthlyAmount) return true;
       return (
-        savingInputs.monthlyAmount >= product.minMonthlyAmount &&
-        savingInputs.monthlyAmount <= product.maxMonthlyAmount
+        savingInputs.monthlyAmount >= product.minMonthlyAmount && savingInputs.monthlyAmount <= product.maxMonthlyAmount
       );
     };
     const 저축기간일치 = (product: SavingsProduct) => {
@@ -59,25 +63,6 @@ export function BestMatchingSavingsFinderPage() {
 
     return savingsProductListData.filter(product => 월납입액범위내(product) && 저축기간일치(product));
   }, [savingsProductListData, savingInputs]);
-
-  // 2. 계산 결과 데이터 - CalculationResultData -> 내부 데이터 + 외부 데이터
-  const calculationResult = useMemo(() => {
-    const { targetAmount, monthlyAmount, savingTerm } = savingInputs;
-    if (!selectedSavingsProduct || !targetAmount || !monthlyAmount || !savingTerm) return null;
-    return {
-      expectedProfit:
-        monthlyAmount *
-        selectedSavingsProduct.availableTerms *
-        (1 + selectedSavingsProduct.annualRate * 0.5),
-      targetAmountDifference:
-        targetAmount -
-        monthlyAmount *
-          selectedSavingsProduct.availableTerms *
-          (1 + selectedSavingsProduct.annualRate * 0.5),
-      recommendedMonthlyAmount:
-        targetAmount / (savingTerm * (1 + selectedSavingsProduct.annualRate * 0.5)),
-    };
-  }, [selectedSavingsProduct, savingInputs]);
 
   // 3. 필터링 된 상품 중 연이자율 상위 2개 상품 출력 - Top2RecommendedSavingsProductsData -> 내부 데이터 + 외부 데이터
   const compareByAnnualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
@@ -164,25 +149,49 @@ export function BestMatchingSavingsFinderPage() {
             <>
               <ListRow
                 contents={
-                  <CalculationResultListRowTexts
-                    label="예상 수익 금액"
-                    value={calculationResult?.expectedProfit.toLocaleString() ?? '0'}
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="예상 수익 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${calculateExpectedProfit(
+                      savingInputs.monthlyAmount ?? 0,
+                      selectedSavingsProduct.availableTerms,
+                      selectedSavingsProduct.annualRate
+                    ).toLocaleString()}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                   />
                 }
               />
               <ListRow
                 contents={
-                  <CalculationResultListRowTexts
-                    label="목표 금액과의 차이"
-                    value={calculationResult?.targetAmountDifference.toLocaleString() ?? '0'}
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="목표 금액과의 차이"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${calculateTargetAmountDifference(
+                      savingInputs.targetAmount ?? 0,
+                      calculateExpectedProfit(
+                        savingInputs.monthlyAmount ?? 0,
+                        selectedSavingsProduct.availableTerms,
+                        selectedSavingsProduct.annualRate
+                      )
+                    ).toLocaleString()}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                   />
                 }
               />
               <ListRow
                 contents={
-                  <CalculationResultListRowTexts
-                    label="추천 월 납입 금액"
-                    value={calculationResult?.recommendedMonthlyAmount.toLocaleString() ?? '0'}
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="추천 월 납입 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${calculateRecommendedMonthlyAmount(
+                      savingInputs.targetAmount ?? 0,
+                      selectedSavingsProduct.availableTerms,
+                      selectedSavingsProduct.annualRate
+                    ).toLocaleString()}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                   />
                 }
               />
