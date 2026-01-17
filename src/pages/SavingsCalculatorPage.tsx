@@ -5,7 +5,6 @@ import { SavingsProductItem } from 'components/SavingsProductItem';
 import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
 import { queryOptions } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
 import { roundToThousand } from 'util/number';
 import { EmptyMessage } from 'components/EmptyMessage';
 import { eq, gt, lt } from 'es-toolkit/compat';
@@ -21,21 +20,12 @@ const savingsProductsQueyOptions = () =>
     queryFn: getSavingsProducts,
   });
 
-interface SavingsFormData {
-  targetAmount: number;
-  monthlyPayment: number;
-  savingPeriod: number;
-}
-
 export function SavingsCalculatorPage() {
-  const { watch, setValue } = useForm<SavingsFormData>({
-    defaultValues: {
-      targetAmount: 0,
-      monthlyPayment: 0,
-      savingPeriod: 12,
-    },
+  const [filters, setFilters] = useState({
+    targetAmount: 0,
+    monthlyPayment: 0,
+    savingPeriod: 12,
   });
-  const { targetAmount, monthlyPayment, savingPeriod } = watch();
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   const [tab, setTab] = useState<Tab>('products');
 
@@ -48,21 +38,21 @@ export function SavingsCalculatorPage() {
       <NumberInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
-        value={targetAmount}
-        onChange={value => setValue('targetAmount', value)}
+        value={filters.targetAmount}
+        onChange={value => setFilters(prev => ({ ...prev, targetAmount: value }))}
       />
       <Spacing size={16} />
       <NumberInput
         label="월 납입액"
         placeholder="월 납입액을 입력하세요"
-        value={monthlyPayment}
-        onChange={value => setValue('monthlyPayment', value)}
+        value={filters.monthlyPayment}
+        onChange={value => setFilters(prev => ({ ...prev, monthlyPayment: value }))}
       />
       <Spacing size={16} />
       <SavingPeriodSelect
         title="저축 기간"
-        value={savingPeriod}
-        onSelect={value => setValue('savingPeriod', value)}
+        value={filters.savingPeriod}
+        onSelect={value => setFilters(prev => ({ ...prev, savingPeriod: value }))}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
@@ -95,9 +85,7 @@ export function SavingsCalculatorPage() {
                 <Suspense fallback={'loading...'}>
                   <SuspenseQuery
                     {...savingsProductsQueyOptions()}
-                    select={products =>
-                      products.filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
-                    }
+                    select={products => products.filter(product => filterSavingsProducts(product, filters))}
                   >
                     {({ data: products }) =>
                       products.map(product => {
@@ -135,18 +123,21 @@ export function SavingsCalculatorPage() {
                   <>
                     <CalculationResultItem
                       name="예상 수익 금액"
-                      amount={monthlyPayment * savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)}
+                      amount={
+                        filters.monthlyPayment * filters.savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)
+                      }
                     />
                     <CalculationResultItem
                       name="목표 금액과의 차이"
                       amount={
-                        targetAmount - monthlyPayment * savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)
+                        filters.targetAmount -
+                        filters.monthlyPayment * filters.savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)
                       }
                     />
                     <CalculationResultItem
                       name="추천 월 납입 금액"
                       amount={roundToThousand(
-                        targetAmount / (savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5))
+                        filters.targetAmount / (filters.savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5))
                       )}
                     />
                   </>
@@ -169,7 +160,7 @@ export function SavingsCalculatorPage() {
                       {...savingsProductsQueyOptions()}
                       select={products =>
                         products
-                          .filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
+                          .filter(product => filterSavingsProducts(product, filters))
                           .sort(sortByAnnualRateDesc)
                           .slice(0, 2)
                       }
@@ -212,12 +203,12 @@ export function SavingsCalculatorPage() {
 
 const filterSavingsProducts = (
   product: SavingsProduct,
-  { monthlyPayment, savingPeriod }: { monthlyPayment: number; savingPeriod: number }
+  filters: { targetAmount: number; monthlyPayment: number; savingPeriod: number }
 ) => {
   return (
-    gt(product.minMonthlyAmount, monthlyPayment) &&
-    lt(product.maxMonthlyAmount, monthlyPayment) &&
-    eq(product.availableTerms, savingPeriod)
+    gt(product.minMonthlyAmount, filters.monthlyPayment) &&
+    lt(product.maxMonthlyAmount, filters.monthlyPayment) &&
+    eq(product.availableTerms, filters.savingPeriod)
   );
 };
 
