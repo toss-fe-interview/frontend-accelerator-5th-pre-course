@@ -1,6 +1,5 @@
 import { AmountInput } from 'components/AmountInput';
 import { CalculationResult, ResultRow, ValidationMessage } from 'components/CalculationResult';
-import { formatDifference } from 'domains/product/formatter';
 import { ProductList } from 'components/ProductList';
 import { SavingTermsSelect } from 'components/SavingTermsSelect';
 import { filterByMonthlyAmount, filterBySavingsTerm, orderByAnnualRate } from 'domains/product/filters';
@@ -21,6 +20,7 @@ export function SavingsCalculatorPage() {
   return (
     <>
       <NavigationBar title="적금 계산기" />
+
       <Spacing size={16} />
       <AmountInput
         label="목표 금액"
@@ -79,7 +79,7 @@ export function SavingsCalculatorPage() {
               return (
                 <>
                   <ResultRow label="예상 수익" value={`${expectedRevenue.toLocaleString()}원`} />
-                  <ResultRow label="목표 금액과의 차이" value={formatDifference(diffFromTarget)} />
+                  <ResultRow label="목표 금액과의 차이" value={`${diffFromTarget.toLocaleString()}원`} />
                   <ResultRow label="추천 월 납입액" value={`${recommendedAmount.toLocaleString()}원`} />
                 </>
               );
