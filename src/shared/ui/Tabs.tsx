@@ -1,13 +1,5 @@
-import {
-  ComponentProps,
-  createContext,
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import { ComponentProps, createContext, PropsWithChildren, ReactNode, useCallback, useContext, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Tab } from 'tosslib';
 
 interface TabsContextValue {
@@ -26,25 +18,39 @@ const useTabsContext = () => {
 };
 
 interface TabsProps {
+  name?: string;
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
 }
 
-export function Tabs({ children, value: controlledValue, defaultValue, onChange }: PropsWithChildren<TabsProps>) {
-  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue ?? '');
+export function Tabs({
+  children,
+  name = 'tab',
+  value: controlledValue,
+  defaultValue,
+  onChange,
+}: PropsWithChildren<TabsProps>) {
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const isControlled = controlledValue !== undefined;
-  const activeValue = isControlled ? controlledValue : uncontrolledValue;
+  const activeValue = isControlled ? controlledValue : (searchParams.get(name) ?? defaultValue ?? '');
 
   const handleValueChange = useCallback(
     (newValue: string) => {
       if (!isControlled) {
-        setUncontrolledValue(newValue);
+        setSearchParams(
+          prev => {
+            const next = new URLSearchParams(prev);
+            next.set(name, newValue);
+            return next;
+          },
+          { replace: true }
+        );
       }
       onChange?.(newValue);
     },
-    [isControlled, onChange]
+    [isControlled, onChange, setSearchParams, name]
   );
 
   const contextValue = useMemo(
