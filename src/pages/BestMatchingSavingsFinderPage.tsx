@@ -77,11 +77,11 @@ export function BestMatchingSavingsFinderPage() {
   }, [selectedSavingsProduct, userSavingGoal]);
 
   // 3. 필터링 된 상품 중 연이자율 상위 2개 상품 출력 - Top2RecommendedSavingsProductsData -> 내부 데이터 + 외부 데이터
-  const top2RecommendedSavingsProducts = useMemo(() => {
-    if (!filteredProducts) return [];
-    const 이자율내림차순 = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
-    return filteredProducts.sort(이자율내림차순).slice(0, 2);
-  }, [filteredProducts]);
+  const compareByAnnualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
+
+  const sortSavingsProductsByHighRate = (products: SavingsProduct[]) => products.toSorted(compareByAnnualRateDesc);
+
+  const top2RecommendedSavingsProducts = sortSavingsProductsByHighRate(filteredProducts).slice(0, 2);
 
   return (
     <>
