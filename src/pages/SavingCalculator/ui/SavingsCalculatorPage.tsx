@@ -89,9 +89,9 @@ export function SavingsCalculatorPage() {
                   {...savingsProductsQueyOptions()}
                   select={products =>
                     products.filter(product => {
-                      const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.월_납입액);
-                      const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.월_납입액);
-                      const isMatchingAvailableTerms = eq(product.availableTerms, filters.저축_기간);
+                      const isAboveMinMonthlyAmount = product.minMonthlyAmount > filters.월_납입액;
+                      const isBelowMaxMonthlyAmount = product.maxMonthlyAmount < filters.월_납입액;
+                      const isMatchingAvailableTerms = product.availableTerms === filters.저축_기간;
 
                       return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                     })
@@ -155,9 +155,9 @@ export function SavingsCalculatorPage() {
                       const getRecommendedProducts = flow(
                         (products: SavingsProduct[]) =>
                           products.filter(product => {
-                            const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.월_납입액);
-                            const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.월_납입액);
-                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.저축_기간);
+                            const isAboveMinMonthlyAmount = product.minMonthlyAmount > filters.월_납입액;
+                            const isBelowMaxMonthlyAmount = product.maxMonthlyAmount < filters.월_납입액;
+                            const isMatchingAvailableTerms = product.availableTerms === filters.저축_기간;
 
                             return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                           }),
