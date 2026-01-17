@@ -1,19 +1,19 @@
-import { SavingsProductType } from 'shared/types/api/savings';
-
-import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
-import TabScreen from 'shared/components/layout/TabScreen';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { useState } from 'react';
-
-import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
-import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
-import TermField from 'domains/savingsCalculator/components/form/TermField';
-import SavingsQuery from 'shared/query/saving';
 import { useQuery } from '@tanstack/react-query';
 
-import { rangeIn } from 'domains/savingsCalculator/utils/filter';
-import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
-import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
 import CalculationResult from 'domains/savingsCalculator/components/CalculationResult';
+import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
+import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
+import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
+import TermField from 'domains/savingsCalculator/components/form/TermField';
+import { rangeIn } from 'domains/savingsCalculator/utils/filter';
+import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
+
+import SavingsQuery from 'shared/query/saving';
+import TabScreen from 'shared/components/layout/TabScreen';
+import IconCheckCircle from 'shared/components/Icon/IconCheckCircle';
+import { SavingsProductType } from 'shared/types/api/savings';
 
 export function SavingsCalculatorPage() {
   /** refactor : useSavingsInputs 훅 제거하기
@@ -89,7 +89,7 @@ export function SavingsCalculatorPage() {
                     <ListRow
                       key={product.id}
                       contents={<SavingsProduct product={product} />}
-                      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                      right={isSelected ? <IconCheckCircle /> : undefined}
                       onClick={() => setSelectedProduct(product)}
                     />
                   );
@@ -148,18 +148,21 @@ export function SavingsCalculatorPage() {
               {hasNoMatchingProducts ? (
                 <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
               ) : (
-                matchingProducts.slice(0, 2).map(product => {
-                  const isSelected = selectedProduct?.id === product.id;
+                matchingProducts
+                  .sort((a, b) => a.annualRate - b.annualRate)
+                  .slice(0, 2)
+                  .map(product => {
+                    const isSelected = selectedProduct?.id === product.id;
 
-                  return (
-                    <ListRow
-                      key={product.id}
-                      contents={<SavingsProduct product={product} />}
-                      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-                      onClick={() => setSelectedProduct(product)}
-                    />
-                  );
-                })
+                    return (
+                      <ListRow
+                        key={product.id}
+                        contents={<SavingsProduct product={product} />}
+                        right={isSelected ? <IconCheckCircle /> : undefined}
+                        onClick={() => setSelectedProduct(product)}
+                      />
+                    );
+                  })
               )}
             </>
           ),
