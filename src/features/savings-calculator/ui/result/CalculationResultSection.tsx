@@ -8,6 +8,7 @@ import {
   calculateRecommendedMonthlyAmount,
 } from 'features/savings-calculator/lib/calculationUtil';
 import { isCalculationReady } from 'features/savings-calculator/lib/savingsConditionValidators';
+import { SavingsCondition } from 'features/savings-calculator/model/types';
 
 interface CalculationResult {
   finalAmount: number;
@@ -17,25 +18,22 @@ interface CalculationResult {
 
 interface CalculationResultSectionProps {
   product: SavingsProduct | null;
-  targetAmount: number;
-  monthlyAmount: number;
-  term: number;
+  condition: SavingsCondition;
   emptyFallback: ReactNode;
   children: (result: CalculationResult) => ReactNode;
 }
 
 export function CalculationResultSection({
   product,
-  targetAmount,
-  monthlyAmount,
-  term,
+  condition,
   emptyFallback,
   children,
 }: CalculationResultSectionProps) {
-  if (product === null || !isCalculationReady({ monthlyAmount, term, targetAmount })) {
+  if (product === null || !isCalculationReady(condition)) {
     return <>{emptyFallback}</>;
   }
 
+  const { monthlyAmount, term, targetAmount } = condition;
   const { annualRate } = product;
 
   const finalAmount = calculateFinalAmount({
