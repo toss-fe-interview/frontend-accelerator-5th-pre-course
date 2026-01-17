@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { ProductList, savingsProductsQueryOptions } from 'domains/Savings/components/ProductList';
 import { SavingsTabValue } from 'domains/Savings/types';
-import { 적금상품필터링, 추천상품필터링 } from 'domains/Savings/utils/calculator';
+import { 적금상품필터링, 추천상품필터링 } from 'domains/Savings/utils/productFilter';
 import React, { Suspense, useState } from 'react';
 import {
   Spacing,
@@ -27,13 +27,11 @@ export function SavingsCalculatorPage() {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<SavingsTabValue>('products');
 
-  // TODO : 어떻게 리팩터링할까?
   const selectedProduct = products.find(p => p.id === selectedProductId);
   const hasProduct = !selectedProduct;
   const annualRate = selectedProduct?.annualRate ?? 0;
 
   return (
-    // 계산기의 본질. 숫자를 입력, 결과를 보여준다.
     <>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
@@ -42,8 +40,9 @@ export function SavingsCalculatorPage() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={goalAmount ? Number(goalAmount).toLocaleString() : ''}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoalAmount(e.target.value.replace(/,/g, ''))}
-        // 콤마처리 숫자입력할때 보여질 필요가 없으니, 추상화한다.
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setGoalAmount(Number(e.target.value.replace(/,/g, '')) || 0)
+        }
       />
       <Spacing size={16} />
 
@@ -52,7 +51,9 @@ export function SavingsCalculatorPage() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={monthlyDeposit ? Number(monthlyDeposit).toLocaleString() : ''}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMonthlyDeposit(e.target.value.replace(/,/g, ''))}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setMonthlyDeposit(Number(e.target.value.replace(/,/g, '')) || 0)
+        }
       />
       <Spacing size={16} />
 
@@ -68,7 +69,7 @@ export function SavingsCalculatorPage() {
       </SelectBottomSheet>
       <Divider />
 
-      <Tab onChange={v => setSelectedTab(v as SavingsTabValue)}>
+      <Tab onChange={tab => setSelectedTab(tab as SavingsTabValue)}>
         <Tab.Item value={'products'} selected={selectedTab === 'products'}>
           적금 상품
         </Tab.Item>
@@ -78,7 +79,6 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {selectedTab === 'products' && (
-        // Suspense를 드러낸 의도 : ProductList가 api호출을 하고 있음을.
         <Suspense fallback={<div>로딩 중...</div>}>
           <ProductList
             select={products =>
