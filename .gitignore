@@ -17,3 +17,6 @@ yarn-error.log*
 .eslintcache
 .idea
 .vscode
+
+# local documentation
+.docs/
