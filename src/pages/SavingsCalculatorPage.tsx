@@ -54,7 +54,7 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
       <SavingPeriodSelect
         value={savingPeriod}
-        onChange={v => setValue('savingPeriod', v)}
+        onSelect={v => setValue('savingPeriod', v)}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
@@ -91,6 +91,7 @@ export function SavingsCalculatorPage() {
               )
               .map(product => {
                 const isSelected = selectedSavingsProduct?.id === product.id;
+
                 return (
                   <ListRow
                     key={product.id}
