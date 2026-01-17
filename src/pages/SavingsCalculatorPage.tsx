@@ -1,3 +1,4 @@
+import map from 'lodash/fp/map';
 import { useState } from 'react';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 
@@ -73,19 +74,14 @@ export function SavingsCalculatorPage() {
                   products={availableProducts}
                   emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
                 >
-                  {products =>
-                    products.map(product => {
-                      const isSelected = selectedProductId === product.id;
-                      return (
-                        <ListRow
-                          key={product.id}
-                          contents={<SavingsProductInfo product={product} />}
-                          right={isSelected && <CheckCircleIcon />}
-                          onClick={() => setSelectedProductId(isSelected ? null : product.id)}
-                        />
-                      );
-                    })
-                  }
+                  {map(product => (
+                    <ListRow
+                      key={product.id}
+                      contents={<SavingsProductInfo product={product} />}
+                      right={selectedProductId === product.id && <CheckCircleIcon />}
+                      onClick={() => setSelectedProductId(prev => (prev === product.id ? null : product.id))}
+                    />
+                  ))}
                 </SavingsProductListSection>
               </Tabs.Panel>
               <Tabs.Panel value="results">
@@ -126,19 +122,14 @@ export function SavingsCalculatorPage() {
                   candidateProducts={availableProducts}
                   emptyFallback={<EmptyListItem message="적합한 추천 상품이 없습니다." />}
                 >
-                  {recommendedProducts =>
-                    recommendedProducts.map(product => {
-                      const isSelected = selectedProductId === product.id;
-                      return (
-                        <ListRow
-                          key={product.id}
-                          contents={<SavingsProductInfo product={product} />}
-                          right={isSelected && <CheckCircleIcon />}
-                          onClick={() => setSelectedProductId(isSelected ? null : product.id)}
-                        />
-                      );
-                    })
-                  }
+                  {map(product => (
+                    <ListRow
+                      key={product.id}
+                      contents={<SavingsProductInfo product={product} />}
+                      right={selectedProductId === product.id && <CheckCircleIcon />}
+                      onClick={() => setSelectedProductId(prev => (prev === product.id ? null : product.id))}
+                    />
+                  ))}
                 </RecommendedProductSection>
 
                 <Spacing size={40} />
