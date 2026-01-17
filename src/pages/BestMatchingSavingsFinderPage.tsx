@@ -1,3 +1,4 @@
+import AmountInput from 'components/AmountInput';
 import { useSavingsProducts } from 'hook/useSavingsProducts';
 import { useMemo, useState } from 'react';
 import {
@@ -89,22 +90,18 @@ export function BestMatchingSavingsFinderPage() {
       <Spacing size={16} />
 
       {/* 사용자가 목표로 하는 저축 금액과 월 납입액, 저축 기간을 입력받는 영역 */}
-      <TextField
+      <AmountInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
-        suffix="원"
-        onChange={e =>
-          setUserSavingGoal({ ...userSavingGoal, targetAmount: Number(e.target.value) || 0 } as UserSavingGoal)
-        }
+        value={userSavingGoal?.targetAmount || null}
+        onChange={value => setUserSavingGoal({ ...userSavingGoal, targetAmount: value ?? 0 } as UserSavingGoal)}
       />
       <Spacing size={16} />
-      <TextField
+      <AmountInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
-        onChange={e =>
-          setUserSavingGoal({ ...userSavingGoal, monthlyAmount: Number(e.target.value) || 0 } as UserSavingGoal)
-        }
+        value={userSavingGoal?.monthlyAmount || null}
+        onChange={value => setUserSavingGoal({ ...userSavingGoal, monthlyAmount: value ?? 0 } as UserSavingGoal)}
       />
       <Spacing size={16} />
       <SelectBottomSheet
