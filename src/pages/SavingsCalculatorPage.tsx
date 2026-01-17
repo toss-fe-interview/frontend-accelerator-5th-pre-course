@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
-import { Suspense, ErrorBoundary } from '@suspensive/react';
+import { Suspense } from '@suspensive/react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
@@ -91,7 +92,9 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <ErrorBoundary fallback={<ListRow contents={<ListRow.Texts type="1RowTypeA" top="오류가 발생했습니다." />} />}>
+      <ErrorBoundary
+        fallbackRender={() => <ListRow contents={<ListRow.Texts type="1RowTypeA" top="오류가 발생했습니다." />} />}
+      >
         <Suspense fallback={<ListRow contents={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />} />}>
           {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
             <SuspenseQuery
