@@ -9,7 +9,7 @@ export interface SavingsProduct {
 
 export type SavingsTabValue = 'products' | 'results';
 
-export type SavingTabListType = {
+export type SavingTabListType = Array<{
   value: SavingsTabValue;
   name: string;
-}[];
+}>;
