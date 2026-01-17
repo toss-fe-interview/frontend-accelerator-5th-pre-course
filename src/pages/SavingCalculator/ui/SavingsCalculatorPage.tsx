@@ -160,7 +160,7 @@ export function SavingsCalculatorPage() {
                             return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                           }),
                         sortByAnnualRateDesc,
-                        takeTop
+                        takeTopProducts
                       );
 
                       return getRecommendedProducts(products);
@@ -192,7 +192,7 @@ export function SavingsCalculatorPage() {
 }
 
 const sortByAnnualRateDesc = (products: SavingsProduct[]) => orderBy(products, ['annualRate'], ['desc']);
-const takeTop = (products: SavingsProduct[]) => {
+const takeTopProducts = (products: SavingsProduct[]) => {
   const TOP_RECOMMENDATION_COUNT = 2;
   return take(products, TOP_RECOMMENDATION_COUNT);
 };
