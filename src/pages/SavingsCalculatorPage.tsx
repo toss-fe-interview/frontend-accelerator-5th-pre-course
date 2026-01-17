@@ -1,10 +1,11 @@
 import { ErrorBoundary, Suspense } from '@suspensive/react';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { useState } from 'react';
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 
 import { CheckCircleIcon } from 'shared/ui/CheckCircleIcon';
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
+import { Tabs } from 'shared/ui/Tabs';
 
 import { savingsProductsQueryOptions } from 'entities/savings/model/savingsProductsQuery';
 import { SavingsProductInfo } from 'entities/savings/ui/SavingsProductInfo';
@@ -26,8 +27,6 @@ export function SavingsCalculatorPage() {
   });
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-
-  const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
   return (
     <>
@@ -68,41 +67,38 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={tab => setSelectedTab(tab as 'products' | 'results')}>
-        <Tab.Item value="products" selected={selectedTab === 'products'}>
-          적금 상품
-        </Tab.Item>
-        <Tab.Item value="results" selected={selectedTab === 'results'}>
-          계산 결과
-        </Tab.Item>
-      </Tab>
-      <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
-        <Suspense fallback={'loading'}>
-          <SuspenseQuery {...savingsProductsQueryOptions} select={filterAvailableProducts(condition)}>
-            {({ data: availableProducts }) => (
-              <>
-                {selectedTab === 'products' && (
-                  <SavingsProductListSection
-                    products={availableProducts}
-                    emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
-                  >
-                    {products =>
-                      products.map(product => {
-                        const isSelected = selectedProductId === product.id;
-                        return (
-                          <ListRow
-                            key={product.id}
-                            contents={<SavingsProductInfo product={product} />}
-                            right={isSelected && <CheckCircleIcon />}
-                            onClick={() => setSelectedProductId(isSelected ? null : product.id)}
-                          />
-                        );
-                      })
-                    }
-                  </SavingsProductListSection>
-                )}
-                {selectedTab === 'results' && (
-                  <>
+      <Tabs defaultValue="products">
+        <Tabs.List>
+          <Tabs.Tab value="products">적금 상품</Tabs.Tab>
+          <Tabs.Tab value="results">계산 결과</Tabs.Tab>
+        </Tabs.List>
+
+        <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
+          <Suspense fallback={'loading'}>
+            <SuspenseQuery {...savingsProductsQueryOptions} select={filterAvailableProducts(condition)}>
+              {({ data: availableProducts }) => (
+                <>
+                  <Tabs.Panel value="products">
+                    <SavingsProductListSection
+                      products={availableProducts}
+                      emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
+                    >
+                      {products =>
+                        products.map(product => {
+                          const isSelected = selectedProductId === product.id;
+                          return (
+                            <ListRow
+                              key={product.id}
+                              contents={<SavingsProductInfo product={product} />}
+                              right={isSelected && <CheckCircleIcon />}
+                              onClick={() => setSelectedProductId(isSelected ? null : product.id)}
+                            />
+                          );
+                        })
+                      }
+                    </SavingsProductListSection>
+                  </Tabs.Panel>
+                  <Tabs.Panel value="results">
                     <Spacing size={8} />
 
                     <CalculationResultSection
@@ -156,13 +152,13 @@ export function SavingsCalculatorPage() {
                     </RecommendedProductSection>
 
                     <Spacing size={40} />
-                  </>
-                )}
-              </>
-            )}
-          </SuspenseQuery>
-        </Suspense>
-      </ErrorBoundary>
+                  </Tabs.Panel>
+                </>
+              )}
+            </SuspenseQuery>
+          </Suspense>
+        </ErrorBoundary>
+      </Tabs>
     </>
   );
 }
