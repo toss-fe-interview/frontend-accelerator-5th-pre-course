@@ -1,17 +1,25 @@
 import { Suspense, useState } from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { NumberInput } from 'shared/ui/NumberInput';
 import { Select } from 'shared/ui/Select';
-import { useSavingsCalculatorForm } from 'features/savings-calculator/model/useSavingsCalculatorForm';
 import type { SavingsProduct } from 'features/savings-calculator/api/savings';
-import { CalculationResults, ProductList, ProductListItem } from 'features/savings-calculator';
+import { CalculationResults, ProductList, ProductListItem, savingsCalculatorSchema } from 'features/savings-calculator';
 import { Tabs } from 'shared/ui/Tabs';
 import { SavingsCalculation } from 'shared/utils/savings-calculation';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | undefined>(undefined);
-  const form = useSavingsCalculatorForm();
+
+  const form = useForm({
+    defaultValues: {
+      targetAmount: 1000000,
+      monthlyAmount: 50000,
+      availableTerms: 12,
+    },
+    resolver: zodResolver(savingsCalculatorSchema),
+  });
 
   const { targetAmount, monthlyAmount, availableTerms } = form.watch();
 
