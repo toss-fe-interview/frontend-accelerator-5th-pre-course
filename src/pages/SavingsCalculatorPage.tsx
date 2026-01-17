@@ -38,13 +38,13 @@ export function SavingsCalculatorPage() {
     return 저축_기간이_일치함 && 월_납입한도_내에_있음;
   };
 
-  const { data: matchingProducts = [] } = useQuery(
+  const { data: matchedProducts = [] } = useQuery(
     SavingsQuery.getSavingsProducts({
       select: data => data.filter(validateMatchedProduct),
     })
   );
 
-  const hasNoMatchingProducts = matchingProducts.length === 0;
+  const hasNoMatchedProducts = matchedProducts.length === 0;
 
   return (
     <TabScreen
@@ -79,10 +79,10 @@ export function SavingsCalculatorPage() {
                    -> 보여줄 상품이 없다는 건 == 조건에 맞는 상품이 없다는 것 (hasNoMatchingProducts)
                    -> 보여줄 상품들 === 조건에 맞는 상품들 (matchingProducts)
               */}
-              {hasNoMatchingProducts ? (
+              {hasNoMatchedProducts ? (
                 <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
               ) : (
-                matchingProducts.map(product => {
+                matchedProducts.map(product => {
                   const isSelected = selectedProduct?.id === product.id;
 
                   return (
@@ -145,10 +145,10 @@ export function SavingsCalculatorPage() {
               />
               <Spacing size={12} />
 
-              {hasNoMatchingProducts ? (
+              {hasNoMatchedProducts ? (
                 <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
               ) : (
-                matchingProducts
+                matchedProducts
                   .sort(sortByAnnualRateDesc)
                   .slice(0, 2)
                   .map(product => {
