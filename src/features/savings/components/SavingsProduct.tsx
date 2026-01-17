@@ -1,5 +1,5 @@
+import { useSetQueryParams } from 'hooks/useSetQueryParams';
 import { SavingsProduct } from 'model/types';
-import { useSearchParams } from 'react-router-dom';
 import { Assets, colors, ListRow } from 'tosslib';
 
 const SavingsProductItem = ({
@@ -11,7 +11,7 @@ const SavingsProductItem = ({
   isSelected: boolean;
   onSelect?: (product: SavingsProduct) => void;
 }) => {
-  const [searchParams] = useSearchParams();
+  const { searchParams } = useSetQueryParams();
   const productOption = `${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`;
   return (
     <ListRow
