@@ -6,7 +6,7 @@ import {
   calculateRecommendedMonthlyAmount,
   calculateTargetAmountDifference,
 } from 'domain/calculateSavingResult';
-import { savingsProductsQueryOptions } from 'hook/useSavingsProducts';
+import { savingsProductsQueryOptions } from 'queries/savingsProducts';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
