@@ -14,6 +14,8 @@ import { NumberInput } from 'shared/ui/NumberField';
 
 type Tab = 'products' | 'results';
 
+const TOP_RECOMMENDATION_COUNT = 2;
+
 const savingsProductsQueyOptions = () =>
   queryOptions({
     queryKey: ['products'],
@@ -162,7 +164,7 @@ export function SavingsCalculatorPage() {
                         products
                           .filter(product => filterSavingsProducts(product, filters))
                           .sort(sortByAnnualRateDesc)
-                          .slice(0, 2)
+                          .slice(0, TOP_RECOMMENDATION_COUNT)
                       }
                     >
                       {({ data: products }) =>
