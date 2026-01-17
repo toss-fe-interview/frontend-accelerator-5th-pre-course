@@ -9,8 +9,8 @@ import { roundToThousand } from 'shared/utils/number';
 import { EmptyMessage } from 'shared/ui/EmptyMessage';
 import { eq, gt, lt } from 'es-toolkit/compat';
 import { SuspenseQuery } from '@suspensive/react-query';
-import { ErrorBoundary, Suspense } from '@suspensive/react';
 import { NumberInput } from 'shared/ui/NumberField';
+import { AsyncBoundary } from 'shared/ui/AsyncBoundary';
 
 type Tab = 'products' | 'results';
 
@@ -83,36 +83,34 @@ export function SavingsCalculatorPage() {
         switch (tab) {
           case 'products':
             return (
-              <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
-                <Suspense fallback={'loading...'}>
-                  <SuspenseQuery
-                    {...savingsProductsQueyOptions()}
-                    select={products =>
-                      products.filter(product => {
-                        const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
-                        const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
-                        const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
+              <AsyncBoundary>
+                <SuspenseQuery
+                  {...savingsProductsQueyOptions()}
+                  select={products =>
+                    products.filter(product => {
+                      const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
+                      const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
+                      const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
 
-                        return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
-                      })
-                    }
-                  >
-                    {({ data: products }) =>
-                      products.map(product => {
-                        const isSelected = selectedSavingsProduct?.id === product.id;
-                        return (
-                          <SavingsProductListRow
-                            key={product.id}
-                            product={product}
-                            isSelected={isSelected}
-                            onClick={() => setSelectedSavingsProduct(product)}
-                          />
-                        );
-                      })
-                    }
-                  </SuspenseQuery>
-                </Suspense>
-              </ErrorBoundary>
+                      return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
+                    })
+                  }
+                >
+                  {({ data: products }) =>
+                    products.map(product => {
+                      const isSelected = selectedSavingsProduct?.id === product.id;
+                      return (
+                        <SavingsProductListRow
+                          key={product.id}
+                          product={product}
+                          isSelected={isSelected}
+                          onClick={() => setSelectedSavingsProduct(product)}
+                        />
+                      );
+                    })
+                  }
+                </SuspenseQuery>
+              </AsyncBoundary>
             );
           case 'results':
             return (
@@ -154,39 +152,37 @@ export function SavingsCalculatorPage() {
                 />
                 <Spacing size={12} />
 
-                <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
-                  <Suspense fallback={'loading...'}>
-                    <SuspenseQuery
-                      {...savingsProductsQueyOptions()}
-                      select={products =>
-                        products
-                          .filter(product => {
-                            const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
-                            const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
-                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
+                <AsyncBoundary>
+                  <SuspenseQuery
+                    {...savingsProductsQueyOptions()}
+                    select={products =>
+                      products
+                        .filter(product => {
+                          const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
+                          const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
+                          const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
 
-                            return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
-                          })
-                          .sort(sortByAnnualRateDesc)
-                          .slice(0, TOP_RECOMMENDATION_COUNT)
-                      }
-                    >
-                      {({ data: products }) =>
-                        products.map(product => {
-                          const isSelected = selectedSavingsProduct?.id === product.id;
-                          return (
-                            <SavingsProductListRow
-                              key={product.id}
-                              product={product}
-                              isSelected={isSelected}
-                              onClick={() => setSelectedSavingsProduct(product)}
-                            />
-                          );
+                          return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                         })
-                      }
-                    </SuspenseQuery>
-                  </Suspense>
-                </ErrorBoundary>
+                        .sort(sortByAnnualRateDesc)
+                        .slice(0, TOP_RECOMMENDATION_COUNT)
+                    }
+                  >
+                    {({ data: products }) =>
+                      products.map(product => {
+                        const isSelected = selectedSavingsProduct?.id === product.id;
+                        return (
+                          <SavingsProductListRow
+                            key={product.id}
+                            product={product}
+                            isSelected={isSelected}
+                            onClick={() => setSelectedSavingsProduct(product)}
+                          />
+                        );
+                      })
+                    }
+                  </SuspenseQuery>
+                </AsyncBoundary>
 
                 <Spacing size={40} />
               </>
