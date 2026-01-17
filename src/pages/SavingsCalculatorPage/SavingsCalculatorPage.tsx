@@ -13,6 +13,12 @@ import {
 } from './util/savingsCalculations';
 import { getSavingsProducts } from './api/getSavingsProducts';
 
+type SavingsInput = {
+  targetAmount: string;
+  monthlyAmount: string;
+  savingsTerm: number;
+};
+
 export function SavingsCalculatorPage() {
   const [savingsInput, setSavingsInput] = useState({
     targetAmount: '',
@@ -28,6 +34,7 @@ export function SavingsCalculatorPage() {
   useEffect(() => {
     const fetchSavingsProducts = async () => {
       const response = await getSavingsProducts();
+
       if (response) {
         setSavingsProducts(response);
       }
@@ -41,18 +48,26 @@ export function SavingsCalculatorPage() {
   //   - `product.maxMonthlyAmount` (최대 월 납입액)보다 작아야 함
   // - 저축 기간
   //   - `product.availableTerms` (저축 기간)와 동일해야 함
-  const filteredSavingsProducts = savingsProducts.filter(product => {
-    const isMonthlyAmountValid =
-      Number(savingsInput.monthlyAmount) >= product.minMonthlyAmount &&
-      Number(savingsInput.monthlyAmount) <= product.maxMonthlyAmount;
+  const isProductMatchingInput = (product: SavingsProduct, savingsInput: SavingsInput) => {
+    const hasMonthlyAmountInput = savingsInput.monthlyAmount.trim() !== '';
+    const isMonthlyAmountValid = hasMonthlyAmountInput
+      ? Number(savingsInput.monthlyAmount) >= product.minMonthlyAmount &&
+        Number(savingsInput.monthlyAmount) <= product.maxMonthlyAmount
+      : true;
     const isTermMatched = product.availableTerms === savingsInput.savingsTerm;
     return isMonthlyAmountValid && isTermMatched;
+  };
+
+  const filteredSavingsProducts = savingsProducts.filter(product => {
+    return isProductMatchingInput(product, savingsInput);
   });
 
   // 사용자가 입력한 조건에 맞는 적금 상품 중 연 이자율이 가장 높은 2개의 상품을 출력해주세요.
-  const recommendedSavingsProducts = [...filteredSavingsProducts]
-    .sort((a, b) => b.annualRate - a.annualRate)
-    .slice(0, 2);
+  const getTopProductsByRate = (products: SavingsProduct[], count = 2) => {
+    return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, count);
+  };
+
+  const recommendedSavingsProducts = getTopProductsByRate(filteredSavingsProducts, 2);
 
   return (
     <>
