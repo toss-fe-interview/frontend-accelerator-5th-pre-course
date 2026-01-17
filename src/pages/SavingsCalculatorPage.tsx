@@ -6,7 +6,7 @@ import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
 import { queryOptions } from '@tanstack/react-query';
 import { roundToThousand } from 'util/number';
-import { EmptyMessage } from 'components/EmptyMessage';
+import { EmptyMessage } from 'shared/ui/EmptyMessage';
 import { eq, gt, lt } from 'es-toolkit/compat';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { ErrorBoundary, Suspense } from '@suspensive/react';
