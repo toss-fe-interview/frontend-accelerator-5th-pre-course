@@ -33,6 +33,7 @@ export function RecommendSavingsProductList() {
 
                 return (
                     <ListRow
+                        key={savingsProduct.id}
                         contents={
                             <ListRow.Texts
                                 type="3RowTypeA"

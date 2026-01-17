@@ -23,7 +23,7 @@ export function SavingsCalculationSummary({ selectedSavingsProductId }: SavingsC
             data.find((product) => product.id === selectedSavingsProductId),
     });
 
-    const annualRate = savingsProduct?.annualRate ?? 0;
+    const annualRate = (savingsProduct?.annualRate ?? 0) / 100;
 
     const expectedAmount = Math.round(monthlyPayment * savingsPeriod * (1 + annualRate * 0.5));
     const amountDifference = targetAmount - expectedAmount;

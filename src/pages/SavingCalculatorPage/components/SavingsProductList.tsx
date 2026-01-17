@@ -2,10 +2,10 @@ import styled from "@emotion/styled";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { commaizeNumber } from "@toss/utils";
 import { useAtom, useAtomValue } from "jotai";
+import { monthlyPaymentAtom, savingsPeriodAtom } from "pages/SavingCalculatorPage/atoms/savingsCaculationInputs";
+import { selectedSavingsProductIdAtom } from "pages/SavingCalculatorPage/atoms/selectedSavingsProductId";
+import { savingsProductsQueryOptions } from "pages/SavingCalculatorPage/remotes/savingsProducts";
 import { Assets, ListRow, colors } from "tosslib";
-import { monthlyPaymentAtom, savingsPeriodAtom } from "../atoms/savingsCaculationInputs";
-import { selectedSavingsProductIdAtom } from "../atoms/selectedSavingsProductId";
-import { savingsProductsQueryOptions } from "../remotes/savingsProducts";
 
 export function SavingsProductList() {
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useAtom(selectedSavingsProductIdAtom);
