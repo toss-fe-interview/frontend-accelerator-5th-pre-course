@@ -4,7 +4,7 @@ import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing,
 import { AmountField } from './components/AmountField';
 import { SavingsProductItem } from './components/SavingsProductItem';
 import { CalculationResultRow } from './components/CalculationResultRow';
-import { getSavingsProducts } from './api';
+import { savingsProductsQueryOptions } from './queries';
 import {
   SavingsProduct,
   SavingsTerm,
@@ -25,8 +25,7 @@ export function SavingsCalculatorPage() {
   const [savingsTerm, setSavingsTerm] = useState<SavingsTerm>(12);
 
   const { data: savingsProducts = [] } = useQuery({
-    queryKey: ['savings-products', monthlyAmount, savingsTerm],
-    queryFn: getSavingsProducts,
+    ...savingsProductsQueryOptions({ monthlyAmount: toNumber(monthlyAmount), savingsTerm }),
     select: products =>
       products.filter(product => matchesMonthlyAmountAndTerm(product, toNumber(monthlyAmount), savingsTerm)),
   });
