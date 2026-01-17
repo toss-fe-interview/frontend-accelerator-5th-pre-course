@@ -50,13 +50,19 @@ export function BestMatchingSavingsFinderPage() {
     if (!savingsProductListData) return [];
     if (!userSavingGoal) return savingsProductListData;
 
-    const 최소월납입액이상 = (product: SavingsProduct) => product.minMonthlyAmount >= userSavingGoal.monthlyAmount;
-    const 최대월납입액이하 = (product: SavingsProduct) => product.maxMonthlyAmount <= userSavingGoal.monthlyAmount;
-    const 저축기간일치 = (product: SavingsProduct) => product.availableTerms === userSavingGoal.savingTerm;
+    const 월납입액범위내 = (product: SavingsProduct) => {
+      if (!userSavingGoal.monthlyAmount) return true;
+      return (
+        userSavingGoal.monthlyAmount >= product.minMonthlyAmount &&
+        userSavingGoal.monthlyAmount <= product.maxMonthlyAmount
+      );
+    };
+    const 저축기간일치 = (product: SavingsProduct) => {
+      if (!userSavingGoal.savingTerm) return true;
+      return product.availableTerms === userSavingGoal.savingTerm;
+    };
 
-    return savingsProductListData.filter(
-      product => 최소월납입액이상(product) && 최대월납입액이하(product) && 저축기간일치(product)
-    );
+    return savingsProductListData.filter(product => 월납입액범위내(product) && 저축기간일치(product));
   }, [savingsProductListData, userSavingGoal]);
 
   // 2. 계산 결과 데이터 - CalculationResultData -> 내부 데이터 + 외부 데이터
@@ -107,7 +113,7 @@ export function BestMatchingSavingsFinderPage() {
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
-        value={userSavingGoal?.savingTerm || 12}
+        value={userSavingGoal?.savingTerm ?? null}
         onChange={value => setUserSavingGoal({ ...userSavingGoal, savingTerm: value } as UserSavingGoal)}
       >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
