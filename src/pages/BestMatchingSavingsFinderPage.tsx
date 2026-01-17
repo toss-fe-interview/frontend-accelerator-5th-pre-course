@@ -1,4 +1,5 @@
 import AmountInput from 'components/AmountInput';
+import TabContent from 'components/TabContent';
 import { useSavingsProducts } from 'hook/useSavingsProducts';
 import { useMemo, useState } from 'react';
 import {
@@ -135,13 +136,9 @@ export function BestMatchingSavingsFinderPage() {
         </Tab.Item>
       </Tab>
 
-      {/* 선택된 탭이 상품 목록일때
-      1. 적금 상품 목록 출력
-      2. 조건에 맞는 적금 상품 필터링
-      3. 상품 클릭하여 선택 가능
-      */}
-      {selectedTab === 'productList' ? (
-        <>
+      <TabContent selectedTab={selectedTab}>
+        {/* 적금 상품 목록 탭 */}
+        <TabContent.Panel value="productList">
           {filteredProducts.map(product => {
             const isSelected = selectedSavingsProduct?.id === product.id;
 
@@ -164,12 +161,10 @@ export function BestMatchingSavingsFinderPage() {
               />
             );
           })}
-        </>
-      ) : (
-        // 선택된 탭이 계산 결과일때
-        // 1. 계산 결과 출력
-        // 2. 필터링 된 상품 중 연이자율 상위 2개 상품 출력
-        <>
+        </TabContent.Panel>
+
+        {/* 계산 결과 탭 */}
+        <TabContent.Panel value="calculationResult">
           <Spacing size={8} />
 
           {selectedSavingsProduct ? (
@@ -242,8 +237,8 @@ export function BestMatchingSavingsFinderPage() {
           })}
 
           <Spacing size={40} />
-        </>
-      )}
+        </TabContent.Panel>
+      </TabContent>
     </>
   );
 }

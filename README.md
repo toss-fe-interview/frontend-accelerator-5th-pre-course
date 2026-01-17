@@ -63,3 +63,35 @@ yarn dev
 
 6. 리팩터링 및 버그 수정
    [] availableTerms 타입 수정(6, 12, 24)
+
+## 설계 결정 사항
+
+### Compound Component 패턴 적용 (TabContent)
+
+탭 컨텐츠 렌더링에 Compound Component 패턴을 적용했습니다.
+
+**Before: 삼항 연산자**
+
+```tsx
+{
+  selectedTab === 'productList' ? <> ... 적금 상품 목록 ... </> : <> ... 계산 결과 ... </>;
+}
+```
+
+**After: Compound Component**
+
+```tsx
+<TabContent selectedTab={selectedTab}>
+  <TabContent.Panel value="productList">... 적금 상품 목록 ...</TabContent.Panel>
+  <TabContent.Panel value="calculationResult">... 계산 결과 ...</TabContent.Panel>
+</TabContent>
+```
+
+**적용 이유**
+
+| 관점   | 설명                                                               |
+| ------ | ------------------------------------------------------------------ |
+| 추상화 | 탭 전환 로직(`selectedTab === value`)을 `TabContent` 내부에 캡슐화 |
+| 선언적 | 조건문 없이 "어떤 탭에 어떤 컨텐츠"인지 코드만 봐도 파악 가능      |
+| 확장성 | 탭 추가 시 새로운 `Panel`만 추가하면 됨 (조건문 수정 불필요)       |
+| 일관성 | tosslib의 `Tab.Item`, `ListRow.Texts` 등 기존 패턴과 동일한 API    |
