@@ -1,15 +1,17 @@
 import { SavingsProduct } from 'model/types';
+import { useSearchParams } from 'react-router-dom';
 import { Assets, colors, ListRow } from 'tosslib';
 
 const SavingsProductItem = ({
   product,
-  onSelect,
   isSelected,
+  onSelect,
 }: {
   product: SavingsProduct;
-  onSelect?: (product: SavingsProduct | null) => void;
   isSelected: boolean;
+  onSelect?: (product: SavingsProduct) => void;
 }) => {
+  const [searchParams] = useSearchParams();
   const productOption = `${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`;
   return (
     <ListRow
@@ -27,6 +29,9 @@ const SavingsProductItem = ({
       }
       right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
       onClick={() => {
+        if (!searchParams.get('monthlyAmount') || searchParams.get('period') === '0') {
+          return;
+        }
         onSelect?.(product);
       }}
     />

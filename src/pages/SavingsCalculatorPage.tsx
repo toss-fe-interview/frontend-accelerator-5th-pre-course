@@ -4,53 +4,43 @@ import SavingsProductItem from 'features/savings/components/SavingsProduct';
 
 import { TABS } from 'features/savings/constants';
 import { savingsQueries } from 'features/savings/queries';
+import {
+  calcDiffAmount,
+  calcExpectProfit,
+  calcRecommendAmountForMonth,
+  getMatchingSavingsProducts,
+  getRecommendedProduct,
+  handleAmountChange,
+} from 'features/savings/utils/savings';
+import { useSetQueryParams } from 'hooks/useSetQueryParams';
 import { useTab } from 'hooks/useTab';
 
+import { useState } from 'react';
 import { SavingsProduct } from 'model/types';
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+
 import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
-import { isSame } from 'utils/boolean';
 import { numericFormatter } from 'utils/number';
 
 export function SavingsCalculatorPage() {
-  const [goalAmount, setGoalAmount] = useState('');
-  const [monthlyAmount, setMonthlyAmount] = useState('');
-  const [period, setPeriod] = useState(12);
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   const { data: savingsProducts } = useSuspenseQuery(savingsQueries.list());
   const { currentTab, changeTab } = useTab({ key: 'tab', defaultTab: TABS.PRODUCTS });
 
-  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
-    const value = e.target.value;
-    const numericValue = numericFormatter(value);
-    if (isNaN(numericValue)) {
-      return;
-    }
-    setState(numericValue.toLocaleString());
-  };
+  const { searchParams, setQueryParams } = useSetQueryParams();
+  const goalAmount = searchParams.get('goalAmount') || '';
+  const monthlyAmount = searchParams.get('monthlyAmount') || '';
+  const period = Number(searchParams.get('period')) || 0;
 
-  const filteredProducts = savingsProducts.filter(product => {
-    const numericGoalAmount = numericFormatter(monthlyAmount);
+  const expectedProfit = calcExpectProfit({ selectedProduct, monthlyAmount, period });
+  const differentAmount = calcDiffAmount({ goalAmount: numericFormatter(goalAmount), expectedProfit });
+  const recommendAmountForMonth = calcRecommendAmountForMonth({ selectedProduct, goalAmount, period });
 
-    const monthlyAmountCondition =
-      numericGoalAmount > product.minMonthlyAmount && numericGoalAmount < product.maxMonthlyAmount;
-    const isSamePeriodAndTerms = period === product.availableTerms;
-
-    return monthlyAmountCondition && isSamePeriodAndTerms;
+  const matchedProducts = getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period });
+  const recommendedProducts = getRecommendedProduct({
+    product: [...matchedProducts],
+    options: { offset: 0, limit: 2 },
   });
-
-  const expectedProfit = selectedProduct
-    ? Math.round(numericFormatter(monthlyAmount) * period * (1 + (selectedProduct?.annualRate / 100) * 0.5))
-    : 0;
-  const diffBetweenGoalAndExpected = numericFormatter(goalAmount) - expectedProfit;
-
-  const recommendAmountForMonth = selectedProduct
-    ? Math.round(numericFormatter(goalAmount) / (period * (1 + (selectedProduct?.annualRate / 100) * 0.5)) / 1000) *
-      1000
-    : 0;
-
-  const recommendedProducts = [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -62,7 +52,7 @@ export function SavingsCalculatorPage() {
         suffix="원"
         value={goalAmount}
         onChange={e => {
-          handleAmountChange(e, setGoalAmount);
+          handleAmountChange(e, value => setQueryParams('goalAmount', value));
         }}
       />
       <Spacing size={16} />
@@ -70,8 +60,9 @@ export function SavingsCalculatorPage() {
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
+        value={monthlyAmount}
         onChange={e => {
-          handleAmountChange(e, setMonthlyAmount);
+          handleAmountChange(e, value => setQueryParams('monthlyAmount', value));
         }}
       />
       <Spacing size={16} />
@@ -80,7 +71,7 @@ export function SavingsCalculatorPage() {
         title="저축 기간을 선택해주세요"
         value={period}
         onChange={value => {
-          setPeriod(value);
+          setQueryParams('period', value.toString());
         }}
       >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
@@ -101,13 +92,13 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
       {currentTab === TABS.PRODUCTS &&
-        filteredProducts.map(product => {
+        (matchedProducts.length === 0 ? savingsProducts : matchedProducts).map(product => {
           return (
             <SavingsProductItem
               key={product.id}
               product={product}
+              isSelected={product.id === selectedProduct?.id}
               onSelect={setSelectedProduct}
-              isSelected={isSame(product, selectedProduct)}
             />
           );
         })}
@@ -118,7 +109,7 @@ export function SavingsCalculatorPage() {
             <>
               <Spacing size={8} />
               <ListRow contents={<ResultRow subject="목표 금액" amount={expectedProfit} />} />
-              <ListRow contents={<ResultRow subject="목표 금액과의 차이" amount={diffBetweenGoalAndExpected} />} />
+              <ListRow contents={<ResultRow subject="목표 금액과의 차이" amount={differentAmount} />} />
               <ListRow contents={<ResultRow subject="추천 월 납입 금액" amount={recommendAmountForMonth} />} />
             </>
           ) : (
@@ -133,7 +124,7 @@ export function SavingsCalculatorPage() {
           <Spacing size={12} />
           {recommendedProducts.map(product => {
             return (
-              <SavingsProductItem key={product.id} product={product} isSelected={isSame(product, selectedProduct)} />
+              <SavingsProductItem key={product.id} product={product} isSelected={product.id === selectedProduct?.id} />
             );
           })}
 
