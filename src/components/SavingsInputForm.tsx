@@ -9,6 +9,13 @@ interface SavingsInputFormProps {
 
 export function SavingsInputForm(props: SavingsInputFormProps) {
   const { savingsInput, setSavingsInput } = props;
+
+  const updateField = <K extends keyof SavingsInput>(field: K, value: SavingsInput[K]) => {
+    setSavingsInput({ ...savingsInput, [field]: value });
+  };
+
+  const toMoneyValue = (input: string): number => Number(parseMoney(input)) || 0;
+
   return (
     <>
       <TextField
@@ -16,9 +23,7 @@ export function SavingsInputForm(props: SavingsInputFormProps) {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={formatMoney(savingsInput.goalAmount)}
-        onChange={value =>
-          setSavingsInput({ ...savingsInput, goalAmount: Number(parseMoney(value.target.value)) || 0 })
-        }
+        onChange={e => updateField('goalAmount', toMoneyValue(e.target.value))}
       />
       <Spacing size={16} />
       <TextField
@@ -26,16 +31,14 @@ export function SavingsInputForm(props: SavingsInputFormProps) {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={formatMoney(savingsInput.monthlyAmount)}
-        onChange={value =>
-          setSavingsInput({ ...savingsInput, monthlyAmount: Number(parseMoney(value.target.value)) || 0 })
-        }
+        onChange={e => updateField('monthlyAmount', toMoneyValue(e.target.value))}
       />
       <Spacing size={16} />
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={savingsInput.term}
-        onChange={value => setSavingsInput({ ...savingsInput, term: value })}
+        onChange={value => updateField('term', value)}
       >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
