@@ -1,7 +1,6 @@
 import { Suspense, useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, Spacing, Tab } from 'tosslib';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { SAVINGS_PRODUCT_TABS } from 'features/savings/constants';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
@@ -14,6 +13,11 @@ type SavingsTabProps = {
   targetAmount: number | null;
   monthlyPayment: number | null;
   terms: number | null;
+};
+
+export const SAVINGS_PRODUCT_TABS = {
+  PRODUCTS: 'products',
+  RESULTS: 'results',
 };
 
 export function SavingsProductTab({ targetAmount, monthlyPayment, terms }: SavingsTabProps) {
