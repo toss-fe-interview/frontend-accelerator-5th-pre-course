@@ -1,6 +1,6 @@
 import { colors, ListRow } from 'tosslib';
 
-interface ProductProps {
+interface SavingsProductItemProps {
   name: string;
   annualRate: number;
   minMonthlyAmount: number;
@@ -8,7 +8,13 @@ interface ProductProps {
   availableTerms: number;
 }
 
-export const Product = ({ name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms }: ProductProps) => {
+export const SavingsProductItem = ({
+  name,
+  annualRate,
+  minMonthlyAmount,
+  maxMonthlyAmount,
+  availableTerms,
+}: SavingsProductItemProps) => {
   return (
     <ListRow.Texts
       type="3RowTypeA"

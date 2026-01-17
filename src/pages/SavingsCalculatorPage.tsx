@@ -2,7 +2,7 @@ import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tossli
 import { useState } from 'react';
 import { getSavingsProducts, SavingsProduct } from 'api/product';
 import { CheckCircleIcon } from 'components/CheckCircleIcon';
-import { Product } from 'components/Product';
+import { SavingsProductItem } from 'components/SavingsProductItem';
 import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
 import { queryOptions } from '@tanstack/react-query';
@@ -106,7 +106,7 @@ export function SavingsCalculatorPage() {
                           <ListRow
                             key={product.id}
                             contents={
-                              <Product
+                              <SavingsProductItem
                                 name={product.name}
                                 annualRate={product.annualRate}
                                 minMonthlyAmount={product.minMonthlyAmount}
@@ -181,7 +181,7 @@ export function SavingsCalculatorPage() {
                             <ListRow
                               key={product.id}
                               contents={
-                                <Product
+                                <SavingsProductItem
                                   name={product.name}
                                   annualRate={product.annualRate}
                                   minMonthlyAmount={product.minMonthlyAmount}
