@@ -1,3 +1,5 @@
+export type ProductTabs = 'products' | 'results';
+
 export type SavingsProduct = {
   id: string;
   name: string;
@@ -6,5 +8,3 @@ export type SavingsProduct = {
   maxMonthlyAmount: number;
   availableTerms: number;
 };
-
-export type ProductTabs = 'products' | 'results';
