@@ -1,16 +1,16 @@
 import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
-import { getSavingsProducts, SavingsProduct } from 'api/product';
-import { SavingsProductItem } from 'components/SavingsProductItem';
-import { CalculationResultItem } from 'components/CalculationResultItem';
-import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
+import { getSavingsProducts, SavingsProduct } from 'pages/SavingCalculator/api/product';
+import { SavingsProductItem } from 'pages/SavingCalculator/ui/SavingsProductItem';
+import { CalculationResultItem } from 'pages/SavingCalculator/ui/CalculationResultItem';
+import { SavingPeriodSelect } from 'pages/SavingCalculator/ui/SavingPeriodSelect';
 import { queryOptions } from '@tanstack/react-query';
-import { roundToThousand } from 'util/number';
+import { roundToThousand } from 'shared/utils/number';
 import { EmptyMessage } from 'shared/ui/EmptyMessage';
 import { eq, gt, lt } from 'es-toolkit/compat';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { ErrorBoundary, Suspense } from '@suspensive/react';
-import { NumberInput } from 'components/NumberField';
+import { NumberInput } from 'shared/ui/NumberField';
 
 type Tab = 'products' | 'results';
 
