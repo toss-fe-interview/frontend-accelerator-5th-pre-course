@@ -10,11 +10,12 @@ import {
   Tab,
   colors,
   Assets,
-  TextField,
   SelectBottomSheet,
   ListHeader,
 } from 'tosslib';
 import { SavingsFormInput } from 'types/savings';
+import { formatNumber } from 'utils/format';
+import NumberInput from 'components/NumberInput';
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
@@ -105,15 +106,12 @@ export function SavingsCalculatorPage() {
         control={control}
         name="targetAmount"
         render={({ field }) => (
-          <TextField
+          <NumberInput
             label="목표 금액"
             placeholder="목표 금액을 입력하세요"
             suffix="원"
-            value={field.value > 0 ? field.value.toLocaleString('ko-KR') : ''}
-            onChange={e => {
-              const numberValue = parseInt(e.target.value.replace(/,/g, ''), 10);
-              field.onChange(isNaN(numberValue) ? 0 : numberValue);
-            }}
+            value={field.value}
+            onChange={field.onChange}
           />
         )}
       />
@@ -122,15 +120,12 @@ export function SavingsCalculatorPage() {
         control={control}
         name="monthlyAmount"
         render={({ field }) => (
-          <TextField
+          <NumberInput
             label="월 납입액"
             placeholder="희망 월 납입액을 입력하세요"
             suffix="원"
-            value={field.value > 0 ? field.value.toLocaleString('ko-KR') : ''}
-            onChange={e => {
-              const numberValue = parseInt(e.target.value.replace(/,/g, ''), 10);
-              field.onChange(isNaN(numberValue) ? 0 : numberValue);
-            }}
+            value={field.value}
+            onChange={field.onChange}
           />
         )}
       />
@@ -182,7 +177,7 @@ export function SavingsCalculatorPage() {
                   topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                   middle={`연 이자율: ${product.annualRate}%`}
                   middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                  bottom={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`}
+                  bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
                   bottomProps={{ fontSize: 13, color: colors.grey600 }}
                 />
               }
@@ -206,7 +201,7 @@ export function SavingsCalculatorPage() {
                         type="2RowTypeA"
                         top="예상 수익 금액"
                         topProps={{ color: colors.grey600 }}
-                        bottom={`${Math.round(calculationResult.expectedAmount).toLocaleString('ko-KR')}원`}
+                        bottom={`${formatNumber(Math.round(calculationResult.expectedAmount))}원`}
                         bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                       />
                     }
@@ -217,7 +212,7 @@ export function SavingsCalculatorPage() {
                         type="2RowTypeA"
                         top="목표 금액과의 차이"
                         topProps={{ color: colors.grey600 }}
-                        bottom={`${Math.round(calculationResult.difference).toLocaleString('ko-KR')}원`}
+                        bottom={`${formatNumber(Math.round(calculationResult.difference))}원`}
                         bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                       />
                     }
@@ -228,7 +223,7 @@ export function SavingsCalculatorPage() {
                         type="2RowTypeA"
                         top="추천 월 납입 금액"
                         topProps={{ color: colors.grey600 }}
-                        bottom={`${calculationResult.recommendMonthlyAmount.toLocaleString('ko-KR')}원`}
+                        bottom={`${formatNumber(calculationResult.recommendMonthlyAmount)}원`}
                         bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                       />
                     }
@@ -254,7 +249,7 @@ export function SavingsCalculatorPage() {
                       topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                       middle={`연 이자율: ${product.annualRate}%`}
                       middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                      bottom={`${product.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${product.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${product.availableTerms}개월`}
+                      bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
                       bottomProps={{ fontSize: 13, color: colors.grey600 }}
                     />
                   }
