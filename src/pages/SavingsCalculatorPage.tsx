@@ -4,6 +4,7 @@ import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tossli
 import { CheckCircleIcon } from 'shared/ui/CheckCircleIcon';
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
 
+import { useSavingsProducts } from 'entities/savings/model/useSavingsProducts';
 import { SavingsProductInfo } from 'entities/savings/ui/SavingsProductInfo';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
@@ -18,7 +19,8 @@ import { CalculationResultSection } from 'features/savings-calculator/ui/result/
 
 export function SavingsCalculatorPage() {
   const { condition, handleMonthlyAmountChange, handleTargetAmountChange, handleTermChange } = useSavingsCondition();
-  const availableProducts = useAvailableProducts(condition);
+  const { data: products } = useSavingsProducts();
+  const availableProducts = useAvailableProducts({ products, condition });
   const { selectedProduct, handleSelectProduct } = useProductSelection(availableProducts);
 
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
