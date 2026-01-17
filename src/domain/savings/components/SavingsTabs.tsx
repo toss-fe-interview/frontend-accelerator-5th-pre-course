@@ -77,7 +77,7 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
 
   const annualRate = selectedProduct?.annualRate || 0;
   const expectedReturn = calcExpectedReturn(Number(monthlySaving), savingPeriod, annualRate);
-  const differanceFromGoal = calcDifferenceFromGoal(Number(goalAmount), expectedReturn);
+  const differenceFromGoal = calcDifferenceFromGoal(Number(goalAmount), expectedReturn);
   const recommendedMonthlySaving = calcRecommendedMonthlySaving(Number(goalAmount), savingPeriod, annualRate);
 
   return (
@@ -98,7 +98,7 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
             <CalculationResult
               result={{
                 expectedReturn,
-                differanceFromGoal,
+                differenceFromGoal,
                 recommendedMonthlySaving,
               }}
               selectedProduct={selectedProduct}

@@ -2,7 +2,7 @@ export type SavingsResult = {
   /** 예상 수익 금액 */
   expectedReturn: number;
   /** 목표 금액과의 차이 */
-  differanceFromGoal: number;
+  differenceFromGoal: number;
   /** 추천 월 납입 금액 */
   recommendedMonthlySaving: number;
 };
@@ -18,7 +18,7 @@ export const calcExpectedReturn = (
 export const calcDifferenceFromGoal = (
   goalAmount: number,
   expectedReturn: number
-): SavingsResult['differanceFromGoal'] => {
+): SavingsResult['differenceFromGoal'] => {
   return goalAmount - expectedReturn;
 };
 
