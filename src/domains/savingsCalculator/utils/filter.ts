@@ -12,3 +12,7 @@ export const rangeIn = (value: number, { min, max }: RangeInProps) => {
 export const sortByAnnualRateDesc = (a: SavingsProductType, b: SavingsProductType) => {
   return b.annualRate - a.annualRate;
 };
+
+export const getRecommendedProducts = (products: SavingsProductType[]) => {
+  return products.sort(sortByAnnualRateDesc).slice(0, 2);
+};

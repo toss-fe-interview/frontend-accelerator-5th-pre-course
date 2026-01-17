@@ -7,7 +7,7 @@ import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct'
 import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
 import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
 import TermField from 'domains/savingsCalculator/components/form/TermField';
-import { rangeIn, sortByAnnualRateDesc } from 'domains/savingsCalculator/utils/filter';
+import { getRecommendedProducts, rangeIn, sortByAnnualRateDesc } from 'domains/savingsCalculator/utils/filter';
 import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
 
 import SavingsQuery from 'shared/query/saving';
@@ -148,20 +148,17 @@ export function SavingsCalculatorPage() {
               {hasNoMatchedProducts ? (
                 <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
               ) : (
-                matchedProducts
-                  .sort(sortByAnnualRateDesc)
-                  .slice(0, 2)
-                  .map(product => {
-                    const isSelected = selectedProduct?.id === product.id;
+                getRecommendedProducts(matchedProducts).map(product => {
+                  const isSelected = selectedProduct?.id === product.id;
 
-                    return (
-                      <ListRow
-                        key={product.id}
-                        contents={<SavingsProduct product={product} />}
-                        right={isSelected ? <IconCheckCircle /> : undefined}
-                      />
-                    );
-                  })
+                  return (
+                    <ListRow
+                      key={product.id}
+                      contents={<SavingsProduct product={product} />}
+                      right={isSelected ? <IconCheckCircle /> : undefined}
+                    />
+                  );
+                })
               )}
             </>
           ),
