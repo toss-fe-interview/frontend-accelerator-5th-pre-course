@@ -1,6 +1,7 @@
 import { Suspense, useState } from 'react';
 import { Controller } from 'react-hook-form';
-import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, TextField } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
+import { NumberInput } from 'shared/ui/NumberInput';
 import { useSavingsCalculatorForm } from 'features/savings-calculator/model/useSavingsCalculatorForm';
 import type { SavingsProduct } from 'features/savings-calculator/api/savings';
 import { CalculationResults, ProductList, ProductListItem } from 'features/savings-calculator';
@@ -33,12 +34,12 @@ export function SavingsCalculatorPage() {
         name="targetAmount"
         control={form.control}
         render={({ field }) => (
-          <TextField
+          <NumberInput
             label="목표 금액"
             placeholder="목표 금액을 입력하세요"
             suffix="원"
-            value={field.value ? field.value.toString() : ''}
-            onChange={event => field.onChange(Number(event.target.value))}
+            value={field.value}
+            onChange={field.onChange}
           />
         )}
       />
@@ -47,12 +48,12 @@ export function SavingsCalculatorPage() {
         name="monthlyAmount"
         control={form.control}
         render={({ field }) => (
-          <TextField
+          <NumberInput
             label="월 납입액"
             placeholder="희망 월 납입액을 입력하세요"
             suffix="원"
-            value={field.value?.toString()}
-            onChange={event => field.onChange(Number(event.target.value))}
+            value={field.value}
+            onChange={field.onChange}
           />
         )}
       />
