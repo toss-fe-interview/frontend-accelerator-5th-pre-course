@@ -98,26 +98,26 @@ export function SavingsCalculatorPage() {
               <SavingsCalculationSummary
                 label="예상 수익 금액"
                 amount={calculateExpectedAmount({
-                  월납입액: savingsInput.monthlyAmount,
-                  저축기간: savingsInput.savingsTerm,
-                  연이자율: selectedSavingsProduct.annualRate,
+                  monthlyAmount: Number(savingsInput.monthlyAmount),
+                  savingsTerm: savingsInput.savingsTerm,
+                  annualRate: selectedSavingsProduct.annualRate,
                 })}
               />
               <SavingsCalculationSummary
                 label="목표 금액과의 차이"
                 amount={calculateDifference({
-                  목표금액: savingsInput.targetAmount,
-                  월납입액: savingsInput.monthlyAmount,
-                  저축기간: savingsInput.savingsTerm,
-                  연이자율: selectedSavingsProduct.annualRate,
+                  targetAmount: Number(savingsInput.targetAmount),
+                  monthlyAmount: Number(savingsInput.monthlyAmount),
+                  savingsTerm: savingsInput.savingsTerm,
+                  annualRate: selectedSavingsProduct.annualRate,
                 })}
               />
               <SavingsCalculationSummary
                 label="추천 월 납입 금액"
                 amount={calculateRecommendedMonthlyAmount({
-                  목표금액: savingsInput.targetAmount,
-                  저축기간: savingsInput.savingsTerm,
-                  연이자율: selectedSavingsProduct.annualRate,
+                  targetAmount: Number(savingsInput.targetAmount),
+                  savingsTerm: savingsInput.savingsTerm,
+                  annualRate: selectedSavingsProduct.annualRate,
                 })}
               />
             </>
