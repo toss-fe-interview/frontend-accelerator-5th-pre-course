@@ -130,40 +130,33 @@ function SavingsTabContent({
         <>
           <SuspenseQuery
             {...savingsProductQuery.listQuery()}
-            select={products => products.find(product => product.id === selectedProductId)}
+            select={products => {
+              const selectedProduct = products.find(product => product.id === selectedProductId);
+              if (!selectedProduct) {
+                return null;
+              }
+
+              const expectedAmount = calculateExpectedAmount({
+                annualRate: selectedProduct.annualRate,
+                monthlyPayment: monthlyPayment ?? 0,
+                terms: terms ?? 0,
+              });
+              const differenceAmount = targetAmount ? targetAmount - expectedAmount : 0;
+              const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment({
+                targetAmount: targetAmount ?? 0,
+                annualRate: selectedProduct.annualRate,
+                terms: terms ?? 0,
+              });
+
+              return { expectedAmount, differenceAmount, recommendedMonthlyPayment };
+            }}
           >
-            {({ data: selectedProduct }) =>
-              selectedProduct ? (
+            {({ data: result }) =>
+              result ? (
                 <>
-                  <SavingsResultItem
-                    label="예상 수익 금액"
-                    amount={calculateExpectedAmount({
-                      annualRate: selectedProduct.annualRate,
-                      monthlyPayment: monthlyPayment ?? 0,
-                      terms: terms ?? 0,
-                    })}
-                  />
-                  <SavingsResultItem
-                    label="목표 금액과의 차이"
-                    amount={
-                      targetAmount
-                        ? targetAmount -
-                          calculateExpectedAmount({
-                            annualRate: selectedProduct.annualRate,
-                            monthlyPayment: monthlyPayment ?? 0,
-                            terms: terms ?? 0,
-                          })
-                        : 0
-                    }
-                  />
-                  <SavingsResultItem
-                    label="추천 월 납입 금액"
-                    amount={calculateRecommendedMonthlyPayment({
-                      targetAmount: targetAmount ?? 0,
-                      annualRate: selectedProduct.annualRate,
-                      terms: terms ?? 0,
-                    })}
-                  />
+                  <SavingsResultItem label="예상 수익 금액" amount={result.expectedAmount} />
+                  <SavingsResultItem label="목표 금액과의 차이" amount={result.differenceAmount} />
+                  <SavingsResultItem label="추천 월 납입 금액" amount={result.recommendedMonthlyPayment} />
                 </>
               ) : (
                 <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
