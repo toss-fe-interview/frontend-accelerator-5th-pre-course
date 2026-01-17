@@ -1,0 +1,29 @@
+import { colors, ListRow } from 'tosslib';
+
+const SavingsProductListRowTexts = ({
+  name,
+  annualRate,
+  minMonthlyAmount,
+  maxMonthlyAmount,
+  availableTerms,
+}: {
+  name: string;
+  annualRate: number;
+  minMonthlyAmount: number;
+  maxMonthlyAmount: number;
+  availableTerms: number;
+}) => {
+  return (
+    <ListRow.Texts
+      type="3RowTypeA"
+      top={name}
+      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+      middle={`연 이자율: ${annualRate}%`}
+      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+      bottom={`${minMonthlyAmount.toLocaleString()}원 ~ ${maxMonthlyAmount.toLocaleString()}원 | ${availableTerms}개월`}
+      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+    />
+  );
+};
+
+export default SavingsProductListRowTexts;
