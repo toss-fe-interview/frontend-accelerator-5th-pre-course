@@ -35,6 +35,8 @@ export function SavingsCalculatorPage() {
     product.maxMonthlyAmount >= monthlyAmount &&
     product.availableTerms <= availableTerms;
 
+  const sortByHighestAnnualRate = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -130,7 +132,7 @@ export function SavingsCalculatorPage() {
               <Suspense>
                 <ProductList
                   filterBy={filterProductByAmountAndTerm}
-                  sortBy={(a, b) => b.annualRate - a.annualRate}
+                  sortBy={sortByHighestAnnualRate}
                   limit={2}
                   renderItem={product => (
                     <ProductListItem product={product} isSelected={selectedProduct.id === product.id} />
