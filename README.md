@@ -5,3 +5,110 @@
 ```sh
 yarn dev
 ```
+
+# 작업관련
+
+1. 필요한 컴포넌트
+
+- SavingsCalculatorPage => 최상단 페이지 컴
+- ProductList => 입력에 맞게 필터링 되어서 렌더링 + 적금 선택가능
+- CalculationResult => 입력 데이터랑 적금 상품 데이터로 계산하고, 추천상품 목록 렌더링
+
+1. 필요한 데이터
+
+- 클라이언트
+  - 사용자가 입력한 데이터
+  - 서버에서 받아온 데이터인데, 선택 유무 데이터추가된.
+  - 탭 (적금 상품 | 계산 결과)
+- 서버 : api call해서 받아온 데이터
+-
+-
+-
+-
+-
+
+# 순서
+
+1. api call 테스트
+2. 컴포넌트 나누기
+3. 각 컴포넌트 개발
+
+---- 프로젝트 개선 ----
+
+## 문제점 파악
+
+- 이름들이 너무 일반적이거나 애매모호함. => 네이밍
+- onProductSelect이 SavingCalculator에서 사용되지 않고, props로 전달만됨. => 컴포넌트 구조
+- 폼이 길어졌을때 form자체를 별도의 컴포넌트로 추출 유무 판단 필요. => 컴포넌트 구조
+- 적금 아이템이 현재 같은 데이터를 바라보고 있는데, 별도의 element로 분리되어있음. => 컴포넌트 추출
+- 값에 대한 엣지 케이스 고려(소수점, 음수, 0 , null, undefined) => 비즈니스 로직 추출
+- 컴포넌트와는 상관있지만, 리액트와 상관없는 로직, 변수, 타입들은 별도의 파일로 분리 필요 => 파일 구조
+- api 에러 처리가 되어있지 않음 => 기능 개선
+- 컴포넌트에 비즈니스 계산 로직들이 포함 추출 => 비즈니스 로직 추출
+
+## 확장성 (서비스 경험에 따른)
+
+- ProductItem로 같은 데이터를 사용하지만, 다른 UI가 추가될 수 있음.
+- isSelected 말고도 다른 값으로 추가되어 그 값을 다루기위해 handleSelectItem 같은 함수가 추가될 수 있음.
+- getProducts 말고 다른 api call이 일어날 수 있음.
+- form 입력에 따라 다른 api call을 해야할 수도 있음.
+- productList 데이터 사이에 광고 데이터가 중간에 낄 수 있음.
+- 회원 유저는 getProducts가 아닌 해당 회원에 맞는 다른 endpoint를 호출해야할수도 있음.
+- CalculationResult에 쿠폰 적용에 따라 계산값이 변경될 수 있음.
+
+## 추상화
+
+- 컴포넌트 레벨로 분리 (추상화 레벨이 맞춰져 있는지?)
+
+## 리팩토링 시작
+
+유지 보수 개선 - 1 (네이밍)
+
+- 변수명 함수명 모두 개선 (최소한의 리소스로 맥락 파악을 쉽게 할 수 있음.)
+  - Calculator => 이름이 너무 일반적이라 계산기 역할만 하는 것으로 오해 가능. SavingsCalculator로 개선. 페이지의 이름을 따라감.
+  - FormDataType => file객체의 formData와 헷 갈릴수 있음. 계산에 필요한 form의 의미에 가깝도록 CalculatorForm로 개선.
+  - 유저 인풋에 따라 필터된 상품들 => filteredProductsByInputs
+  - 예상 수익 금액 => expectedReturnAmount
+  - 목표 금액과의 차이 => targetGapAmount
+  - 추천 월 납입 금액 => recommendedMonthlyContribution
+
+유지 보수 개선 - 2 (파일로 분리)
+
+- 리액트와 상관없으면서 + 재사용될 가능성이 높은 타입, 상수, 함수들은 별도의 파일로 추출 (최소한의 리소스로 컴포넌트 파일 내부 코드량 및 역할을 덜 수 있음)
+  - 컴포넌트와는 상관있지만, 리액트와 상관없는 로직, 변수, 타입들은 별도의 파일로 분리 필요 => 파일 구조
+  - roundToThousand => 천 단위 반올림 하는 함수 (서비스내에 전체로 사용할수 있으므로 유틸로 추출.)
+
+유지 보수 개선 - 3 (컴포넌트 추출)
+
+- 재사용 가능한 컴포넌트들은 추출한다.
+  - ProductItem : productItem은 단순 product 정보를 렌더링 하는 역할만 하는 추상화된 컴포넌트로 추출. - product를 클릭 혹은 링크이동등등 다양한 상황 고려해 외부에서 button 컴포넌트로 감싸 클릭시 로직을 실행, Link 컴포넌트로 감싸서 이동등 특정 기능 수행을 할 수 있도록 확장 하였습니다. - 기존에는 product가 선택되었다는 것을 내부에서 `product.isSelected : boolean`으로 하이라이트 시켜줬지만, 이를 삭제하고 props에 isActive값을 추가함으로서 외부에서 활성화 조건을 지정할수 있도록 개선하였습니다.
+    ⚠️ ProductItem 컴포넌트를 외부에서 button이나 a태그로 감싸게 되면, 스타일이 깨지는 이슈 발생
+  1. 스타일이 깨지지 않도록 우회 할수 있는 방법을 찾거나.
+  2. ProductItem의 컴포넌트 내부 변경.
+
+유지 보수 개선 - 4 (비즈니스 로직을 추출)
+
+- 리액트와 상관없는 비즈니스 로직들은 리액트 컴포넌트 밖으로 추출한다.(리액트의 영역과 리액트가 아닌 영역을 분리)
+  - savingCalculator : prodcut와 userInput을 바탕으로 필요한 값을 계산합니다.
+    - 비즈니스 로직은 리액트와 직접적으로 상관이 없기때문에 분리진행.
+    - 함수의 위치는 사용 컴포넌트에 두었습니다.
+    - 각 계산 함수들은 서로 연관이 있고, 실제 특정 값이 특정 계산에 사용되기 때문에 객체로 묶어 관리합니다.
+    - 컴포넌트 내부에서 계산 로직은 알 필요가 없기때문에 `추상화된 메서드`를 사용하여 계산값을 얻을수 있다.
+  - getFilterProductsByInputValue : products와 userInput을 바탕으로 products를 필터하여 return 합니다.
+
+유지 보수 개선 - 5 (컴포넌트 구조 조정 및 props 개선)
+
+- ProductsContainer 컴포넌트 삭제
+  - 데이터 페칭과 상태 관리만 담당하던 중간 레이어 컴포넌트 제거
+  - 불필요한 컴포넌트 depth 감소 (SavingsCalculatorPage → ProductsContainer → SavingCalculator에서 SavingsCalculatorPage → SavingCalculator로 단순화)
+
+- useProducts 커스텀훅 생성
+  - ProductsContainer의 로직(데이터 페칭, 상태 관리, handleSelectItem)을 커스텀훅으로 추출
+  - SavingCalculator에서 직접 훅을 호출하여 products와 handleSelectItem을 사용
+  - props drilling 제거: products, onProductSelect props가 불필요해짐
+
+- CalculationResult에 render props 패턴 적용
+  - onClickProduct props 대신 render props로 변경
+  - 추천 상품 목록의 렌더링 방식을 외부에서 정의할 수 있도록 유연성 확보
+  - 기존: CalculationResult 내부에서 ProductItem을 직접 렌더링
+  - 개선: render props로 ProductList 컴포넌트 재사용, ListHeader도 외부에서 정의

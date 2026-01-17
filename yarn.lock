@@ -959,6 +959,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/query-core@npm:5.90.17":
+  version: 5.90.17
+  resolution: "@tanstack/query-core@npm:5.90.17"
+  checksum: 10c0/f10ba6d82d21fab5a3ad5df028090255f0da5368dad2a78cdb57426519bdb3608d284fbfe733ece139382f60ae17deb5eef14249fbff854b3791795effd8f06f
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^5.90.17":
+  version: 5.90.17
+  resolution: "@tanstack/react-query@npm:5.90.17"
+  dependencies:
+    "@tanstack/query-core": "npm:5.90.17"
+  peerDependencies:
+    react: ^18 || ^19
+  checksum: 10c0/af722dbfbdfaa85d298963a175945d5089c714d83721320d24c3bd96ca5b74120ffff27866dfc6a45195ac6ec7ffe7e55cefd521fc03de55021bf997735d21cd
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:1.0.8":
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
@@ -3699,6 +3717,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-error-boundary@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "react-error-boundary@npm:6.1.0"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+  checksum: 10c0/943eda25fef9bb70400861506be679d3025fa291ac1665b789d6af886cfb8d8af6c155d1fa6649b19ff45aa40ec9fd88592f169da07beeb74e08e674452932a9
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -4392,6 +4419,7 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
     "@hono/vite-dev-server": "npm:^0.18.0"
+    "@tanstack/react-query": "npm:^5.90.17"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8.18.2"
@@ -4407,6 +4435,7 @@ __metadata:
     prettier: "npm:^3.4.2"
     react: "npm:^18"
     react-dom: "npm:^18"
+    react-error-boundary: "npm:^6.1.0"
     react-router-dom: "npm:^7.1.1"
     tosslib: "file:./tosslib.tgz"
     typescript: "npm:~5.7.2"
