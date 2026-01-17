@@ -1,5 +1,6 @@
 import { AmountInput } from 'components/AmountInput';
-import { CalculationResult } from 'components/CalculationResult';
+import { CalculationResult, ResultRow, ValidationMessage } from 'components/CalculationResult';
+import { formatDifference } from 'domains/product/formatter';
 import { ProductList } from 'components/ProductList';
 import { SavingTermsSelect } from 'components/SavingTermsSelect';
 import { filterByMonthlyAmount, filterBySavingsTerm, orderByAnnualRate } from 'domains/product/filters';
@@ -37,7 +38,10 @@ export function SavingsCalculatorPage() {
         onChange={amount => setSavingsQueryParams({ monthlyAmount: amount })}
       />
       <Spacing size={16} />
-      <SavingTermsSelect value={selectedTerm ?? 0} onChange={value => setSavingsQueryParams({ selectedTerm: value })} />
+      <SavingTermsSelect
+        value={selectedTerm ?? 12}
+        onChange={value => setSavingsQueryParams({ selectedTerm: value })}
+      />
       <Spacing size={24} />
       <Border height={16} />
       <Spacing size={8} />
@@ -66,7 +70,21 @@ export function SavingsCalculatorPage() {
         <Suspense fallback={<ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중..." />} />}>
           <Spacing size={8} />
 
-          <CalculationResult />
+          <CalculationResult>
+            {props => {
+              if (!props.isValid) {
+                return <ValidationMessage message={props.validationMessage} />;
+              }
+              const { expectedRevenue, diffFromTarget, recommendedAmount } = props.data;
+              return (
+                <>
+                  <ResultRow label="예상 수익" value={`${expectedRevenue.toLocaleString()}원`} />
+                  <ResultRow label="목표 금액과의 차이" value={formatDifference(diffFromTarget)} />
+                  <ResultRow label="추천 월 납입액" value={`${recommendedAmount.toLocaleString()}원`} />
+                </>
+              );
+            }}
+          </CalculationResult>
 
           <Spacing size={8} />
           <Border height={16} />
