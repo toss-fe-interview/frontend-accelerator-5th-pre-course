@@ -1,12 +1,13 @@
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, Spacing, Tab } from 'tosslib';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { Suspense, ErrorBoundary } from '@suspensive/react';
+import { SuspenseQuery } from '@suspensive/react-query';
 import { savingsProductQuery } from 'features/savings/apis/queries';
 import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'features/savings/utils/calculate';
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
 import { SavingsResultItem } from 'features/savings/components/SavingsResultItem';
+import { SavingsProduct } from 'features/savings/types';
 import { EmptyMessage } from 'shared/components/EmptyMessage';
-import { ErrorBoundary } from 'shared/components/ErrorBoundary';
 import { useTab } from 'shared/hooks/useTab';
 
 type SavingsTabProps = {
@@ -19,6 +20,13 @@ export const SAVINGS_PRODUCT_TABS = {
   PRODUCTS: 'products',
   RESULTS: 'results',
 };
+
+const RECOMMENDED_PRODUCTS_COUNT = 2;
+
+const descending =
+  <T,>(getValue: (item: T) => number) =>
+  (a: T, b: T) =>
+    getValue(b) - getValue(a);
 
 export function SavingsProductTab({ targetAmount, monthlyPayment, terms }: SavingsTabProps) {
   const { tab, handleTabChange } = useTab(SAVINGS_PRODUCT_TABS.PRODUCTS);
@@ -51,6 +59,20 @@ export function SavingsProductTab({ targetAmount, monthlyPayment, terms }: Savin
   );
 }
 
+const filterByMonthlyPayment = (products: SavingsProduct[], monthlyPayment: number | null) =>
+  monthlyPayment === null
+    ? products
+    : products.filter(
+        product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
+      );
+
+const getRecommendedProducts = (products: SavingsProduct[], monthlyPayment: number | null) => {
+  const filtered = filterByMonthlyPayment(products, monthlyPayment);
+  return [...(filtered.length ? filtered : products)]
+    .sort(descending(product => product.annualRate))
+    .slice(0, RECOMMENDED_PRODUCTS_COUNT);
+};
+
 type SavingsTabContentProps = {
   tab: string;
   selectedProductId: string | null;
@@ -68,101 +90,118 @@ function SavingsTabContent({
   monthlyPayment,
   terms,
 }: SavingsTabContentProps) {
-  const { data: savingsProducts } = useSuspenseQuery(savingsProductQuery.listQuery());
-
-  const filteredSavingsProducts =
-    monthlyPayment === null
-      ? savingsProducts
-      : savingsProducts.filter(
-          product => monthlyPayment >= product.minMonthlyAmount && monthlyPayment <= product.maxMonthlyAmount
-        );
-  const recommendedProducts = [...(filteredSavingsProducts.length ? filteredSavingsProducts : savingsProducts)]
-    .sort((a, b) => b.annualRate - a.annualRate)
-    .slice(0, 2);
-  const selectedSavingsProduct = savingsProducts.find(product => product.id === selectedProductId);
-
-  const expectedAmount = calculateExpectedAmount({
-    annualRate: selectedSavingsProduct?.annualRate ?? 0,
-    monthlyPayment: monthlyPayment ?? 0,
-    terms: terms ?? 0,
-  });
-  const differenceAmount = targetAmount ? targetAmount - expectedAmount : 0;
-  const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment({
-    targetAmount: targetAmount ?? 0,
-    annualRate: selectedSavingsProduct?.annualRate ?? 0,
-    terms: terms ?? 0,
-  });
-
-  const showProductList = filteredSavingsProducts.length > 0;
-  const showCalculationResults = selectedSavingsProduct !== undefined;
-
   return (
     <>
       {tab === SAVINGS_PRODUCT_TABS.PRODUCTS && (
-        <>
-          {showProductList ? (
-            filteredSavingsProducts.map(product => {
-              const selected = selectedProductId === product.id;
-              return (
-                <ListRow
-                  key={product.id}
-                  contents={
-                    <SavingProductItem
-                      name={product.name}
-                      annualRate={product.annualRate}
-                      minMonthlyAmount={product.minMonthlyAmount}
-                      maxMonthlyAmount={product.maxMonthlyAmount}
-                      availableTerms={product.availableTerms}
-                    />
-                  }
-                  right={selected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-                  onClick={() => onSelectProduct(product.id)}
-                />
-              );
-            })
-          ) : (
-            <EmptyMessage message="상품이 존재하지 않습니다." />
-          )}
-        </>
+        <SuspenseQuery
+          {...savingsProductQuery.listQuery()}
+          select={products => filterByMonthlyPayment(products, monthlyPayment)}
+        >
+          {({ data: filteredProducts }) =>
+            filteredProducts.length > 0 ? (
+              filteredProducts.map(product => {
+                const selected = selectedProductId === product.id;
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={
+                      <SavingProductItem
+                        name={product.name}
+                        annualRate={product.annualRate}
+                        minMonthlyAmount={product.minMonthlyAmount}
+                        maxMonthlyAmount={product.maxMonthlyAmount}
+                        availableTerms={product.availableTerms}
+                      />
+                    }
+                    right={selected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                    onClick={() => onSelectProduct(product.id)}
+                  />
+                );
+              })
+            ) : (
+              <EmptyMessage message="상품이 존재하지 않습니다." />
+            )
+          }
+        </SuspenseQuery>
       )}
 
       <Spacing size={8} />
 
       {tab === SAVINGS_PRODUCT_TABS.RESULTS && (
         <>
-          {showCalculationResults ? (
-            <>
-              <SavingsResultItem label="예상 수익 금액" amount={expectedAmount} />
-              <SavingsResultItem label="목표 금액과의 차이" amount={differenceAmount} />
-              <SavingsResultItem label="추천 월 납입 금액" amount={recommendedMonthlyPayment} />
-            </>
-          ) : (
-            <EmptyMessage message="상품을 선택해주세요." />
-          )}
+          <SuspenseQuery
+            {...savingsProductQuery.listQuery()}
+            select={products => products.find(product => product.id === selectedProductId)}
+          >
+            {({ data: selectedProduct }) =>
+              selectedProduct ? (
+                <>
+                  <SavingsResultItem
+                    label="예상 수익 금액"
+                    amount={calculateExpectedAmount({
+                      annualRate: selectedProduct.annualRate,
+                      monthlyPayment: monthlyPayment ?? 0,
+                      terms: terms ?? 0,
+                    })}
+                  />
+                  <SavingsResultItem
+                    label="목표 금액과의 차이"
+                    amount={
+                      targetAmount
+                        ? targetAmount -
+                          calculateExpectedAmount({
+                            annualRate: selectedProduct.annualRate,
+                            monthlyPayment: monthlyPayment ?? 0,
+                            terms: terms ?? 0,
+                          })
+                        : 0
+                    }
+                  />
+                  <SavingsResultItem
+                    label="추천 월 납입 금액"
+                    amount={calculateRecommendedMonthlyPayment({
+                      targetAmount: targetAmount ?? 0,
+                      annualRate: selectedProduct.annualRate,
+                      terms: terms ?? 0,
+                    })}
+                  />
+                </>
+              ) : (
+                <EmptyMessage message="상품을 선택해주세요." />
+              )
+            }
+          </SuspenseQuery>
           <Spacing size={8} />
           <Border height={16} />
           <Spacing size={8} />
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
-          {recommendedProducts.map(product => {
-            const selected = selectedProductId === product.id;
-            return (
-              <ListRow
-                key={product.id}
-                contents={
-                  <SavingProductItem
-                    name={product.name}
-                    annualRate={product.annualRate}
-                    minMonthlyAmount={product.minMonthlyAmount}
-                    maxMonthlyAmount={product.maxMonthlyAmount}
-                    availableTerms={product.availableTerms}
+          <SuspenseQuery
+            {...savingsProductQuery.listQuery()}
+            select={products => getRecommendedProducts(products, monthlyPayment)}
+          >
+            {({ data: recommendedProducts }) =>
+              recommendedProducts.map(product => {
+                const selected = selectedProductId === product.id;
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={
+                      <SavingProductItem
+                        name={product.name}
+                        annualRate={product.annualRate}
+                        minMonthlyAmount={product.minMonthlyAmount}
+                        maxMonthlyAmount={product.maxMonthlyAmount}
+                        availableTerms={product.availableTerms}
+                      />
+                    }
+                    right={selected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
+                    onClick={() => onSelectProduct(product.id)}
                   />
-                }
-                right={selected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-                onClick={() => onSelectProduct(product.id)}
-              />
-            );
-          })}
+                );
+              })
+            }
+          </SuspenseQuery>
           <Spacing size={40} />
         </>
       )}
