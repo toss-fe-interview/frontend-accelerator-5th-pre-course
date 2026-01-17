@@ -78,14 +78,17 @@ export function SavingsCalculatorPage() {
           <Suspense fallback={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />}>
             <GetFilteredProducts>
               {filteredProducts =>
-                filteredProducts.map(product => (
-                  <SavingsProductItem
-                    key={product.id}
-                    product={product}
-                    checked={selectedProduct?.id === product.id}
-                    onClick={() => setSelectedProduct(product)}
-                  />
-                ))
+                filteredProducts.map(product => {
+                  const isSelected = selectedProduct?.id === product.id;
+                  return (
+                    <SavingsProductItem
+                      key={product.id}
+                      product={product}
+                      isSelected={isSelected}
+                      onClick={() => setSelectedProduct(product)}
+                    />
+                  );
+                })
               }
             </GetFilteredProducts>
           </Suspense>
@@ -116,14 +119,17 @@ export function SavingsCalculatorPage() {
             <Suspense fallback={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />}>
               <GetRecommendedProducts>
                 {recommendedProducts =>
-                  recommendedProducts.map(product => (
-                    <SavingsProductItem
-                      key={product.id}
-                      product={product}
-                      checked={selectedProduct?.id === product.id}
-                      onClick={() => setSelectedProduct(product)}
-                    />
-                  ))
+                  recommendedProducts.map(product => {
+                    const isSelected = selectedProduct?.id === product.id;
+                    return (
+                      <SavingsProductItem
+                        key={product.id}
+                        product={product}
+                        isSelected={isSelected}
+                        onClick={() => setSelectedProduct(product)}
+                      />
+                    );
+                  })
                 }
               </GetRecommendedProducts>
             </Suspense>

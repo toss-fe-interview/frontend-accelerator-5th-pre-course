@@ -3,16 +3,15 @@ import { Assets, colors, ListRow } from 'tosslib';
 
 export const SavingsProductItem = ({
   product,
-  checked,
+  isSelected,
   onClick,
 }: {
   product: SavingProduct;
-  checked: boolean;
+  isSelected: boolean;
   onClick: () => void;
 }) => {
   return (
     <ListRow
-      key={product.id}
       contents={
         <ListRow.Texts
           type="3RowTypeA"
@@ -24,7 +23,7 @@ export const SavingsProductItem = ({
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
-      right={checked ? <Assets.Icon name="icon-check-circle-green" /> : null}
+      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
       onClick={onClick}
     />
   );
