@@ -32,13 +32,13 @@ export const SavingsResultTabs = ({ savingsInput }: { savingsInput: SavingsInput
     return isMonthlyAmountValid && isTermMatched;
   };
 
-  const filteredSavingsProducts = savingsProducts.filter(product => {
-    return isProductMatchingInput(product, savingsInput);
-  });
-
   const getTopProductsByRate = (products: SavingsProduct[], count = 2) => {
     return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, count);
   };
+
+  const filteredSavingsProducts = savingsProducts.filter(product => {
+    return isProductMatchingInput(product, savingsInput);
+  });
 
   const recommendedSavingsProducts = getTopProductsByRate(filteredSavingsProducts, 2);
 
@@ -116,7 +116,6 @@ export const SavingsResultTabs = ({ savingsInput }: { savingsInput: SavingsInput
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {/* SavingProductList 랑 UI가 같은데 컴포넌트로 분리했다면? */}
           {recommendedSavingsProducts.length > 0 ? (
             recommendedSavingsProducts.map(product => {
               const isSelected = selectedSavingsProduct?.id === product.id;

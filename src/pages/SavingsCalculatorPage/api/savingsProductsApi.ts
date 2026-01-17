@@ -1,7 +1,7 @@
 import { http, isHttpError } from 'tosslib';
 import { SavingsProduct } from '../types/types';
 
-export async function getSavingsProducts() {
+export async function savingsProductsApi() {
   try {
     const response = await http.get<SavingsProduct[]>('/api/savings-products');
     return response;
