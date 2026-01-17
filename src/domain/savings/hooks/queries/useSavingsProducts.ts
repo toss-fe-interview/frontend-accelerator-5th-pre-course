@@ -1,18 +1,16 @@
-import { useFetch } from '@shared/hooks';
-import { savingsApis } from '@savings/apis';
-import type { SavingsProduct } from '@savings/apis/type';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
-export type SavingsProductsFilterParams = {
-  monthlySaving?: number;
-  savingPeriod?: number;
-};
+import type { SavingsProduct, SavingsProductsFilterParams } from '@savings/apis/type';
+import { savingsQueryOptions } from './options';
 
 type UseSavingsProductsProps = {
   filterParams?: SavingsProductsFilterParams;
 };
 
 const useSavingsProducts = ({ filterParams }: UseSavingsProductsProps) => {
-  const { data: savingsProducts } = useFetch(savingsApis.getSavingsProducts);
+  const { data: savingsProducts } = useSuspenseQuery({
+    ...savingsQueryOptions.products(filterParams),
+  });
 
   const { monthlySaving, savingPeriod } = filterParams ?? {};
 

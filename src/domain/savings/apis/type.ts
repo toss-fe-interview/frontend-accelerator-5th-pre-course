@@ -12,3 +12,8 @@ export type SavingsProduct = {
   /** 저축 기간 */
   availableTerms: number;
 };
+
+export type SavingsProductsFilterParams = {
+  monthlySaving?: number;
+  savingPeriod?: number;
+};

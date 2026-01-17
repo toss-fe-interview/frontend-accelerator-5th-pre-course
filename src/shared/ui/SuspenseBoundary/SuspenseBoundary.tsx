@@ -1,3 +1,4 @@
+import { useQueryErrorResetBoundary } from '@tanstack/react-query';
 import { Component, ErrorInfo, ReactNode, Suspense } from 'react';
 
 type RenderFallbackProps = {
@@ -8,6 +9,7 @@ type RenderFallbackProps = {
 type ErrorBoundaryProps = {
   children: ReactNode;
   fallback: ReactNode | ((props: RenderFallbackProps) => ReactNode);
+  onReset?: () => void;
 };
 
 interface ErrorBoundaryState {
@@ -30,11 +32,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   reset = () => {
-    const { error } = this.state;
-    // 만약 Error에 _retry 메소드가 있다면 실행
-    if (error && (error as any)._retry) {
-      (error as any)._retry();
-    }
+    this.props.onReset?.();
     this.setState({ hasError: false, error: null });
   };
 
@@ -60,8 +58,10 @@ type SuspenseBoundaryProps = {
 };
 
 export const SuspenseBoundary = ({ children, pendingFallback, rejectedFallback }: SuspenseBoundaryProps) => {
+  const { reset } = useQueryErrorResetBoundary();
+
   return (
-    <ErrorBoundary fallback={rejectedFallback}>
+    <ErrorBoundary fallback={rejectedFallback} onReset={reset}>
       <Suspense fallback={pendingFallback}>{children}</Suspense>
     </ErrorBoundary>
   );
