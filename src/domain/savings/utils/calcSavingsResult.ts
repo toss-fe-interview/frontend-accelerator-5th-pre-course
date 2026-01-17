@@ -29,3 +29,15 @@ export const calcRecommendedMonthlySaving = (
 ): SavingsResult['recommendedMonthlySaving'] => {
   return goalAmount / (savingPeriod * (1 + annualRate + 0.5));
 };
+
+export const calcSavingsResult = (goalAmount: number, savingPeriod: number, annualRate: number): SavingsResult => {
+  const expectedReturn = calcExpectedReturn(goalAmount, savingPeriod, annualRate);
+  const differenceFromGoal = calcDifferenceFromGoal(goalAmount, expectedReturn);
+  const recommendedMonthlySaving = calcRecommendedMonthlySaving(goalAmount, savingPeriod, annualRate);
+
+  return {
+    expectedReturn,
+    differenceFromGoal,
+    recommendedMonthlySaving,
+  };
+};

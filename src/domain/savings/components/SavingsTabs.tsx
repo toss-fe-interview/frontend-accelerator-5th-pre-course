@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Border, Button, ListHeader, ListRow, Spacing, Tab } from 'tosslib';
-import { arrayIncludes } from '@shared/utils';
+import { arrayIncludes, roundToUnit } from '@shared/utils';
 import { SuspenseBoundary, SwitchCase, Delay } from '@shared/ui';
-import { calcDifferenceFromGoal, calcExpectedReturn, calcRecommendedMonthlySaving } from '@savings/utils';
+import { calcSavingsResult } from '@savings/utils';
 import { useSavingsProducts } from '@savings/hooks/queries';
 import { ProductListItem } from './ProductListItem';
 import { CalculationResult } from './CalculationResult';
@@ -61,7 +61,7 @@ export const SavingsTabs = (props: SavingsTabsProps) => {
 };
 
 const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: string }) => {
-  const { monthlySaving, savingPeriod, goalAmount } = savingsForm;
+  const { monthlySaving, savingPeriod } = savingsForm;
   const { data: savingsProducts } = useSavingsProducts({
     filterParams: {
       monthlySaving,
@@ -74,11 +74,6 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
   const handleClickProduct = (sp: SavingsProduct) => {
     setSelectedProduct(sp);
   };
-
-  const annualRate = selectedProduct?.annualRate || 0;
-  const expectedReturn = calcExpectedReturn(monthlySaving, savingPeriod, annualRate);
-  const differenceFromGoal = calcDifferenceFromGoal(goalAmount, expectedReturn);
-  const recommendedMonthlySaving = calcRecommendedMonthlySaving(goalAmount, savingPeriod, annualRate);
 
   return (
     <SwitchCase
@@ -96,13 +91,24 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
           <>
             <Spacing size={8} />
             {selectedProduct ? (
-              <CalculationResult
-                result={{
-                  expectedReturn,
-                  differenceFromGoal,
-                  recommendedMonthlySaving,
-                }}
-              />
+              (() => {
+                const annualRate = selectedProduct?.annualRate || 0;
+                const { expectedReturn, differenceFromGoal, recommendedMonthlySaving } = calcSavingsResult(
+                  monthlySaving,
+                  savingPeriod,
+                  annualRate
+                );
+
+                return (
+                  <CalculationResult
+                    result={{
+                      expectedReturn: roundToUnit(expectedReturn),
+                      differenceFromGoal: roundToUnit(differenceFromGoal),
+                      recommendedMonthlySaving: roundToUnit(recommendedMonthlySaving),
+                    }}
+                  />
+                );
+              })()
             ) : (
               <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
             )}
