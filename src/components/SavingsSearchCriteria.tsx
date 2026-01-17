@@ -2,12 +2,12 @@ import { SavingsInput } from 'type';
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { formatMoney, parseMoney } from 'utils/money';
 
-interface SavingsInputFormProps {
+interface SavingsSearchCriteriaProps {
   savingsInput: SavingsInput;
   setSavingsInput: (savingsInput: SavingsInput) => void;
 }
 
-export function SavingsInputForm(props: SavingsInputFormProps) {
+export function SavingsSearchCriteria(props: SavingsSearchCriteriaProps) {
   const { savingsInput, setSavingsInput } = props;
 
   const updateField = <K extends keyof SavingsInput>(field: K, value: SavingsInput[K]) => {

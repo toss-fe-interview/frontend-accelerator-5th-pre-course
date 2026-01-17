@@ -1,7 +1,7 @@
 import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useMemo, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { SavingsInputForm } from 'components/SavingsInputForm';
+import { SavingsSearchCriteria } from 'components/SavingsSearchCriteria';
 import { CalculationResults } from 'components/CalculationResults';
 import { ProductInfoTexts } from 'components/ProductInfoTexts';
 import { SavingsInput, SavingsProduct } from 'type';
@@ -40,7 +40,7 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <SavingsInputForm savingsInput={savingsInput} setSavingsInput={setSavingsInput} />
+      <SavingsSearchCriteria savingsInput={savingsInput} setSavingsInput={setSavingsInput} />
 
       <Spacing size={24} />
       <Border height={16} />
