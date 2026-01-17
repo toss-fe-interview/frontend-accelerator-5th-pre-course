@@ -1,39 +1,31 @@
+import { filter } from 'es-toolkit/compat';
 import { flow } from 'es-toolkit/function';
 import { useState } from 'react';
 import { SavingsProduct } from 'shared/api/type';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { CheckCircleIcon } from 'shared/icon';
+import { Calculator } from 'shared/ui/Calculator';
+import { removeCommas } from 'shared/utils/string';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { CalculationResult } from './ui/CalculationResult';
+import { SavingProduct } from './ui/SavingProduct';
+import { createSavingsFilter, sortByDesc, takeTop2 } from './utils';
 
 type TabType = 'products' | 'results';
 
-export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsProduct[] }) {
-  const [목표금액, set목표금액] = useState<number>(0);
-  const [월납입액, set월납입액] = useState<number>(0);
-  const [저축기간, set저축기간] = useState<6 | 12 | 24>(12);
+const 저축기간범위 = [6, 12, 24, 48] as const;
 
-  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsProduct[] }) {
+  const [목표금액, set목표금액] = useState(0);
+  const [월납입액, set월납입액] = useState(0);
+  const [저축기간, set저축기간] = useState<(typeof 저축기간범위)[number]>(12);
+
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct>();
   const [selectedTab, setSelectedTab] = useState<TabType>('products');
 
-  const filteredProducts = savingProducts.filter(
-    product =>
-      product.minMonthlyAmount <= 월납입액 &&
-      product.maxMonthlyAmount >= 월납입액 &&
-      product.availableTerms === 저축기간
-  );
+  const savingsFilters = createSavingsFilter({ 월납입액, 저축기간 });
+  const filteredProducts = filter(savingProducts, savingsFilters);
 
-  const sortByHighRate = (products: SavingsProduct[]) => products.toSorted((a, b) => b.annualRate - a.annualRate);
-  const takeTop2 = (products: SavingsProduct[]) => products.slice(0, 2);
-  const getBestProducts = flow(sortByHighRate, takeTop2);
+  const getRecommendProducts = flow(sortByDesc, takeTop2);
 
   return (
     <>
@@ -44,8 +36,8 @@ export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsP
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={toKRW(목표금액)}
-        onChange={e => set목표금액(amountToNumber(e.target.value))}
+        value={목표금액.toLocaleString('ko-KR')}
+        onChange={e => set목표금액(Number(removeCommas(e.target.value)) || 0)}
       />
 
       <Spacing size={16} />
@@ -54,16 +46,18 @@ export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsP
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={toKRW(월납입액)}
-        onChange={e => set월납입액(amountToNumber(e.target.value))}
+        value={월납입액.toLocaleString('ko-KR')}
+        onChange={e => set월납입액(Number(removeCommas(e.target.value)) || 0)}
       />
 
       <Spacing size={16} />
 
       <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={저축기간} onChange={set저축기간}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+        {저축기간범위.map(value => (
+          <SelectBottomSheet.Option key={value} value={value}>
+            {value}개월
+          </SelectBottomSheet.Option>
+        ))}
       </SelectBottomSheet>
 
       <Spacing size={24} />
@@ -109,34 +103,46 @@ export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsP
           <Spacing size={8} />
           {selectedProduct ? (
             <>
-              {(() => {
-                const expectedAmount = 월납입액 * 저축기간 * (1 + selectedProduct.annualRate * 0.5);
-                return (
+              <Calculator formula={() => 월납입액 * 저축기간 * (1 + selectedProduct.annualRate * 0.5)}>
+                {예상수익금액 => (
                   <ListRow
-                    contents={<CalculationResult top="예상 수익 금액" bottom={`${toKRW(expectedAmount)} 원`} />}
+                    contents={
+                      <CalculationResult top="예상 수익 금액" bottom={`${예상수익금액.toLocaleString('ko-KR')} 원`} />
+                    }
                   />
-                );
-              })()}
+                )}
+              </Calculator>
 
-              {(() => {
-                const expectedAmount = 월납입액 * 저축기간 * (1 + selectedProduct.annualRate * 0.5);
-                const diffAmount = 목표금액 - expectedAmount;
-                return (
-                  <ListRow
-                    contents={<CalculationResult top="목표 금액과의 차이" bottom={`${toKRW(diffAmount)} 원`} />}
-                  />
-                );
-              })()}
+              <Calculator formula={() => 월납입액 * 저축기간 * (1 + selectedProduct.annualRate * 0.5)}>
+                {예상수익금액 => {
+                  const 목표금액과의차이 = 목표금액 - 예상수익금액;
+                  return (
+                    <ListRow
+                      contents={
+                        <CalculationResult
+                          top="목표 금액과의 차이"
+                          bottom={`${목표금액과의차이.toLocaleString('ko-KR')} 원`}
+                        />
+                      }
+                    />
+                  );
+                }}
+              </Calculator>
 
-              {(() => {
-                const recommendedMonthly =
-                  Math.round(목표금액 / (저축기간 * (1 + selectedProduct.annualRate * 0.5)) / 1000) * 1000;
-                return (
+              <Calculator
+                formula={() => Math.round(목표금액 / (저축기간 * (1 + selectedProduct.annualRate * 0.5)) / 1000) * 1000}
+              >
+                {추천월납입금액 => (
                   <ListRow
-                    contents={<CalculationResult top="추천 월 납입 금액" bottom={`${toKRW(recommendedMonthly)} 원`} />}
+                    contents={
+                      <CalculationResult
+                        top="추천 월 납입 금액"
+                        bottom={`${추천월납입금액.toLocaleString('ko-KR')} 원`}
+                      />
+                    }
                   />
-                );
-              })()}
+                )}
+              </Calculator>
             </>
           ) : (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
@@ -150,7 +156,7 @@ export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsP
 
           <Spacing size={12} />
 
-          {getBestProducts(filteredProducts).map(product => {
+          {getRecommendProducts(filteredProducts).map(product => {
             const isSelected = selectedProduct?.id === product.id;
             return (
               <ListRow
@@ -174,43 +180,3 @@ export function SavingsCalculator({ savingProducts }: { savingProducts: SavingsP
     </>
   );
 }
-
-const CheckCircleIcon = () => <Assets.Icon name="icon-check-circle-green" />;
-
-const SavingProduct = ({
-  name,
-  annualRate,
-  minMonthlyAmount,
-  maxMonthlyAmount,
-  availableTerms,
-}: Omit<SavingsProduct, 'id'>) => {
-  return (
-    <ListRow.Texts
-      type="3RowTypeA"
-      top={name}
-      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-      middle={`연 이자율: ${annualRate}%`}
-      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-      bottom={`${minMonthlyAmount.toLocaleString()}원 ~ ${maxMonthlyAmount.toLocaleString()}원 | ${availableTerms}개월`}
-      bottomProps={{ fontSize: 13, color: colors.grey600 }}
-    />
-  );
-};
-
-const CalculationResult = ({ top, bottom }: { top: string; bottom: string }) => {
-  return (
-    <ListRow.Texts
-      type="2RowTypeA"
-      top={top}
-      topProps={{ color: colors.grey600 }}
-      bottom={bottom}
-      bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-    />
-  );
-};
-
-const toKRW = (amount: number) => amount.toLocaleString('ko-KR');
-
-export const amountToNumber = (value: string) => {
-  return Number(value.replace(/,/g, '')) || 0;
-};
