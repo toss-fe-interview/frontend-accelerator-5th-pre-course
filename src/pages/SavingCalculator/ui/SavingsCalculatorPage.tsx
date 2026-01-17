@@ -118,27 +118,24 @@ export function SavingsCalculatorPage() {
                 <Spacing size={8} />
 
                 {selectedSavingsProduct ? (
-                  <>
-                    <CalculationResultItem
-                      name="예상 수익 금액"
-                      amount={
-                        filters.monthlyPayment * filters.savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)
-                      }
-                    />
-                    <CalculationResultItem
-                      name="목표 금액과의 차이"
-                      amount={
-                        filters.targetAmount -
-                        filters.monthlyPayment * filters.savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)
-                      }
-                    />
-                    <CalculationResultItem
-                      name="추천 월 납입 금액"
-                      amount={roundToThousand(
-                        filters.targetAmount / (filters.savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5))
-                      )}
-                    />
-                  </>
+                  (() => {
+                    const interestMultiplier = 1 + selectedSavingsProduct.annualRate * 0.5;
+                    const totalPrincipal = filters.monthlyPayment * filters.savingPeriod;
+
+                    const expectedTotalAmount = totalPrincipal * interestMultiplier;
+                    const differenceFromTarget = filters.targetAmount - expectedTotalAmount;
+                    const recommendedMonthlyPayment = roundToThousand(
+                      filters.targetAmount / (filters.savingPeriod * interestMultiplier)
+                    );
+
+                    return (
+                      <>
+                        <CalculationResultItem name="예상 수익 금액" amount={expectedTotalAmount} />
+                        <CalculationResultItem name="목표 금액과의 차이" amount={differenceFromTarget} />
+                        <CalculationResultItem name="추천 월 납입 금액" amount={recommendedMonthlyPayment} />
+                      </>
+                    );
+                  })()
                 ) : (
                   <EmptyMessage message="상품을 선택해주세요." />
                 )}
