@@ -1,7 +1,8 @@
 import { Suspense, useState } from 'react';
 import { Controller } from 'react-hook-form';
-import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { NumberInput } from 'shared/ui/NumberInput';
+import { Select } from 'shared/ui/Select';
 import { useSavingsCalculatorForm } from 'features/savings-calculator/model/useSavingsCalculatorForm';
 import type { SavingsProduct } from 'features/savings-calculator/api/savings';
 import { CalculationResults, ProductList, ProductListItem } from 'features/savings-calculator';
@@ -62,16 +63,17 @@ export function SavingsCalculatorPage() {
         name="availableTerms"
         control={form.control}
         render={({ field }) => (
-          <SelectBottomSheet
+          <Select
             label="저축 기간"
             title="저축 기간을 선택해주세요"
             value={field.value}
-            onChange={value => field.onChange(value)}
-          >
-            <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-          </SelectBottomSheet>
+            onChange={field.onChange}
+            options={[
+              { value: 6, label: '6개월' },
+              { value: 12, label: '12개월' },
+              { value: 24, label: '24개월' },
+            ]}
+          />
         )}
       />
 
