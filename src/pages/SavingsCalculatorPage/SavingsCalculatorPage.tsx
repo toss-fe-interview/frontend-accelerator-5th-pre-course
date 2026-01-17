@@ -1,6 +1,6 @@
 import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { SavingsProduct } from './types/types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { formatCurrency } from './lib/formatCurrency';
 import { extractNumbers } from './lib/extractNumbers';
@@ -10,8 +10,8 @@ import {
   calculateDifference,
   calculateExpectedAmount,
   calculateRecommendedMonthlyAmount,
-} from './util/savingsCalculations';
-import { getSavingsProducts } from './api/getSavingsProducts';
+} from './utils/savingsCalculations';
+import { useSavingsProducts } from './hooks/useSavingsProducts';
 
 type SavingsInput = {
   targetAmount: string;
@@ -28,26 +28,8 @@ export function SavingsCalculatorPage() {
   const [savingsProductTab, setSavingsProductTab] = useState<'products' | 'results'>('products');
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
 
-  // const { filteredSavingsProducts, recommendedSavingsProducts } = useSavingsProducts({ savingsInput });
-  const [savingsProducts, setSavingsProducts] = useState<SavingsProduct[]>([]);
+  const { data: savingsProducts = [] } = useSavingsProducts();
 
-  useEffect(() => {
-    const fetchSavingsProducts = async () => {
-      const response = await getSavingsProducts();
-
-      if (response) {
-        setSavingsProducts(response);
-      }
-    };
-
-    fetchSavingsProducts();
-  }, []);
-
-  //   - 월 납입액
-  //   - `product.minMonthlyAmount` (최소 월 납입액)보다 크고
-  //   - `product.maxMonthlyAmount` (최대 월 납입액)보다 작아야 함
-  // - 저축 기간
-  //   - `product.availableTerms` (저축 기간)와 동일해야 함
   const isProductMatchingInput = (product: SavingsProduct, savingsInput: SavingsInput) => {
     const hasMonthlyAmountInput = savingsInput.monthlyAmount.trim() !== '';
     const isMonthlyAmountValid = hasMonthlyAmountInput
@@ -62,7 +44,6 @@ export function SavingsCalculatorPage() {
     return isProductMatchingInput(product, savingsInput);
   });
 
-  // 사용자가 입력한 조건에 맞는 적금 상품 중 연 이자율이 가장 높은 2개의 상품을 출력해주세요.
   const getTopProductsByRate = (products: SavingsProduct[], count = 2) => {
     return [...products].sort((a, b) => b.annualRate - a.annualRate).slice(0, count);
   };
