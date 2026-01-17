@@ -16,6 +16,10 @@ import { orderBy, take } from 'es-toolkit';
 import { AmountField } from 'components/AmountField';
 import { TermSelect } from 'components/TermSelect';
 
+const isSelected = (current: 'products' | 'results', target: 'products' | 'results'): boolean => {
+  return current === target;
+};
+
 export function SavingsCalculatorPage() {
   // 목표금액
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
@@ -65,10 +69,10 @@ export function SavingsCalculatorPage() {
       <Spacing size={8} />
 
       <Tab onChange={value => setCurrentTab(value as 'products' | 'results')}>
-        <Tab.Item value="products" selected={currentTab === 'products'}>
+        <Tab.Item value="products" selected={isSelected(currentTab, 'products')}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={currentTab === 'results'}>
+        <Tab.Item value="results" selected={isSelected(currentTab, 'results')}>
           계산 결과
         </Tab.Item>
       </Tab>
