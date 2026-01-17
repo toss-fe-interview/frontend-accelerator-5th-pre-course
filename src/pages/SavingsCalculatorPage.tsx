@@ -61,6 +61,7 @@ export function SavingsCalculatorPage() {
       />
       <Spacing size={16} />
       <SavingPeriodSelect
+        title="저축 기간"
         value={savingPeriod}
         onSelect={value => setValue('savingPeriod', value)}
         options={[
