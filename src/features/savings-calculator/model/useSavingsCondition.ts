@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { SavingsCondition } from 'features/savings-calculator/model/types';
 
-export function useSavingsCondition() {
+export const useSavingsCondition = () => {
   const [condition, setCondition] = useState<SavingsCondition>({
     targetAmount: 0,
     monthlyAmount: 0,
@@ -27,4 +27,4 @@ export function useSavingsCondition() {
     handleMonthlyAmountChange,
     handleTermChange,
   };
-}
+};

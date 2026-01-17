@@ -9,12 +9,7 @@ interface SavingsTermSelectProps {
 
 export function SavingsTermSelect({ label, title, value, onChange }: SavingsTermSelectProps) {
   return (
-    <SelectBottomSheet
-      label={label}
-      title={title}
-      value={value}
-      onChange={selectedValue => onChange(Number(selectedValue))}
-    >
+    <SelectBottomSheet label={label} title={title} value={value} onChange={onChange}>
       <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
       <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
       <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { SavingsProduct } from 'entities/savings/model/types';
 
-export function useProductSelection(products: SavingsProduct[]) {
+export const useProductSelection = (products: SavingsProduct[]) => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   const selectedProduct = products.find(product => product.id === selectedProductId);
@@ -16,4 +16,4 @@ export function useProductSelection(products: SavingsProduct[]) {
     handleSelectProduct,
     selectedProductId,
   };
-}
+};
