@@ -7,7 +7,6 @@ import { calculateExpectedAmount, calculateRecommendedMonthlyPayment } from 'fea
 import { SavingProductItem } from 'features/savings/components/SavingProductItem';
 import { SavingsResultItem } from 'features/savings/components/SavingsResultItem';
 import { SavingsProduct } from 'features/savings/types';
-import { EmptyMessage } from 'shared/components/EmptyMessage';
 import { useTab } from 'shared/hooks/useTab';
 
 type SavingsTabProps = {
@@ -43,8 +42,8 @@ export function SavingsProductTab({ targetAmount, monthlyPayment, terms }: Savin
         </Tab.Item>
       </Tab>
 
-      <ErrorBoundary fallback={<EmptyMessage message="오류가 발생했습니다." />}>
-        <Suspense fallback={<EmptyMessage message="로딩 중..." />}>
+      <ErrorBoundary fallback={<ListRow contents={<ListRow.Texts type="1RowTypeA" top="오류가 발생했습니다." />} />}>
+        <Suspense fallback={<ListRow contents={<ListRow.Texts type="1RowTypeA" top="로딩 중..." />} />}>
           <SavingsTabContent
             tab={tab}
             selectedProductId={selectedProductId}
@@ -119,7 +118,7 @@ function SavingsTabContent({
                 );
               })
             ) : (
-              <EmptyMessage message="상품이 존재하지 않습니다." />
+              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다." />} />
             )
           }
         </SuspenseQuery>
@@ -167,7 +166,7 @@ function SavingsTabContent({
                   />
                 </>
               ) : (
-                <EmptyMessage message="상품을 선택해주세요." />
+                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
               )
             }
           </SuspenseQuery>
