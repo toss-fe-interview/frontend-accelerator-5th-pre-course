@@ -1,13 +1,19 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NuqsAdapter } from 'nuqs/adapters/react';
 import { GlobalPortal, GlobalStyles } from 'tosslib';
-import { Routes } from './pages/Routes';
+import { Routes } from './Routes';
+
+const queryClient = new QueryClient();
 
 export function App() {
   return (
-    <>
-      <GlobalStyles />
-      <GlobalPortal.Provider>
-        <Routes />
-      </GlobalPortal.Provider>
-    </>
+    <NuqsAdapter>
+      <QueryClientProvider client={queryClient}>
+        <GlobalStyles />
+        <GlobalPortal.Provider>
+          <Routes />
+        </GlobalPortal.Provider>
+      </QueryClientProvider>
+    </NuqsAdapter>
   );
 }
