@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
 export type SavingsForm = {
-  goalAmount: string;
-  monthlySaving: string;
+  goalAmount: number;
+  monthlySaving: number;
   savingPeriod: 6 | 12 | 24;
 };
 
 export const useSavingsForm = () => {
   const [savingsForm, setSavingsForm] = useState<SavingsForm>({
-    goalAmount: '',
-    monthlySaving: '',
+    goalAmount: 0,
+    monthlySaving: 0,
     savingPeriod: 12,
   });
 

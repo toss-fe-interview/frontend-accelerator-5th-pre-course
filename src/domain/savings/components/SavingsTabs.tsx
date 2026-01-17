@@ -64,7 +64,7 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
   const { monthlySaving, savingPeriod, goalAmount } = savingsForm;
   const { data: savingsProducts } = useSavingsProducts({
     filterParams: {
-      monthlySaving: Number(monthlySaving),
+      monthlySaving,
       savingPeriod,
     },
   });
@@ -76,9 +76,9 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
   };
 
   const annualRate = selectedProduct?.annualRate || 0;
-  const expectedReturn = calcExpectedReturn(Number(monthlySaving), savingPeriod, annualRate);
-  const differenceFromGoal = calcDifferenceFromGoal(Number(goalAmount), expectedReturn);
-  const recommendedMonthlySaving = calcRecommendedMonthlySaving(Number(goalAmount), savingPeriod, annualRate);
+  const expectedReturn = calcExpectedReturn(monthlySaving, savingPeriod, annualRate);
+  const differenceFromGoal = calcDifferenceFromGoal(goalAmount, expectedReturn);
+  const recommendedMonthlySaving = calcRecommendedMonthlySaving(goalAmount, savingPeriod, annualRate);
 
   return (
     <SwitchCase
@@ -95,14 +95,17 @@ const Contents = ({ activeTab, savingsForm }: SavingsTabsProps & { activeTab: st
         results: (
           <>
             <Spacing size={8} />
-            <CalculationResult
-              result={{
-                expectedReturn,
-                differenceFromGoal,
-                recommendedMonthlySaving,
-              }}
-              selectedProduct={selectedProduct}
-            />
+            {selectedProduct ? (
+              <CalculationResult
+                result={{
+                  expectedReturn,
+                  differenceFromGoal,
+                  recommendedMonthlySaving,
+                }}
+              />
+            ) : (
+              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+            )}
             <Spacing size={8} />
             <Border height={16} />
             <Spacing size={8} />

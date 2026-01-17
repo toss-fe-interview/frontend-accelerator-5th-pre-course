@@ -9,11 +9,10 @@ type ProductListItemProps = {
 };
 
 export const ProductListItem = ({ savingsProduct, selected, onClick }: ProductListItemProps) => {
-  const { id, name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
+  const { name, annualRate, minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
 
   return (
     <ListRow
-      key={id}
       contents={
         <ListRow.Texts
           type="3RowTypeA"

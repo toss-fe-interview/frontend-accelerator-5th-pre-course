@@ -2,7 +2,6 @@ import { Border, NavigationBar, SelectBottomSheet, Spacing } from 'tosslib';
 import { NumberField } from '@shared/ui';
 import { useSavingsForm } from '@savings/hooks';
 import { SavingsTabs } from 'domain/savings/components/SavingsTabs';
-import { commaizeNumber } from '@shared/utils';
 
 function SavingsCalculatorPage() {
   const { savingsForm, updateSavingsForm } = useSavingsForm();
@@ -19,7 +18,6 @@ function SavingsCalculatorPage() {
         onChange={val => updateSavingsForm({ goalAmount: val })}
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        formatter={v => commaizeNumber(Number(v))}
       />
       <Spacing size={16} />
       <NumberField
@@ -28,7 +26,6 @@ function SavingsCalculatorPage() {
         onChange={val => updateSavingsForm({ monthlySaving: val })}
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        formatter={v => commaizeNumber(Number(v))}
       />
       <Spacing size={16} />
       <SelectBottomSheet
