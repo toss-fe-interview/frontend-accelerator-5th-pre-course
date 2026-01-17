@@ -53,7 +53,7 @@ export function SavingsCalculatorPage() {
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         suffix="원"
-        value={Number(goalAmount).toLocaleString('ko-KR')}
+        value={goalAmount.toLocaleString('ko-KR')}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoalAmount(e.target.value)}
         // 콤마처리 숫자입력할때 보여질 필요가 없으니, 추상화한다.
       />
@@ -63,7 +63,7 @@ export function SavingsCalculatorPage() {
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
-        value={Number(monthlyDeposit).toLocaleString('ko-KR')}
+        value={monthlyDeposit.toLocaleString('ko-KR')}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMonthlyDeposit(e.target.value)}
       />
       <Spacing size={16} />
@@ -90,6 +90,7 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {selectedTab === 'products' && (
+        // Suspense를 드러낸 의도 : ProductList가 api호출을 하고 있음을.
         <Suspense fallback={<div>로딩 중...</div>}>
           <ProductList
             select={products =>
@@ -103,21 +104,7 @@ export function SavingsCalculatorPage() {
               return (
                 <ListRow
                   key={product.id}
-                  contents={
-                    <ListRow.Texts
-                      type="3RowTypeA"
-                      top={product.name}
-                      topProps={{
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        color: colors.grey900,
-                      }}
-                      middle={`연 이자율: ${product.annualRate}%`}
-                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                      bottom={`${product.availableTerms}개월`}
-                      bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                    />
-                  }
+                  contents={<ProductList.Item product={product} />}
                   right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                   onClick={() => setSelectedProductId(product.id)}
                 />
@@ -130,7 +117,6 @@ export function SavingsCalculatorPage() {
       {selectedTab === 'results' && (
         <>
           {hasProduct ? (
-            // 추상화 레벨이 맞지 않음.
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요" />} />
           ) : (
             <>
@@ -142,6 +128,7 @@ export function SavingsCalculatorPage() {
           <Divider spacing={8} />
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
+
           <Suspense fallback={<div>로딩 중...</div>}>
             <ProductList
               select={products => getTopRateProducts(products, 2)}
@@ -150,21 +137,7 @@ export function SavingsCalculatorPage() {
                 return (
                   <ListRow
                     key={product.id}
-                    contents={
-                      <ListRow.Texts
-                        type="3RowTypeA"
-                        top={product.name}
-                        topProps={{
-                          fontSize: 16,
-                          fontWeight: 'bold',
-                          color: colors.grey900,
-                        }}
-                        middle={`연 이자율: ${product.annualRate}%`}
-                        middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                        bottom={`${product.availableTerms}개월`}
-                        bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                      />
-                    }
+                    contents={<ProductList.Item product={product} />}
                     right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
                     onClick={() => setSelectedProductId(product.id)}
                   />
