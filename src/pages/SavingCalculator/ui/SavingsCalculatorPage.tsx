@@ -1,7 +1,7 @@
 import { Border, ListHeader, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 import { getSavingsProducts, SavingsProduct } from 'pages/SavingCalculator/api/product';
-import { SavingsProductListRow } from 'pages/SavingCalculator/ui/SavingsProductItem';
+import { SavingsProductItem } from 'pages/SavingCalculator/ui/SavingsProductItem';
 import { CalculationResultItem } from 'pages/SavingCalculator/ui/CalculationResultItem';
 import { TermsSelect } from 'pages/SavingCalculator/ui/TermsSelect';
 import { queryOptions } from '@tanstack/react-query';
@@ -98,7 +98,7 @@ export function SavingsCalculatorPage() {
                     products.map(product => {
                       const isSelected = selectedSavingsProduct?.id === product.id;
                       return (
-                        <SavingsProductListRow
+                        <SavingsProductItem
                           key={product.id}
                           product={product}
                           isSelected={isSelected}
@@ -169,7 +169,7 @@ export function SavingsCalculatorPage() {
                       products.map(product => {
                         const isSelected = selectedSavingsProduct?.id === product.id;
                         return (
-                          <SavingsProductListRow
+                          <SavingsProductItem
                             key={product.id}
                             product={product}
                             isSelected={isSelected}

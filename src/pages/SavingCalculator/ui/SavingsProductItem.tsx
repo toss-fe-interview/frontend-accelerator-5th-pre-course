@@ -1,13 +1,13 @@
 import { Assets, colors, ListRow } from 'tosslib';
 import { SavingsProduct } from '../api/product';
 
-interface SavingsProductListRowProps {
+interface SavingsProductItemProps {
   product: SavingsProduct;
   isSelected: boolean;
   onClick: () => void;
 }
 
-export const SavingsProductListRow = ({ product, isSelected, onClick }: SavingsProductListRowProps) => {
+export const SavingsProductItem = ({ product, isSelected, onClick }: SavingsProductItemProps) => {
   return (
     <ListRow
       key={product.id}
