@@ -9,19 +9,17 @@ const numericInputSchema = z.string().transform(val => {
 
 export const NumberInput = ({
   label,
-  placeholder,
   value,
   onChange,
 }: {
   label: string;
-  placeholder: string;
   value: number;
   onChange: (value: number) => void;
 }) => {
   return (
     <TextField
       label={label}
-      placeholder={placeholder}
+      placeholder={`${label}을 입력하세요`}
       suffix="원"
       value={value.toLocaleString('ko-KR')}
       onChange={e => {

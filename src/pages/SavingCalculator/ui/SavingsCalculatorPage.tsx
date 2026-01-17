@@ -7,7 +7,6 @@ import { TermsSelect } from 'pages/SavingCalculator/ui/TermsSelect';
 import { queryOptions } from '@tanstack/react-query';
 import { roundToThousand } from 'shared/utils/number';
 import { EmptyMessage } from 'shared/ui/EmptyMessage';
-import { eq, gt, lt } from 'es-toolkit/compat';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { NumberInput } from 'shared/ui/NumberField';
 import { AsyncBoundary } from 'shared/ui/AsyncBoundary';
@@ -40,14 +39,12 @@ export function SavingsCalculatorPage() {
 
       <NumberInput
         label="목표 금액"
-        placeholder="목표 금액을 입력하세요"
         value={filters.목표_금액}
         onChange={value => setFilters(prev => ({ ...prev, 목표_금액: value }))}
       />
       <Spacing size={16} />
       <NumberInput
         label="월 납입액"
-        placeholder="월 납입액을 입력하세요"
         value={filters.월_납입액}
         onChange={value => setFilters(prev => ({ ...prev, 월_납입액: value }))}
       />
