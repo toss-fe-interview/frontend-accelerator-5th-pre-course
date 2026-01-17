@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { getSavingsProducts, SavingsProduct } from 'pages/SavingCalculator/api/product';
 import { SavingsProductListRow } from 'pages/SavingCalculator/ui/SavingsProductItem';
 import { CalculationResultItem } from 'pages/SavingCalculator/ui/CalculationResultItem';
-import { SavingPeriodSelect } from 'pages/SavingCalculator/ui/SavingPeriodSelect';
+import { TermsSelect } from 'pages/SavingCalculator/ui/TermsSelect';
 import { queryOptions } from '@tanstack/react-query';
 import { roundToThousand } from 'shared/utils/number';
 import { EmptyMessage } from 'shared/ui/EmptyMessage';
@@ -25,7 +25,7 @@ export function SavingsCalculatorPage() {
   const [filters, setFilters] = useState({
     targetAmount: 0,
     monthlyPayment: 0,
-    savingPeriod: 12,
+    terms: 12,
   });
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   const [tab, setTab] = useState<Tab>('products');
@@ -50,10 +50,10 @@ export function SavingsCalculatorPage() {
         onChange={value => setFilters(prev => ({ ...prev, monthlyPayment: value }))}
       />
       <Spacing size={16} />
-      <SavingPeriodSelect
+      <TermsSelect
         title="저축 기간"
-        value={filters.savingPeriod}
-        onSelect={value => setFilters(prev => ({ ...prev, savingPeriod: value }))}
+        value={filters.terms}
+        onSelect={value => setFilters(prev => ({ ...prev, terms: value }))}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
@@ -89,7 +89,7 @@ export function SavingsCalculatorPage() {
                     products.filter(product => {
                       const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
                       const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
-                      const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
+                      const isMatchingAvailableTerms = eq(product.availableTerms, filters.terms);
 
                       return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                     })
@@ -119,12 +119,12 @@ export function SavingsCalculatorPage() {
                 {selectedSavingsProduct ? (
                   (() => {
                     const interestMultiplier = 1 + selectedSavingsProduct.annualRate * 0.5;
-                    const totalPrincipal = filters.monthlyPayment * filters.savingPeriod;
+                    const totalPrincipal = filters.monthlyPayment * filters.terms;
 
                     const expectedTotalAmount = totalPrincipal * interestMultiplier;
                     const differenceFromTarget = filters.targetAmount - expectedTotalAmount;
                     const recommendedMonthlyPayment = roundToThousand(
-                      filters.targetAmount / (filters.savingPeriod * interestMultiplier)
+                      filters.targetAmount / (filters.terms * interestMultiplier)
                     );
 
                     return (
@@ -157,7 +157,7 @@ export function SavingsCalculatorPage() {
                           products.filter(product => {
                             const isAboveMinMonthlyAmount = gt(product.minMonthlyAmount, filters.monthlyPayment);
                             const isBelowMaxMonthlyAmount = lt(product.maxMonthlyAmount, filters.monthlyPayment);
-                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.savingPeriod);
+                            const isMatchingAvailableTerms = eq(product.availableTerms, filters.terms);
 
                             return isAboveMinMonthlyAmount && isBelowMaxMonthlyAmount && isMatchingAvailableTerms;
                           }),

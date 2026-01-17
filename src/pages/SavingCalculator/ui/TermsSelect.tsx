@@ -1,13 +1,13 @@
 import { SelectBottomSheet } from 'tosslib';
 
-interface SavingPeriodSelectProps {
+interface TermsSelectProps {
   title: string;
   value: number;
   onSelect: (value: number) => void;
   options: Array<{ value: number; label: string }>;
 }
 
-export const SavingPeriodSelect = ({ title, value, onSelect, options }: SavingPeriodSelectProps) => {
+export const TermsSelect = ({ title, value, onSelect, options }: TermsSelectProps) => {
   return (
     <SelectBottomSheet
       title={title}
