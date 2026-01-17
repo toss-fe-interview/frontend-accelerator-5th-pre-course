@@ -10,7 +10,6 @@ import { SavingsProductInfo } from 'entities/savings/ui/SavingsProductInfo';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
 import { filterAvailableProducts } from 'features/savings-calculator/lib/filterAvailableProducts';
-import { getConditionEmptyText } from 'features/savings-calculator/lib/savingsConditionUtils';
 import { isSelectionReady } from 'features/savings-calculator/lib/savingsConditionValidators';
 import { SavingsCondition } from 'features/savings-calculator/model/types';
 import { SavingsProductDataBoundary } from 'features/savings-calculator/ui/boundary/SavingsProductDataBoundary';
@@ -94,7 +93,16 @@ export function SavingsCalculatorPage() {
                 <CalculationResultSection
                   product={availableProducts.find(product => product.id === selectedProductId) ?? null}
                   condition={condition}
-                  emptyFallback={<EmptyListItem message={getConditionEmptyText(condition) ?? '상품을 선택해주세요.'} />}
+                  emptyFallback={
+                    <EmptyListItem
+                      message={
+                        (condition.targetAmount <= 0 && '목표 금액을 입력해주세요.') ||
+                        (condition.monthlyAmount <= 0 && '월 납입액을 입력해주세요.') ||
+                        (condition.term <= 0 && '저축 기간을 선택해주세요.') ||
+                        '상품을 선택해주세요.'
+                      }
+                    />
+                  }
                 >
                   {({ finalAmount, differenceAmount, recommendedMonthlyAmount }) => (
                     <>
