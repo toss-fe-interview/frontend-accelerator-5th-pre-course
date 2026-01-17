@@ -1,18 +1,7 @@
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 
-import { formatCurrency, parseNumberInput } from 'utils/format';
+import { formatAmount } from 'utils/format';
 import {
   calculateExpectedProfit,
   calculateDifferenceProfit,
@@ -24,32 +13,41 @@ import { ErrorBoundary, Suspense } from '@suspensive/react';
 import { SuspenseQuery } from '@suspensive/react-query';
 
 import { orderBy, take } from 'es-toolkit';
+import { AmountField } from 'components/AmountField';
 
 export function SavingsCalculatorPage() {
+  // 목표금액
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
+  // 월 납입액
   const [monthlyAmount, setMonthlyAmount] = useState<number | null>(null);
+  // 저축 기간
   const [savingsTerm, setSavingsTerm] = useState<number | null>(null);
+
+  // 현재 탭
   const [currentTab, setCurrentTab] = useState<'products' | 'results'>('products');
+
+  // 선택된 상품
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   return (
     <>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
-      <TextField
+      {/* 무엇을 위한 컴포넌트인가? 
+          목표 금액을 다루는 입력창
+      */}
+      <AmountField
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
-        suffix="원"
-        value={targetAmount !== null ? formatCurrency(targetAmount) : ''}
-        onChange={e => setTargetAmount(parseNumberInput(e.target.value))}
+        value={targetAmount}
+        onChange={setTargetAmount}
       />
       <Spacing size={16} />
-      <TextField
+      <AmountField
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
-        value={monthlyAmount !== null ? formatCurrency(monthlyAmount) : ''}
-        onChange={e => setMonthlyAmount(parseNumberInput(e.target.value))}
+        value={monthlyAmount}
+        onChange={setMonthlyAmount}
       />
       <Spacing size={16} />
       <SelectBottomSheet
@@ -83,6 +81,7 @@ export function SavingsCalculatorPage() {
               case 'products':
                 return (
                   <SuspenseQuery {...getSavingsProductsQueryOptions()}>
+                    {/* react query의 select 옵션도 써보기 */}
                     {({ data: savingsProducts }) =>
                       filterSavingsProducts({
                         data: savingsProducts,
@@ -97,7 +96,7 @@ export function SavingsCalculatorPage() {
                               topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                               middle={`연 이자율: ${product.annualRate}%`}
                               middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                              bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                              bottom={`${formatAmount(product.minMonthlyAmount)}원 ~ ${formatAmount(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
                               bottomProps={{ fontSize: 13, color: colors.grey600 }}
                             />
                           }
@@ -145,7 +144,7 @@ export function SavingsCalculatorPage() {
                                   type="2RowTypeA"
                                   top="예상 수익 금액"
                                   topProps={{ color: colors.grey600 }}
-                                  bottom={`${formatCurrency(expectedProfit)}원`}
+                                  bottom={`${formatAmount(expectedProfit)}원`}
                                   bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                                 />
                               }
@@ -156,7 +155,7 @@ export function SavingsCalculatorPage() {
                                   type="2RowTypeA"
                                   top="목표 금액과의 차이"
                                   topProps={{ color: colors.grey600 }}
-                                  bottom={`${formatCurrency(differenceProfit)}원`}
+                                  bottom={`${formatAmount(differenceProfit)}원`}
                                   bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                                 />
                               }
@@ -167,7 +166,7 @@ export function SavingsCalculatorPage() {
                                   type="2RowTypeA"
                                   top="추천 월 납입 금액"
                                   topProps={{ color: colors.grey600 }}
-                                  bottom={`${formatCurrency(recommendedMonthlyAmount)}원`}
+                                  bottom={`${formatAmount(recommendedMonthlyAmount)}원`}
                                   bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
                                 />
                               }
@@ -203,7 +202,7 @@ export function SavingsCalculatorPage() {
                                     topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
                                     middle={`연 이자율: ${product.annualRate}%`}
                                     middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                                    bottom={`${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                                    bottom={`${formatAmount(product.minMonthlyAmount)}원 ~ ${formatAmount(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
                                     bottomProps={{ fontSize: 13, color: colors.grey600 }}
                                   />
                                 }
