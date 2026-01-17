@@ -1,21 +1,19 @@
 import { useSavingsProductsQuery } from 'entities/savings/api';
-import { SAVINGS_DURATIONS } from 'entities/savings/config/constant';
 import { formatNumberWithCommas, parseDigitsOnly } from 'entities/savings/lib';
 import { SavingsTab } from 'entities/savings/model';
-import { CalculationResult, Message, SavingsProduct } from 'entities/savings/ui';
+import {
+  CalculationResult,
+  Message,
+  MonthlyDepositInput,
+  SavingsProduct,
+  TargetAmountInput,
+} from 'entities/savings/ui';
+import SavingsTermSelect from 'entities/savings/ui/SavingsTermSelect';
 import { useState } from 'react';
 import { isBetween, sortBy, takeFromHead } from 'shared/lib';
-import {
-  Assets,
-  Border,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+
+const SAVINGS_TERMS = [6, 12, 24];
 
 const CheckCircleGreen = () => <Assets.Icon name="icon-check-circle-green" />;
 
@@ -24,13 +22,13 @@ export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState('');
   const savingsProductsQuery = useSavingsProductsQuery();
   const [monthlyDeposit, setMonthlyDeposit] = useState('');
-  const [savingDuration, setSavingDuration] = useState(12);
+  const [savingsTerm, setSavingTerm] = useState(12);
   const [selectedSavingsProductId, setSelectedSavingsProductId] = useState('');
 
   const availableSavingsProducts = (savingsProductsQuery.data ?? [])
     .filter(product => {
-      const isMatchedSavingDuration = product.availableTerms === savingDuration;
-      return isMatchedSavingDuration;
+      const isMatchedSavingsTerm = product.availableTerms === savingsTerm;
+      return isMatchedSavingsTerm;
     })
     .filter(product => {
       const isBetweenMonthlyDeposit = isBetween({
@@ -60,43 +58,27 @@ export function SavingsCalculatorPage() {
     <>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
-      <TextField
-        label="목표 금액"
-        placeholder="목표 금액을 입력하세요"
-        suffix="원"
+      <TargetAmountInput
         value={formatNumberWithCommas(targetAmount)}
         onChange={e => {
           setTargetAmount(parseDigitsOnly(e.target.value));
         }}
       />
       <Spacing size={16} />
-      <TextField
-        label="월 납입액"
-        placeholder="희망 월 납입액을 입력하세요"
-        suffix="원"
+      <MonthlyDepositInput
         value={formatNumberWithCommas(monthlyDeposit)}
         onChange={e => {
           setMonthlyDeposit(parseDigitsOnly(e.target.value));
         }}
       />
       <Spacing size={16} />
-      <SelectBottomSheet
-        label="저축 기간"
-        title="저축 기간을 선택해주세요"
-        value={savingDuration}
-        onChange={duration => {
-          setSavingDuration(duration);
+      <SavingsTermSelect
+        options={SAVINGS_TERMS}
+        value={savingsTerm}
+        onChange={term => {
+          setSavingTerm(term);
         }}
-      >
-        {SAVINGS_DURATIONS.map(duration => (
-          <SelectBottomSheet.Option key={duration} value={duration}>
-            {`${duration}개월`}
-          </SelectBottomSheet.Option>
-        ))}
-      </SelectBottomSheet>
-      <Spacing size={24} />
-      <Border height={16} />
-      <Spacing size={8} />
+      />
       <Tab
         onChange={value => {
           setTab(value as SavingsTab);
