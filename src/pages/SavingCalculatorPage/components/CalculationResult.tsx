@@ -2,7 +2,7 @@ import { SavingProduct } from 'models/SavingProduct';
 import { colors, ListRow } from 'tosslib';
 import { priceFormatterToLocaleString } from 'utils/priceFormatter';
 import { roundToUnit } from 'utils/math';
-import { SavingCalculationParams } from '../hooks/useSavingCalculationParams';
+import { SavingCalculationParams } from '../types/SavingCalculationParam';
 
 interface CalculationResultProps {
   selectedSavingProduct: SavingProduct;

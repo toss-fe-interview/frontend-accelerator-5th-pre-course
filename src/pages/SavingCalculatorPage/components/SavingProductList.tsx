@@ -1,6 +1,6 @@
 import { SavingProduct } from 'models/SavingProduct';
-import { Assets, colors, ListRow } from 'tosslib';
-import { priceFormatterToLocaleString } from 'utils/priceFormatter';
+import { ListRow } from 'tosslib';
+import { SavingProductListItem } from './SavingProductListItem';
 
 export const SavingProductList = ({
   savingsProducts,
@@ -17,27 +17,14 @@ export const SavingProductList = ({
 
   return (
     <div>
-      {savingsProducts?.map(product => {
-        const isSelected = selectedSavingProduct?.id === product.id;
-        return (
-          <ListRow
-            key={product.id}
-            contents={
-              <ListRow.Texts
-                type="3RowTypeA"
-                top={product.name}
-                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                middle={`연 이자율: ${product.annualRate}%`}
-                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                bottom={`${priceFormatterToLocaleString(product.minMonthlyAmount)}원 ~ ${priceFormatterToLocaleString(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                bottomProps={{ fontSize: 13, color: colors.grey600 }}
-              />
-            }
-            right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : undefined}
-            onClick={() => selectSavingProduct(product)}
-          />
-        );
-      })}
+      {savingsProducts.map(product => (
+        <SavingProductListItem
+          key={product.id}
+          product={product}
+          isSelected={selectedSavingProduct?.id === product.id}
+          onSelect={selectSavingProduct}
+        />
+      ))}
     </div>
   );
 };
