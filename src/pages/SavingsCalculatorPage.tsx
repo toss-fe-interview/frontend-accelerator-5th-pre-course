@@ -12,6 +12,7 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { roundToThousand } from 'util/number';
 import { EmptyMessage } from 'components/EmptyMessage';
+import { eq, gt, lt } from 'es-toolkit/compat';
 
 const productQueries = {
   all: () =>
@@ -53,7 +54,7 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
       <SavingPeriodSelect
         value={savingPeriod}
-        onChange={value => setValue('savingPeriod', value)}
+        onChange={v => setValue('savingPeriod', v)}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
@@ -81,27 +82,34 @@ export function SavingsCalculatorPage() {
       {(() => {
         switch (tab) {
           case 'products':
-            return filterSavingsProducts(savingsProducts, monthlyPayment, savingPeriod).map(product => {
-              const isSelected = selectedSavingsProduct?.id === product.id;
-              return (
-                <ListRow
-                  key={product.id}
-                  contents={
-                    <Product
-                      name={product.name}
-                      annualRate={product.annualRate}
-                      minMonthlyAmount={product.minMonthlyAmount}
-                      maxMonthlyAmount={product.maxMonthlyAmount}
-                      availableTerms={product.availableTerms}
-                    />
-                  }
-                  right={isSelected ? <CheckCircleIcon /> : null}
-                  onClick={() => {
-                    setSelectedSavingsProduct(product);
-                  }}
-                />
-              );
-            });
+            return savingsProducts
+              .filter(
+                product =>
+                  gt(product.minMonthlyAmount, monthlyPayment) &&
+                  lt(product.maxMonthlyAmount, monthlyPayment) &&
+                  eq(product.availableTerms, savingPeriod)
+              )
+              .map(product => {
+                const isSelected = selectedSavingsProduct?.id === product.id;
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={
+                      <Product
+                        name={product.name}
+                        annualRate={product.annualRate}
+                        minMonthlyAmount={product.minMonthlyAmount}
+                        maxMonthlyAmount={product.maxMonthlyAmount}
+                        availableTerms={product.availableTerms}
+                      />
+                    }
+                    right={isSelected ? <CheckCircleIcon /> : null}
+                    onClick={() => {
+                      setSelectedSavingsProduct(product);
+                    }}
+                  />
+                );
+              });
 
           case 'results':
             return (
@@ -140,7 +148,13 @@ export function SavingsCalculatorPage() {
                 />
                 <Spacing size={12} />
 
-                {filterSavingsProducts(savingsProducts, monthlyPayment, savingPeriod)
+                {savingsProducts
+                  .filter(
+                    product =>
+                      gt(product.minMonthlyAmount, monthlyPayment) &&
+                      lt(product.maxMonthlyAmount, monthlyPayment) &&
+                      eq(product.availableTerms, savingPeriod)
+                  )
                   .sort((a, b) => b.annualRate - a.annualRate)
                   .slice(0, 2)
                   .map(product => {
@@ -174,13 +188,3 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
-
-const filterSavingsProducts = (products: SavingsProduct[], monthlyPayment: number, savingPeriod: number) => {
-  return products.filter(product => {
-    const isAboveMinPayment = product.minMonthlyAmount < monthlyPayment;
-    const isBelowMaxPayment = product.maxMonthlyAmount > monthlyPayment;
-    const matchesSavingPeriod = product.availableTerms === savingPeriod;
-
-    return isAboveMinPayment && isBelowMaxPayment && matchesSavingPeriod;
-  });
-};
