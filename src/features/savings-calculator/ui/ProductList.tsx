@@ -1,16 +1,16 @@
 import React from 'react';
-import type { SavingsProduct } from 'features/savings-calculator/api/savings';
-import { useSavingsProducts } from 'features/savings-calculator/model/useSavingsProducts';
+import type { SavingsProduct } from 'features/savings-calculator';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getSavingsProductsQueryOptions } from '../api';
 
 export function ProductList({
-  select = products => products,
+  select,
   renderItem,
 }: {
   select?: (products: SavingsProduct[]) => SavingsProduct[];
   renderItem: (product: SavingsProduct) => React.ReactNode;
 }) {
-  const { products } = useSavingsProducts();
-  const result = select(products);
+  const { data: result } = useSuspenseQuery({...getSavingsProductsQueryOptions(), select});
 
   return result.map(product => <React.Fragment key={product.id}>{renderItem(product)}</React.Fragment>);
 }

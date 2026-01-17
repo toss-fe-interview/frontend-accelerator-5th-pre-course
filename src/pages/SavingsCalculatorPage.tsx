@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { NumberInput } from 'shared/ui/NumberInput';
 import { Select } from 'shared/ui/Select';
-import type { SavingsProduct } from 'features/savings-calculator/api/savings';
+import type { SavingsProduct } from 'features/savings-calculator/api/get-savings';
 import { CalculationResults, ProductList, ProductListItem, savingsCalculatorSchema } from 'features/savings-calculator';
 import { Tabs } from 'shared/ui/Tabs';
 import { SavingsCalculation } from 'shared/utils/savings-calculation';

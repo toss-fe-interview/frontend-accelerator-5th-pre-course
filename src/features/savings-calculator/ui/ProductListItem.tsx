@@ -1,5 +1,5 @@
 import { Assets, colors, ListRow } from 'tosslib';
-import type { SavingsProduct } from 'features/savings-calculator/api/savings';
+import type { SavingsProduct } from 'features/savings-calculator/api/get-savings';
 import { formatCurrency } from 'shared/utils/format';
 
 export function ProductListItem({
