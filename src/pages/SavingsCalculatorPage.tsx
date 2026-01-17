@@ -1,27 +1,47 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 
 import { CheckCircleIcon } from 'shared/ui/CheckCircleIcon';
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
 
-import { useSavingsProducts } from 'entities/savings/model/useSavingsProducts';
+import { getSavingsProducts } from 'entities/savings/api/SavingsProduct.api';
 import { SavingsProductInfo } from 'entities/savings/ui/SavingsProductInfo';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
-import { useAvailableProducts } from 'features/savings-calculator/model/useAvailableProducts';
-import { useProductSelection } from 'features/savings-calculator/model/useProductSelection';
-import { useSavingsCondition } from 'features/savings-calculator/model/useSavingsCondition';
+import { SavingsCondition } from 'features/savings-calculator/model/types';
 import { AmountInput } from 'features/savings-calculator/ui/input/AmountInput';
 import { SavingsTermSelect } from 'features/savings-calculator/ui/input/SavingsTermSelect';
 import { RecommendedProductSection } from 'features/savings-calculator/ui/recommendation/RecommendedProductSection';
 import { CalculationResultAmount } from 'features/savings-calculator/ui/result/CalculationResultAmount';
 import { CalculationResultSection } from 'features/savings-calculator/ui/result/CalculationResultSection';
 
+const queryKey = ['savings-products'];
+
 export function SavingsCalculatorPage() {
-  const { condition, handleMonthlyAmountChange, handleTargetAmountChange, handleTermChange } = useSavingsCondition();
-  const { data: products } = useSavingsProducts();
-  const availableProducts = useAvailableProducts({ products, condition });
-  const { selectedProduct, handleSelectProduct } = useProductSelection(availableProducts);
+  const [condition, setCondition] = useState<SavingsCondition>({
+    targetAmount: 0,
+    monthlyAmount: 0,
+    term: 12,
+  });
+
+  const { data: availableProducts } = useSuspenseQuery({
+    queryKey,
+    queryFn: getSavingsProducts,
+    select: products =>
+      products.filter(savingsProduct => {
+        const { monthlyAmount, term } = condition;
+        const { minMonthlyAmount, maxMonthlyAmount, availableTerms } = savingsProduct;
+
+        const isMonthlyAmountInRange = minMonthlyAmount <= monthlyAmount && maxMonthlyAmount >= monthlyAmount;
+        const isTermMatched = availableTerms === term;
+
+        return isMonthlyAmountInRange && isTermMatched;
+      }),
+  });
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
+  const selectedProduct = availableProducts.find(product => product.id === selectedProductId);
 
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
@@ -36,7 +56,9 @@ export function SavingsCalculatorPage() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={condition.targetAmount}
-        onChange={handleTargetAmountChange}
+        onChange={(targetAmount: number) => {
+          setCondition(prev => ({ ...prev, targetAmount }));
+        }}
       />
       <Spacing size={16} />
       <AmountInput
@@ -44,14 +66,18 @@ export function SavingsCalculatorPage() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={condition.monthlyAmount}
-        onChange={handleMonthlyAmountChange}
+        onChange={(monthlyAmount: number) => {
+          setCondition(prev => ({ ...prev, monthlyAmount }));
+        }}
       />
       <Spacing size={16} />
       <SavingsTermSelect
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={condition.term}
-        onChange={handleTermChange}
+        onChange={(term: number) => {
+          setCondition(prev => ({ ...prev, term }));
+        }}
       />
 
       <Spacing size={24} />
@@ -80,7 +106,7 @@ export function SavingsCalculatorPage() {
                   key={product.id}
                   contents={<SavingsProductInfo product={product} />}
                   right={isSelected && <CheckCircleIcon />}
-                  onClick={() => handleSelectProduct(isSelected ? null : product)}
+                  onClick={() => setSelectedProductId(isSelected ? null : product.id)}
                 />
               );
             })
@@ -129,7 +155,7 @@ export function SavingsCalculatorPage() {
                     key={product.id}
                     contents={<SavingsProductInfo product={product} />}
                     right={isSelected && <CheckCircleIcon />}
-                    onClick={() => handleSelectProduct(isSelected ? null : product)}
+                    onClick={() => setSelectedProductId(isSelected ? null : product.id)}
                   />
                 );
               })
