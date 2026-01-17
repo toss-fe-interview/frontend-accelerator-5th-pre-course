@@ -1,24 +1,20 @@
 import { useMemo, useState } from 'react';
-import { Border, SelectBottomSheet, Spacing, Tab, TextField, ListHeader } from 'tosslib';
+import { Border, SelectBottomSheet, Spacing, Tab, TextField, ListRow } from 'tosslib';
 import CalculationResult from './CalculationResult';
 import ProductList from './ProductList';
 import { ProductItem } from 'types/products';
 import { CalculatorForm } from 'types/calculate';
 import { getNumericStringOnly } from 'utils/number';
 import useProducts from 'hooks/useProducts';
+import Product from './ProductItem';
+import RecommendProductList from './RecommendProductList';
 
-type Tabs = 'products' | 'results';
+type Tabs = (typeof TABS)[keyof typeof TABS];
 
-function getFilterProductsByInputValue(products: ProductItem[], userInput: CalculatorForm) {
-  if (products.length === 0) {
-    return [];
-  }
-
-  return products
-    .filter(product => product.minMonthlyAmount < Number(userInput.monthlyPayment))
-    .filter(product => product.maxMonthlyAmount > Number(userInput.monthlyPayment))
-    .filter(product => product.availableTerms === userInput.savingPeriod);
-}
+const TABS = {
+  PRODUCT: 'products',
+  RESULT: 'results',
+} as const;
 
 export default function SavingCalculator() {
   const { products, handleSelectItem } = useProducts();
@@ -43,6 +39,10 @@ export default function SavingCalculator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [products, calculatingData.monthlyPayment, calculatingData.targetAmount, calculatingData.savingPeriod]
   );
+
+  const selectedProduct = filteredProducts.find(product => product.isSelected);
+  const calculator = savingCalculator(calculatingData, selectedProduct);
+  const recommendedProducts = filteredProducts.sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
   return (
     <>
@@ -99,23 +99,95 @@ export default function SavingCalculator() {
         </Tab.Item>
       </Tab>
 
-      {tab === 'products' ? (
-        <ProductList products={filteredProducts} onClickProduct={handleSelectItem} />
-      ) : (
-        <CalculationResult
-          products={filteredProducts}
-          userInput={calculatingData}
-          render={recommendedProducts => (
-            <>
-              <ListHeader
-                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-              />
-              <Spacing size={12} />
-              <ProductList products={recommendedProducts} onClickProduct={handleSelectItem} />
-            </>
+      {tab === TABS.PRODUCT && (
+        <ProductList
+          items={filteredProducts}
+          renderItem={product => (
+            <Product
+              product={product}
+              isActive={product.isSelected}
+              onClick={() => {
+                handleSelectItem(product.id);
+              }}
+            />
           )}
         />
       )}
+
+      {tab === TABS.RESULT && (
+        <>
+          {selectedProduct ? (
+            <CalculationResult
+              예상수익금액={calculator.getExpectedReturnAmount()}
+              목표금액과의차이={calculator.getTargetGapAmount()}
+              추천월납입금액={calculator.getRecommendedMonthlyContribution()}
+            />
+          ) : (
+            <EmptyContent text="상품을 선택해주세요." />
+          )}
+          <Spacing size={8} />
+          <Border height={16} />
+          <Spacing size={8} />
+          <Spacing size={40} />
+          <RecommendProductList
+            items={recommendedProducts}
+            renderItem={recommendedProducts => (
+              <Product
+                product={recommendedProducts}
+                isActive={recommendedProducts.isSelected}
+                onClick={() => {
+                  handleSelectItem(recommendedProducts.id);
+                }}
+              />
+            )}
+          />
+        </>
+      )}
     </>
   );
+}
+
+function getFilterProductsByInputValue(products: ProductItem[], userInput: CalculatorForm) {
+  if (products.length === 0) {
+    return [];
+  }
+
+  return products
+    .filter(product => product.minMonthlyAmount < Number(userInput.monthlyPayment))
+    .filter(product => product.maxMonthlyAmount > Number(userInput.monthlyPayment))
+    .filter(product => product.availableTerms === userInput.savingPeriod);
+}
+
+function savingCalculator(userInput: CalculatorForm, targetProduct?: ProductItem) {
+  if (!targetProduct) {
+    return {
+      getExpectedReturnAmount() {
+        return 0;
+      },
+      getTargetGapAmount() {
+        return 0;
+      },
+      getRecommendedMonthlyContribution() {
+        return 0;
+      },
+    };
+  }
+  return {
+    // 최종 금액 = 월 납입액 * 저축 기간 * (1 + 연이자율 * 0.5)
+    getExpectedReturnAmount() {
+      return Number(userInput.monthlyPayment) * userInput.savingPeriod * (1 + targetProduct.annualRate * 0.5);
+    },
+    // 목표 금액과의 차이 = 목표 금액 - 예상 수익 금액
+    getTargetGapAmount() {
+      return Number(userInput.targetAmount) - this.getExpectedReturnAmount();
+    },
+    // 월 납입액 = 목표 금액 ÷ (저축 기간 * (1 + 연이자율 * 0.5))
+    getRecommendedMonthlyContribution() {
+      return Number(userInput.targetAmount) / (userInput.savingPeriod * (1 + targetProduct.annualRate * 0.5));
+    },
+  };
+}
+
+function EmptyContent({ text }: { text: string }) {
+  return <ListRow contents={<ListRow.Texts type="1RowTypeA" top={text} />} />;
 }

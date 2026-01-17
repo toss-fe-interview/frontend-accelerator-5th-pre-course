@@ -1,23 +1,16 @@
+import React from 'react';
 import { ProductItem } from 'types/products';
-import Product from './ProductItem';
 
 interface ProductListProps {
-  products: ProductItem[];
-  onClickProduct: (id: string) => void;
+  items: ProductItem[];
+  renderItem: (product: ProductItem) => JSX.Element;
 }
 
-export default function ProductList({ products, onClickProduct }: ProductListProps) {
+export default function ProductList({ items, renderItem }: ProductListProps) {
   return (
     <>
-      {products.map(product => (
-        <button
-          key={product.id}
-          onClick={() => {
-            onClickProduct(product.id);
-          }}
-        >
-          <Product product={product} isActive={product.isSelected} />
-        </button>
+      {items.map(item => (
+        <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
       ))}
     </>
   );

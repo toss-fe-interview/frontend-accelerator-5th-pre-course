@@ -4,11 +4,13 @@ import { type ProductItem } from 'types/products';
 interface ProductItemProps {
   product: ProductItem;
   isActive?: boolean;
+  onClick: () => void;
 }
 
-export default function Product({ product, isActive }: ProductItemProps) {
+export default function Product({ product, isActive, onClick }: ProductItemProps) {
   return (
     <ListRow
+      onClick={onClick}
       key={product.id}
       contents={
         <ListRow.Texts
