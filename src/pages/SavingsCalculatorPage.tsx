@@ -1,9 +1,18 @@
 import { SavingsProduct } from 'api/savings-products/types';
 import { useSavingsProducts } from 'api/savings-products/useSavingsProducts';
-import CalculationResult from 'components/savings-products/CalculationResult';
-import SavingsProductsList from 'components/savings-products/SavingsProductsList';
+import SavingsProductItem from 'components/savings-products/SavingsProductItem';
 import { useMemo, useState } from 'react';
-import { Border, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import {
+  Border,
+  colors,
+  ListHeader,
+  ListRow,
+  NavigationBar,
+  SelectBottomSheet,
+  Spacing,
+  Tab,
+  TextField,
+} from 'tosslib';
 import { formatNumberToKo } from 'utils/formatting';
 import { parseFormattedNumber } from 'utils/parse';
 import { filterSavingsProducts } from 'utils/savings-filter';
@@ -74,22 +83,99 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      {tabValue === 'products' && (
-        <SavingsProductsList
-          products={hasAllFilterValues ? filteredProducts : savingsProducts}
-          selectedProduct={selectedSavingsProduct}
-          setSelectedProduct={setSelectedSavingsProduct}
-        />
-      )}
+      {tabValue === 'products' &&
+        (() => {
+          const displayProducts = hasAllFilterValues ? filteredProducts : savingsProducts;
+
+          return displayProducts.length > 0 ? (
+            <>
+              {displayProducts.map(product => (
+                <SavingsProductItem
+                  key={product.id}
+                  product={product}
+                  selectedProductId={selectedSavingsProduct && selectedSavingsProduct.id}
+                  onClick={() => setSelectedSavingsProduct(product)}
+                />
+              ))}
+            </>
+          ) : (
+            <>
+              <Spacing size={10} />
+              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다." />} />
+            </>
+          );
+        })()}
 
       {tabValue === 'results' && (
-        <CalculationResult
-          filteredProducts={filteredProducts}
-          targetAmount={targetAmount}
-          monthlyPayment={monthlyPayment}
-          selectedProduct={selectedSavingsProduct}
-          setSelectedProduct={setSelectedSavingsProduct}
-        />
+        <>
+          {selectedSavingsProduct && targetAmount && monthlyPayment ? (
+            <>
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="예상 수익 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${formatNumberToKo(monthlyPayment * selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5))}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="목표 금액과의 차이"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${formatNumberToKo(targetAmount - monthlyPayment * selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5))}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ListRow.Texts
+                    type="2RowTypeA"
+                    top="추천 월 납입 금액"
+                    topProps={{ color: colors.grey600 }}
+                    bottom={`${formatNumberToKo(Math.round(targetAmount / (selectedSavingsProduct.availableTerms * (1 + selectedSavingsProduct.annualRate * 0.5)) / 1000) * 1000)}원`}
+                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  />
+                }
+              />
+            </>
+          ) : (
+            <>
+              <Spacing size={10} />
+              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+            </>
+          )}
+
+          <Spacing size={8} />
+          <Border height={16} />
+          <Spacing size={8} />
+
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+
+          {filteredProducts.length > 0 ? (
+            [...filteredProducts]
+              .sort((a, b) => b.annualRate - a.annualRate)
+              .slice(0, 2)
+              .map(product => (
+                <SavingsProductItem
+                  key={product.id}
+                  product={product}
+                  selectedProductId={selectedSavingsProduct && selectedSavingsProduct.id}
+                  onClick={() => setSelectedSavingsProduct(product)}
+                />
+              ))
+          ) : (
+            <ListRow
+              contents={<ListRow.Texts type="1RowTypeA" top="상품이 존재하지 않습니다. 입력값을 모두 입력해주세요." />}
+            />
+          )}
+        </>
       )}
     </>
   );

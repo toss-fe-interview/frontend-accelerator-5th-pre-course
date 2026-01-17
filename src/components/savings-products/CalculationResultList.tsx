@@ -1,9 +1,8 @@
 import { SavingsProduct } from 'api/savings-products/types';
 import { colors, ListRow } from 'tosslib';
-import { calculateDiffTargetAmount, calculateExpecteProfit, calculateSuggestMonthlyPayment } from 'utils/calculate';
 import { formatNumberToKo } from 'utils/formatting';
 
-interface CalculattionResultListProps {
+export interface CalculattionResultListProps {
   selectedProduct: SavingsProduct;
   targetAmount: number;
   monthlyPayment: number;
@@ -14,22 +13,12 @@ export default function CalculattionResultList({
   targetAmount,
   monthlyPayment,
 }: CalculattionResultListProps) {
-  const expecteProfit = calculateExpecteProfit({
-    availableTerms: selectedProduct.availableTerms,
-    annualRate: selectedProduct.annualRate,
-    monthlyPayment: monthlyPayment,
-  });
+  const expecteProfit = monthlyPayment * selectedProduct.availableTerms * (1 + selectedProduct.annualRate * 0.5);
 
-  const diffTargetAmount = calculateDiffTargetAmount({
-    targetAmount,
-    expecteProfit,
-  });
+  const diffTargetAmount = targetAmount - expecteProfit;
 
-  const suggestMonthlyAmount = calculateSuggestMonthlyPayment({
-    availableTerms: selectedProduct.availableTerms,
-    annualRate: selectedProduct.annualRate,
-    targetAmount,
-  });
+  const suggestMonthlyAmount =
+    Math.round(targetAmount / (selectedProduct.availableTerms * (1 + selectedProduct.annualRate * 0.5)) / 1000) * 1000;
 
   return (
     <>
