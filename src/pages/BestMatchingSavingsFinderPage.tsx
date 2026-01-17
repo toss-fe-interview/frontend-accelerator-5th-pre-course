@@ -1,19 +1,10 @@
 import AmountInput from 'components/AmountInput';
+import CalculationResultListRowTexts from 'components/CalculationResultListRowTexts';
+import SavingsProductListRowTexts from 'components/SavingsProductListRowTexts';
 import TabContent from 'components/TabContent';
 import { useSavingsProducts } from 'hook/useSavingsProducts';
 import { useMemo, useState } from 'react';
-import {
-  Assets,
-  Border,
-  colors,
-  ListHeader,
-  ListRow,
-  NavigationBar,
-  SelectBottomSheet,
-  Spacing,
-  Tab,
-  TextField,
-} from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 
 type UserSavingGoal = {
   targetAmount: number;
@@ -146,14 +137,12 @@ export function BestMatchingSavingsFinderPage() {
               <ListRow
                 key={product.id}
                 contents={
-                  <ListRow.Texts
-                    type="3RowTypeA"
-                    top={product.name}
-                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                    middle={`연 이자율: ${product.annualRate}%`}
-                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                    bottom={`${product.minMonthlyAmount.toLocaleString()}원 ~ ${product.maxMonthlyAmount.toLocaleString()}원 | ${product.availableTerms}개월`}
-                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                  <SavingsProductListRowTexts
+                    name={product.name}
+                    annualRate={product.annualRate}
+                    minMonthlyAmount={product.minMonthlyAmount}
+                    maxMonthlyAmount={product.maxMonthlyAmount}
+                    availableTerms={product.availableTerms}
                   />
                 }
                 right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
@@ -171,34 +160,25 @@ export function BestMatchingSavingsFinderPage() {
             <>
               <ListRow
                 contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="예상 수익 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${calculationResult?.expectedProfit.toLocaleString()}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  <CalculationResultListRowTexts
+                    label="예상 수익 금액"
+                    value={calculationResult?.expectedProfit.toLocaleString() ?? '0'}
                   />
                 }
               />
               <ListRow
                 contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="목표 금액과의 차이"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${calculationResult?.targetAmountDifference.toLocaleString()}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  <CalculationResultListRowTexts
+                    label="목표 금액과의 차이"
+                    value={calculationResult?.targetAmountDifference.toLocaleString() ?? '0'}
                   />
                 }
               />
               <ListRow
                 contents={
-                  <ListRow.Texts
-                    type="2RowTypeA"
-                    top="추천 월 납입 금액"
-                    topProps={{ color: colors.grey600 }}
-                    bottom={`${calculationResult?.recommendedMonthlyAmount.toLocaleString()}원`}
-                    bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
+                  <CalculationResultListRowTexts
+                    label="추천 월 납입 금액"
+                    value={calculationResult?.recommendedMonthlyAmount.toLocaleString() ?? '0'}
                   />
                 }
               />
