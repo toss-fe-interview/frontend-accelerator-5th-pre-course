@@ -4,15 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 
 import CalculationResult from 'domains/savingsCalculator/components/CalculationResult';
 import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
-import MonthlyAmountField from 'domains/savingsCalculator/components/form/MonthlyAmountField';
-import TargetAmountField from 'domains/savingsCalculator/components/form/TargetAmountField';
-import TermField from 'domains/savingsCalculator/components/form/TermField';
 import { getRecommendedProducts, rangeIn } from 'domains/savingsCalculator/utils/filter';
 import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
 
 import SavingsQuery from 'shared/query/saving';
 import IconCheckCircle from 'shared/components/Icon/IconCheckCircle';
 import { SavingsProductType } from 'shared/types/api/savings';
+import CurrencyInput from 'domains/savingsCalculator/components/form/CurrencyInput';
+import Select from 'domains/savingsCalculator/components/form/Select';
 
 export function SavingsCalculatorPage() {
   /** refactor : useSavingsInputs 훅 제거하기
@@ -51,11 +50,31 @@ export function SavingsCalculatorPage() {
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      <TargetAmountField label="목표 금액" value={targetAmount} onChange={value => setTargetAmount(value)} />
+      <CurrencyInput
+        label="목표 금액"
+        value={targetAmount}
+        placeholder="목표 금액을 입력하세요"
+        onChange={value => setTargetAmount(value)}
+      />
       <Spacing size={16} />
-      <MonthlyAmountField label="월 납입액" value={monthlyPayment} onChange={value => setMonthlyPayment(value)} />
+      <CurrencyInput
+        label="월 납입액"
+        value={monthlyPayment}
+        placeholder="월 납입액을 입력하세요"
+        onChange={value => setMonthlyPayment(value)}
+      />
       <Spacing size={16} />
-      <TermField label="저축 기간" value={term} onChange={value => setTerm(value)} />
+      <Select
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        selectedValue={term}
+        options={[
+          { value: 6, label: '6개월' },
+          { value: 12, label: '12개월' },
+          { value: 24, label: '24개월' },
+        ]}
+        onChange={value => setTerm(value)}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
