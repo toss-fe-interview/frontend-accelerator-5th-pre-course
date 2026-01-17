@@ -4,7 +4,7 @@ import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 import { NumberInput } from 'shared/ui/NumberInput';
 import { Select } from 'shared/ui/Select';
 import type { SavingsProduct } from 'features/savings-calculator/api/get-savings';
-import { CalculationResults, ProductList, ProductListItem, savingsCalculatorSchema } from 'features/savings-calculator';
+import { ProductList, ProductListItem, ResultRow, savingsCalculatorSchema } from 'features/savings-calculator';
 import { Tabs } from 'shared/ui/Tabs';
 import { SavingsCalculation } from 'shared/utils/savings-calculation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -117,11 +117,10 @@ export function SavingsCalculatorPage() {
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
           ) : (
             <>
-              <CalculationResults
-                expectedAmount={expectedAmount}
-                difference={difference}
-                recommendedMonthlyAmount={recommendedMonthlyAmount}
-              />
+              <Spacing size={8} />
+              <ResultRow label="예상 수익 금액" value={expectedAmount} />
+              <ResultRow label="목표 금액과의 차이" value={difference} />
+              <ResultRow label="추천 월 납입 금액" value={recommendedMonthlyAmount} />
               <Spacing size={8} />
               <Border height={16} />
               <Spacing size={8} />
