@@ -13,9 +13,9 @@ export default function CalculattionResultList({
   targetAmount,
   monthlyPayment,
 }: CalculattionResultListProps) {
-  const expecteProfit = monthlyPayment * selectedProduct.availableTerms * (1 + selectedProduct.annualRate * 0.5);
+  const expectedProfit = monthlyPayment * selectedProduct.availableTerms * (1 + selectedProduct.annualRate * 0.5);
 
-  const diffTargetAmount = targetAmount - expecteProfit;
+  const diffTargetAmount = targetAmount - expectedProfit;
 
   const suggestMonthlyAmount =
     Math.round(targetAmount / (selectedProduct.availableTerms * (1 + selectedProduct.annualRate * 0.5)) / 1000) * 1000;
@@ -28,7 +28,7 @@ export default function CalculattionResultList({
             type="2RowTypeA"
             top="예상 수익 금액"
             topProps={{ color: colors.grey600 }}
-            bottom={`${formatNumberToKo(expecteProfit)}원`}
+            bottom={`${formatNumberToKo(expectedProfit)}원`}
             bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
           />
         }
