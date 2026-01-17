@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { SuspenseQuery } from '@suspensive/react-query';
 import { useState } from 'react';
 import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { formatNumber } from 'utils/format';
@@ -19,13 +19,9 @@ type TabKey = keyof typeof TABS_CONFIG;
 const isValidTabKey = (tab: string): tab is TabKey => tab in TABS_CONFIG;
 
 export default function SavingsCalculatorPage() {
-  const { data: products } = useSuspenseQuery(savingsProductsQueries.listQuery());
-
   const { targetAmount, monthlyAmount, savingTerms, setCalculatorParams } = useCalculatorParams();
   const { selectedProductId, setSelectedProductId } = useSelectProductParams();
   const [currentTab, setCurrentTab] = useState<TabKey>('products');
-
-  const filteredProducts = products.filter(matchesPaymentRange(monthlyAmount)).filter(matchesPeriod(savingTerms));
 
   return (
     <>
@@ -62,9 +58,14 @@ export default function SavingsCalculatorPage() {
           </Tab.Item>
         ))}
       </Tab>
-      {(() => {
-        switch (currentTab) {
-          case 'products':
+
+      {currentTab === 'products' && (
+        <SuspenseQuery {...savingsProductsQueries.listQuery()}>
+          {({ data: products }) => {
+            const filteredProducts = products
+              .filter(matchesPaymentRange(monthlyAmount))
+              .filter(matchesPeriod(savingTerms));
+
             return filteredProducts.length > 0 ? (
               filteredProducts.map(product => {
                 const isSelected = selectedProductId === product.id;
@@ -89,13 +90,21 @@ export default function SavingsCalculatorPage() {
             ) : (
               <EmptyMessage message="조건에 맞는 상품이 없습니다." />
             );
-          case 'results': {
+          }}
+        </SuspenseQuery>
+      )}
+
+      {currentTab === 'results' && (
+        <SuspenseQuery {...savingsProductsQueries.listQuery()}>
+          {({ data: products }) => {
+            const filteredProducts = products
+              .filter(matchesPaymentRange(monthlyAmount))
+              .filter(matchesPeriod(savingTerms));
             const recommendedProducts = filteredProducts.sort(byHighestAnnualRate).slice(0, 2);
             const selectedProduct = products.find(product => product.id === selectedProductId);
 
             return (
               <>
-                <Spacing size={8} />
                 {(() => {
                   if (!selectedProduct) {
                     return <EmptyMessage message="상품을 선택해주세요." />;
@@ -163,13 +172,9 @@ export default function SavingsCalculatorPage() {
                 <Spacing size={40} />
               </>
             );
-          }
-          default: {
-            const _exhaustiveCheck: never = currentTab;
-            return _exhaustiveCheck;
-          }
-        }
-      })()}
+          }}
+        </SuspenseQuery>
+      )}
     </>
   );
 }
