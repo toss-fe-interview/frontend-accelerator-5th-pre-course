@@ -6,11 +6,11 @@ import { useSavingsProducts } from 'hook/useSavingsProducts';
 import { useMemo, useState } from 'react';
 import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 
-type UserSavingGoal = {
-  targetAmount: number;
-  monthlyAmount: number;
-  savingTerm: number;
-} | null;
+type SavingInputs = {
+  targetAmount: number | null;
+  monthlyAmount: number | null;
+  savingTerm: number | null;
+};
 
 type SavingsProduct = {
   id: string;
@@ -25,8 +25,12 @@ type SelectedTabData = 'productList' | 'calculationResult';
 
 export function BestMatchingSavingsFinderPage() {
   // 사용자 입력 데이터
-  // 1. 사용자의 저축 목표 데이터 - UserSavingGoalData -> 내부 데이터
-  const [userSavingGoal, setUserSavingGoal] = useState<UserSavingGoal>(null);
+  // 1. 사용자의 저축 입력 데이터 - SavingInputs -> 내부 데이터
+  const [savingInputs, setSavingInputs] = useState<SavingInputs>({
+    targetAmount: null,
+    monthlyAmount: null,
+    savingTerm: null,
+  });
   // 2. 선택된 상품 - SelectedSavingsProductData -> 내부 데이터
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
   // 3. 선택된 탭 - SelectedTabData -> 내부 데이터
@@ -40,40 +44,40 @@ export function BestMatchingSavingsFinderPage() {
   // 1. 적금 상품 목록을 필터링한 데이터
   const filteredProducts = useMemo(() => {
     if (!savingsProductListData) return [];
-    if (!userSavingGoal) return savingsProductListData;
 
     const 월납입액범위내 = (product: SavingsProduct) => {
-      if (!userSavingGoal.monthlyAmount) return true;
+      if (!savingInputs.monthlyAmount) return true;
       return (
-        userSavingGoal.monthlyAmount >= product.minMonthlyAmount &&
-        userSavingGoal.monthlyAmount <= product.maxMonthlyAmount
+        savingInputs.monthlyAmount >= product.minMonthlyAmount &&
+        savingInputs.monthlyAmount <= product.maxMonthlyAmount
       );
     };
     const 저축기간일치 = (product: SavingsProduct) => {
-      if (!userSavingGoal.savingTerm) return true;
-      return product.availableTerms === userSavingGoal.savingTerm;
+      if (!savingInputs.savingTerm) return true;
+      return product.availableTerms === savingInputs.savingTerm;
     };
 
     return savingsProductListData.filter(product => 월납입액범위내(product) && 저축기간일치(product));
-  }, [savingsProductListData, userSavingGoal]);
+  }, [savingsProductListData, savingInputs]);
 
   // 2. 계산 결과 데이터 - CalculationResultData -> 내부 데이터 + 외부 데이터
   const calculationResult = useMemo(() => {
-    if (!selectedSavingsProduct || !userSavingGoal) return null;
+    const { targetAmount, monthlyAmount, savingTerm } = savingInputs;
+    if (!selectedSavingsProduct || !targetAmount || !monthlyAmount || !savingTerm) return null;
     return {
       expectedProfit:
-        userSavingGoal.monthlyAmount *
+        monthlyAmount *
         selectedSavingsProduct.availableTerms *
         (1 + selectedSavingsProduct.annualRate * 0.5),
       targetAmountDifference:
-        userSavingGoal.targetAmount -
-        userSavingGoal.monthlyAmount *
+        targetAmount -
+        monthlyAmount *
           selectedSavingsProduct.availableTerms *
           (1 + selectedSavingsProduct.annualRate * 0.5),
       recommendedMonthlyAmount:
-        userSavingGoal.targetAmount / (userSavingGoal.savingTerm * (1 + selectedSavingsProduct.annualRate * 0.5)),
+        targetAmount / (savingTerm * (1 + selectedSavingsProduct.annualRate * 0.5)),
     };
-  }, [selectedSavingsProduct, userSavingGoal]);
+  }, [selectedSavingsProduct, savingInputs]);
 
   // 3. 필터링 된 상품 중 연이자율 상위 2개 상품 출력 - Top2RecommendedSavingsProductsData -> 내부 데이터 + 외부 데이터
   const compareByAnnualRateDesc = (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate;
@@ -91,22 +95,22 @@ export function BestMatchingSavingsFinderPage() {
       <AmountInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
-        value={userSavingGoal?.targetAmount || null}
-        onChange={value => setUserSavingGoal({ ...userSavingGoal, targetAmount: value ?? 0 } as UserSavingGoal)}
+        value={savingInputs.targetAmount}
+        onChange={value => setSavingInputs({ ...savingInputs, targetAmount: value })}
       />
       <Spacing size={16} />
       <AmountInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
-        value={userSavingGoal?.monthlyAmount || null}
-        onChange={value => setUserSavingGoal({ ...userSavingGoal, monthlyAmount: value ?? 0 } as UserSavingGoal)}
+        value={savingInputs.monthlyAmount}
+        onChange={value => setSavingInputs({ ...savingInputs, monthlyAmount: value })}
       />
       <Spacing size={16} />
       <SelectBottomSheet
         label="저축 기간"
         title="저축 기간을 선택해주세요"
-        value={userSavingGoal?.savingTerm ?? null}
-        onChange={value => setUserSavingGoal({ ...userSavingGoal, savingTerm: value } as UserSavingGoal)}
+        value={savingInputs.savingTerm}
+        onChange={value => setSavingInputs({ ...savingInputs, savingTerm: value })}
       >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
