@@ -39,9 +39,7 @@ export function SavingsCalculatorPage() {
         placeholder="목표 금액을 입력하세요"
         suffix="원"
         value={condition.targetAmount}
-        onChange={(targetAmount: number) => {
-          setCondition(prev => ({ ...prev, targetAmount }));
-        }}
+        onChange={targetAmount => setCondition(prev => ({ ...prev, targetAmount }))}
       />
       <Spacing size={16} />
       <AmountInput
@@ -49,18 +47,14 @@ export function SavingsCalculatorPage() {
         placeholder="희망 월 납입액을 입력하세요"
         suffix="원"
         value={condition.monthlyAmount}
-        onChange={(monthlyAmount: number) => {
-          setCondition(prev => ({ ...prev, monthlyAmount }));
-        }}
+        onChange={monthlyAmount => setCondition(prev => ({ ...prev, monthlyAmount }))}
       />
       <Spacing size={16} />
       <SavingsTermSelect
         label="저축 기간"
         title="저축 기간을 선택해주세요"
         value={condition.term}
-        onChange={(term: number) => {
-          setCondition(prev => ({ ...prev, term }));
-        }}
+        onChange={term => setCondition(prev => ({ ...prev, term }))}
       />
 
       <Spacing size={24} />
