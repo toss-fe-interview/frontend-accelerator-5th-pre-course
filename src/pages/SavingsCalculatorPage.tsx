@@ -16,7 +16,7 @@ import { NumberInput } from 'components/NumberField';
 
 type Tab = 'products' | 'results';
 
-const productQueriesOptions = () =>
+const savingsProductsQueyOptions = () =>
   queryOptions({
     queryKey: ['products'],
     queryFn: getSavingsProducts,
@@ -94,7 +94,7 @@ export function SavingsCalculatorPage() {
               <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
                 <Suspense fallback={'loading...'}>
                   <SuspenseQuery
-                    {...productQueriesOptions()}
+                    {...savingsProductsQueyOptions()}
                     select={products =>
                       products.filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
                     }
@@ -166,7 +166,7 @@ export function SavingsCalculatorPage() {
                 <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
                   <Suspense fallback={'loading...'}>
                     <SuspenseQuery
-                      {...productQueriesOptions()}
+                      {...savingsProductsQueyOptions()}
                       select={products =>
                         products
                           .filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
