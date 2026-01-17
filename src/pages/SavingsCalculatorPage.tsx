@@ -1,4 +1,9 @@
-import { calculateExpectedProfit, calculateRecommendMonthlyPayment } from 'utils/calculate';
+import {
+  calculateExpectedProfit,
+  calculateRecommendMonthlyPayment,
+  isMonthlyPaymentInRange,
+  isSavingsTermsMatching,
+} from 'utils/calculate';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 import {
@@ -16,45 +21,36 @@ import { ProductTabs, SavingsProduct } from 'features/savings/model/types';
 import { savingsProductsApi } from 'features/savings/api/savings-products';
 import SavingsProductItem from 'features/savings/ui/SavingsProductItem';
 import CalculatedResultItem from 'features/savings/ui/CalculatedResultItem';
-import AmountField from 'features/savings/ui/AmountField';
-
-const NUM_MAX_LENGTH = 13;
+import NumberField from 'features/savings/ui/NumberField';
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
-  const [monthlyAmount, setMonthlyAmount] = useState<number | null>(null);
-  const [savingTerms, setSavingTerms] = useState(12);
+  const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
+  const [savingsTerms, setSavingsTerms] = useState(12);
   const [selectedTab, setSelectedTab] = useState<ProductTabs>('products');
   const [selectedSavingProduct, setSelectedSavingProduct] = useState<SavingsProduct | null>(null);
 
-  const { data: products = [], error } = useQuery<SavingsProduct[], HttpError>({
+  const { data: savingsProducts = [], error } = useQuery<SavingsProduct[], HttpError>({
     queryKey: ['savings-products'],
     queryFn: savingsProductsApi,
   });
 
   const expectedProfit = calculateExpectedProfit(
-    monthlyAmount ?? 0,
-    savingTerms,
+    monthlyPayment ?? 0,
+    savingsTerms,
     selectedSavingProduct?.annualRate ?? 0
   );
 
   const diffAmount = (targetAmount ?? 0) - expectedProfit;
   const recommendMonthlyPayment = calculateRecommendMonthlyPayment(
     targetAmount ?? 0,
-    savingTerms,
+    savingsTerms,
     selectedSavingProduct?.annualRate ?? 0
   );
 
-  const hasAllValues = targetAmount && monthlyAmount && savingTerms;
-  const filteredProducts = hasAllValues
-    ? products.filter(product => {
-        return (
-          product.availableTerms === savingTerms &&
-          monthlyAmount <= product.maxMonthlyAmount &&
-          monthlyAmount >= product.minMonthlyAmount
-        );
-      })
-    : products;
+  const filteredProducts = savingsProducts.filter(product => {
+    return isMonthlyPaymentInRange(monthlyPayment ?? 0, product) && isSavingsTermsMatching(savingsTerms, product);
+  });
 
   const recommendedProducts = [...filteredProducts].sort((prev, curr) => curr.annualRate - prev.annualRate).slice(0, 2);
 
@@ -68,33 +64,27 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
 
       <>
-        <AmountField
+        <NumberField
           label="목표 금액"
           value={targetAmount?.toString() ?? ''}
-          onChange={e => {
-            const value = e.target.value;
-            if (value.length > NUM_MAX_LENGTH) return;
-            const onlyNumber = e.target.value.replace(/[^0-9]/g, '');
-            setTargetAmount(Number(onlyNumber));
+          onChange={targetValue => {
+            setTargetAmount(targetValue);
           }}
         />
         <Spacing size={16} />
-        <AmountField
+        <NumberField
           label="월 납입액"
-          value={monthlyAmount?.toString() ?? ''}
-          onChange={e => {
-            const value = e.target.value;
-            if (value.length > NUM_MAX_LENGTH) return;
-            const onlyNumber = e.target.value.replace(/[^0-9]/g, '');
-            setMonthlyAmount(Number(onlyNumber));
+          value={monthlyPayment?.toString() ?? ''}
+          onChange={targetValue => {
+            setMonthlyPayment(targetValue);
           }}
         />
         <Spacing size={16} />
         <SelectBottomSheet
           label="저축 기간"
           title="저축 기간을 선택해주세요"
-          value={savingTerms}
-          onChange={setSavingTerms}
+          value={savingsTerms}
+          onChange={setSavingsTerms}
         >
           <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
           <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
