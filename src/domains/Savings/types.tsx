@@ -7,7 +7,6 @@ export interface SavingsProduct {
   availableTerms: number;
 }
 
-
 export type SavingsTabValue = 'products' | 'results';
 
 export type SavingTabListType = {
