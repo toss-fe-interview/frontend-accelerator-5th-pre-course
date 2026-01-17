@@ -1,15 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
+import { queryOptions } from '@tanstack/react-query';
 import { http } from 'tosslib';
 import { SavingsProduct, SavingsProductsSchema } from 'types/savingsProducts';
 
-export const getSavingsProducts = async (): Promise<SavingsProduct[]> => {
+const getSavingsProducts = async (): Promise<SavingsProduct[]> => {
   const response = await http.get('/api/savings-products');
   return SavingsProductsSchema.parse(response);
 };
 
-export const useSavingsProducts = () => {
-  return useQuery({
+export const savingsProductsQueryOptions = () =>
+  queryOptions({
     queryKey: ['savingsProducts'],
     queryFn: getSavingsProducts,
   });
-};
