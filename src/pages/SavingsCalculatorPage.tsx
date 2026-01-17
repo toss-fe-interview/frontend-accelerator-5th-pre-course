@@ -101,7 +101,7 @@ export function SavingsCalculatorPage() {
         <Tabs.Content value="products">
           <Suspense>
             <ProductList
-              filterBy={filterProductByAmountAndTerm}
+              select={products => products.filter(filterProductByAmountAndTerm)}
               renderItem={product => (
                 <ProductListItem
                   product={product}
@@ -131,9 +131,9 @@ export function SavingsCalculatorPage() {
               <Spacing size={12} />
               <Suspense>
                 <ProductList
-                  filterBy={filterProductByAmountAndTerm}
-                  sortBy={sortByHighestAnnualRate}
-                  limit={2}
+                  select={products =>
+                    products.filter(filterProductByAmountAndTerm).sort(sortByHighestAnnualRate).slice(0, 2)
+                  }
                   renderItem={product => (
                     <ProductListItem product={product} isSelected={selectedProduct.id === product.id} />
                   )}
