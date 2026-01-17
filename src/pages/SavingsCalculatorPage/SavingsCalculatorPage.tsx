@@ -7,7 +7,6 @@ import { SavingProductErrorFallback } from './components/fallback/SavingProductE
 import { CurrencyTextField } from './components/fields/CurrencyTextField';
 import { SelectTermField } from './components/fields/SelectTermField';
 import { useEffect, useRef, useState } from 'react';
-import { formatCurrency, formatDifference } from 'utils/format';
 import { SavingsProduct } from './models/savings-products.dto';
 import { savingsProductsQuery } from './queries/savings-products.query';
 import { FilteredSavingsProducts } from './components/FilteredSavingsProducts';
@@ -101,6 +100,7 @@ export function SavingsCalculatorPage() {
               <Tab.Item value={TAB.results}>계산 결과</Tab.Item>
 
               <Tab.Content value={TAB.products}>
+                {/* 해당 컴포넌트 명도 변경해봐야할거 같음, 왜냐하면 적금 상품 리스트인데, 기능에 초점 맞춰서 FilteredSavingsProducts 으로 나온듯! */}
                 <FilteredSavingsProducts savingsProducts={savingsProducts} filter={{ monthlyPayment, term }}>
                   {_ =>
                     match(_)
@@ -126,22 +126,16 @@ export function SavingsCalculatorPage() {
                 <CalculationResult selectedProduct={selectedProduct} filter={{ targetAmount, monthlyPayment, term }}>
                   {_ =>
                     match(_)
-                      .with({ type: 'success' }, ({ result }) => (
-                        <>
-                          <CalculationResultItem
-                            label="예상 수익 금액"
-                            value={`${formatCurrency(Math.round(result.expectedAmount))}원`}
-                          />
-                          <CalculationResultItem
-                            label="목표 금액과의 차이"
-                            value={`${formatDifference(Math.round(result.difference))}원`}
-                          />
-                          <CalculationResultItem
-                            label="추천 월 납입 금액"
-                            value={`${formatCurrency(result.recommendedMonthlyPayment)}원`}
-                          />
-                        </>
-                      ))
+                      .with(
+                        { type: 'success' },
+                        ({ result: { expectedAmount, difference, recommendedMonthlyPayment } }) => (
+                          <>
+                            <CalculationResultItem label="예상 수익 금액" value={expectedAmount} />
+                            <CalculationResultItem label="목표 금액과의 차이" value={difference} />
+                            <CalculationResultItem label="추천 월 납입 금액" value={recommendedMonthlyPayment} />
+                          </>
+                        )
+                      )
                       .with({ type: 'productUnselected' }, () => (
                         <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
                       ))
