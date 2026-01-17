@@ -5,7 +5,6 @@ import {
   NavigationBar,
   Spacing,
   Border,
-  TextField,
   SelectBottomSheet,
   Tab,
   ListRow,
@@ -18,6 +17,8 @@ import { savingsProductsApi } from 'features/savings/api/savings-products';
 import SavingsProductItem from 'features/savings/ui/SavingsProductItem';
 import CalculatedResultItem from 'features/savings/ui/CalculatedResultItem';
 import AmountField from 'features/savings/ui/AmountField';
+
+const NUM_MAX_LENGTH = 13;
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
@@ -72,7 +73,7 @@ export function SavingsCalculatorPage() {
           value={targetAmount?.toString() ?? ''}
           onChange={e => {
             const value = e.target.value;
-            if (value.length > 13) return;
+            if (value.length > NUM_MAX_LENGTH) return;
             const onlyNumber = e.target.value.replace(/[^0-9]/g, '');
             setTargetAmount(Number(onlyNumber));
           }}
@@ -83,7 +84,7 @@ export function SavingsCalculatorPage() {
           value={monthlyAmount?.toString() ?? ''}
           onChange={e => {
             const value = e.target.value;
-            if (value.length > 13) return;
+            if (value.length > NUM_MAX_LENGTH) return;
             const onlyNumber = e.target.value.replace(/[^0-9]/g, '');
             setMonthlyAmount(Number(onlyNumber));
           }}
