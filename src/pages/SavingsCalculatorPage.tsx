@@ -7,7 +7,6 @@ import { MonthlyPaymentInput } from 'components/MonthlyPaymentInput';
 import { Product } from 'components/Product';
 import { CalculationResultItem } from 'components/CalculationResultItem';
 import { SavingPeriodSelect } from 'components/SavingPeriodSelect';
-import { useTabState, Tab as TabType } from 'hooks/useTabState';
 import { queryOptions } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { roundToThousand } from 'util/number';
@@ -15,6 +14,8 @@ import { EmptyMessage } from 'components/EmptyMessage';
 import { eq, gt, lt } from 'es-toolkit/compat';
 import { SuspenseQuery } from '@suspensive/react-query';
 import { ErrorBoundary, Suspense } from '@suspensive/react';
+
+type Tab = 'products' | 'results';
 
 const productQueries = {
   all: 'savingsProducts',
@@ -41,7 +42,7 @@ export function SavingsCalculatorPage() {
   });
   const { targetAmount, monthlyPayment, savingPeriod } = watch();
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
-  const { tab, setTab } = useTabState();
+  const [tab, setTab] = useState<Tab>('products');
 
   return (
     <>
@@ -69,7 +70,7 @@ export function SavingsCalculatorPage() {
 
       <Tab
         onChange={value => {
-          setTab(value as TabType);
+          setTab(value as Tab);
         }}
       >
         <Tab.Item value="products" selected={tab === 'products'}>
