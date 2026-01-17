@@ -26,8 +26,6 @@ export default function SavingsCalculatorPage() {
   const [currentTab, setCurrentTab] = useState<TabKey>('products');
 
   const filteredProducts = products.filter(matchesPaymentRange(monthlyAmount)).filter(matchesPeriod(savingTerms));
-  const recommendedProducts = filteredProducts.sort(byHighestAnnualRate).slice(0, 2);
-  const selectedProduct = products.find(product => product.id === selectedProductId);
 
   return (
     <>
@@ -83,6 +81,9 @@ export default function SavingsCalculatorPage() {
               <EmptyMessage message="조건에 맞는 상품이 없습니다." />
             );
           case 'results': {
+            const recommendedProducts = filteredProducts.sort(byHighestAnnualRate).slice(0, 2);
+            const selectedProduct = products.find(product => product.id === selectedProductId);
+
             const 예상만기금액 =
               selectedProduct && savingTerms
                 ? get_예상만기금액(monthlyAmount ?? 0, savingTerms, selectedProduct.annualRate)
