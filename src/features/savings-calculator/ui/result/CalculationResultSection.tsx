@@ -7,6 +7,7 @@ import {
   calculateFinalAmount,
   calculateRecommendedMonthlyAmount,
 } from 'features/savings-calculator/lib/calculationUtil';
+import { isCalculationReady } from 'features/savings-calculator/lib/savingsConditionValidators';
 
 interface CalculationResult {
   finalAmount: number;
@@ -31,7 +32,7 @@ export function CalculationResultSection({
   emptyFallback,
   children,
 }: CalculationResultSectionProps) {
-  if (product === null) {
+  if (product === null || !isCalculationReady({ monthlyAmount, term, targetAmount })) {
     return <>{emptyFallback}</>;
   }
 
