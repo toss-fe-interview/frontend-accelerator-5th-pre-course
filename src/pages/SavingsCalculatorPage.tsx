@@ -17,6 +17,7 @@ import { ProductTabs, SavingsProduct } from 'features/savings/model/types';
 import { savingsProductsApi } from 'features/savings/api/savings-products';
 import SavingsProductItem from 'features/savings/ui/SavingsProductItem';
 import CalculatedResultItem from 'features/savings/ui/CalculatedResultItem';
+import AmountField from 'features/savings/ui/AmountField';
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
@@ -66,11 +67,9 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
 
       <>
-        <TextField
+        <AmountField
           label="목표 금액"
-          placeholder="${label}을 입력하세요"
-          suffix="원"
-          value={targetAmount?.toString()}
+          value={targetAmount?.toString() ?? ''}
           onChange={e => {
             const value = e.target.value;
             if (value.length > 13) return;
@@ -79,11 +78,9 @@ export function SavingsCalculatorPage() {
           }}
         />
         <Spacing size={16} />
-        <TextField
+        <AmountField
           label="월 납입액"
-          placeholder="희망 월 납입액을 입력하세요"
-          suffix="원"
-          value={monthlyAmount?.toString()}
+          value={monthlyAmount?.toString() ?? ''}
           onChange={e => {
             const value = e.target.value;
             if (value.length > 13) return;
