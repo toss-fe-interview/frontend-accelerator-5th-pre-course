@@ -1,4 +1,4 @@
-import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 
 import { formatAmount } from 'utils/format';
@@ -14,6 +14,7 @@ import { SuspenseQuery } from '@suspensive/react-query';
 
 import { orderBy, take } from 'es-toolkit';
 import { AmountField } from 'components/AmountField';
+import { TermSelect } from 'components/TermSelect';
 
 export function SavingsCalculatorPage() {
   // 목표금액
@@ -33,9 +34,6 @@ export function SavingsCalculatorPage() {
     <>
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
-      {/* 무엇을 위한 컴포넌트인가? 
-          목표 금액을 다루는 입력창
-      */}
       <AmountField
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
@@ -50,17 +48,17 @@ export function SavingsCalculatorPage() {
         onChange={setMonthlyAmount}
       />
       <Spacing size={16} />
-      <SelectBottomSheet
+      <TermSelect
         label="저축 기간"
-        title="저축 기간을 선택해주세요"
-        value={savingsTerm !== null ? String(savingsTerm) : null}
-        onChange={value => setSavingsTerm(value === null ? null : Number(value))}
-      >
-        <SelectBottomSheet.Option value="6">6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value="12">12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value="18">18개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value="24">24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+        value={savingsTerm}
+        onChange={setSavingsTerm}
+        options={[
+          { label: '6개월', value: 6 },
+          { label: '12개월', value: 12 },
+          { label: '18개월', value: 18 },
+          { label: '24개월', value: 24 },
+        ]}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
