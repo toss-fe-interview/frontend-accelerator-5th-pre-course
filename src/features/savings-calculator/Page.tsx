@@ -35,11 +35,23 @@ export default function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TargetAmountInput value={targetAmount} onChange={value => setCalculatorParams({ targetAmount: value })} />
+      <TargetAmountInput
+        label="목표 금액"
+        value={targetAmount}
+        onChange={value => setCalculatorParams({ targetAmount: value })}
+      />
       <Spacing size={16} />
-      <MonthlyAmountInput value={monthlyAmount} onChange={value => setCalculatorParams({ monthlyAmount: value })} />
+      <MonthlyAmountInput
+        label="월 납입액"
+        value={monthlyAmount}
+        onChange={value => setCalculatorParams({ monthlyAmount: value })}
+      />
       <Spacing size={16} />
-      <SavingTermsSelect value={savingTerms} onChange={value => setCalculatorParams({ savingTerms: value })} />
+      <SavingTermsSelect
+        label="저축 기간"
+        value={savingTerms}
+        onChange={value => setCalculatorParams({ savingTerms: value })}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
