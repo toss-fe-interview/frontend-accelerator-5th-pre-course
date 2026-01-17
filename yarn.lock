@@ -1924,6 +1924,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-toolkit@npm:^1.44.0":
+  version: 1.44.0
+  resolution: "es-toolkit@npm:1.44.0"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+  checksum: 10c0/b80ff52ddc85ba26914cda57c9d4e46379ccc38c60dc097ef0d065cc0b20f95a16cf8d537969eea600b51c6687b5900a6cce67489db16d5ccc14d47597a29c34
+  languageName: node
+  linkType: hard
+
 "esbuild@npm:^0.25.0":
   version: 0.25.10
   resolution: "esbuild@npm:0.25.10"
@@ -3066,6 +3078,27 @@ __metadata:
     "@pkgjs/parseargs":
       optional: true
   checksum: 10c0/6acc10d139eaefdbe04d2f679e6191b3abf073f111edf10b1de5302c97ec93fffeb2fdd8681ed17f16268aa9dd4f8c588ed9d1d3bffbbfa6e8bf897cbb3149b9
+  languageName: node
+  linkType: hard
+
+"jotai@npm:^2.16.2":
+  version: 2.16.2
+  resolution: "jotai@npm:2.16.2"
+  peerDependencies:
+    "@babel/core": ">=7.0.0"
+    "@babel/template": ">=7.0.0"
+    "@types/react": ">=17.0.0"
+    react: ">=17.0.0"
+  peerDependenciesMeta:
+    "@babel/core":
+      optional: true
+    "@babel/template":
+      optional: true
+    "@types/react":
+      optional: true
+    react:
+      optional: true
+  checksum: 10c0/d3458edd5047c7399002399e9e000cdc1511d10b012b42a8fae2e76e0ef74de759078dbb4951fc01a13fdb75224f823a68a8603242d0fc5f38f4f273e96888eb
   languageName: node
   linkType: hard
 
@@ -4451,6 +4484,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.18.2"
     "@typescript-eslint/parser": "npm:^8.18.2"
     "@vitejs/plugin-react-swc": "npm:^3.7.2"
+    es-toolkit: "npm:^1.44.0"
     eslint: "npm:^8.57.1"
     eslint-config-prettier: "npm:^8.10.0"
     eslint-plugin-import: "npm:^2.31.0"
@@ -4458,6 +4492,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.3"
     eslint-plugin-react-hooks: "npm:^5.1.0"
     hono: "npm:^4.6.16"
+    jotai: "npm:^2.16.2"
     prettier: "npm:^3.4.2"
     react: "npm:^18"
     react-dom: "npm:^18"

@@ -1,11 +1,25 @@
 import styled from "@emotion/styled";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { commaizeNumber } from "@toss/utils";
+import { useAtomValue } from "jotai";
 import { ListRow, colors } from "tosslib";
+import { monthlyPaymentAtom, savingsPeriodAtom } from "../atoms/savingsCaculationInputs";
 import { savingsProductsQueryOptions } from "../remotes/savingsProducts";
 
 export function SavingsProductList() {
-  const { data: savingsProducts } = useSuspenseQuery(savingsProductsQueryOptions());
+  const monthlyPayment = useAtomValue(monthlyPaymentAtom);
+  const savingsPeriod = useAtomValue(savingsPeriodAtom);
+
+  const { data: savingsProducts } = useSuspenseQuery({
+    ...savingsProductsQueryOptions(),
+    select: (data) =>
+      data.filter(
+        (product) =>
+          monthlyPayment >= product.minMonthlyAmount &&
+          monthlyPayment <= product.maxMonthlyAmount &&
+          savingsPeriod === product.availableTerms
+      ),
+  });
 
   return (
     <Container>

@@ -1,11 +1,11 @@
+import { Suspense } from 'react';
 import {
   Border,
   NavigationBar,
-  SelectBottomSheet,
   Spacing,
-  Tab,
-  TextField
+  Tab
 } from 'tosslib';
+import { SavingsCalculator } from './components/SavingsCalculator';
 import { SavingsProductList } from './components/SavingsProductList';
 
 export function SavingsCalculatorPage() {
@@ -15,15 +15,7 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
-      <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => { }}>
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      <SavingsCalculator />
 
       <Spacing size={24} />
       <Border height={16} />
@@ -38,7 +30,9 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
 
-      <SavingsProductList />
+      <Suspense fallback="Loading...">
+        <SavingsProductList />
+      </Suspense>
 
       {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
       {/* <Spacing size={8} />
