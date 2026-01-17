@@ -135,18 +135,18 @@ export function SavingsCalculatorPage() {
                 {selectedSavingsProduct ? (
                   <>
                     <CalculationResultItem
-                      label="예상 수익 금액"
-                      value={monthlyPayment * savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)}
+                      name="예상 수익 금액"
+                      amount={monthlyPayment * savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)}
                     />
                     <CalculationResultItem
-                      label="목표 금액과의 차이"
-                      value={
+                      name="목표 금액과의 차이"
+                      amount={
                         targetAmount - monthlyPayment * savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5)
                       }
                     />
                     <CalculationResultItem
-                      label="추천 월 납입 금액"
-                      value={roundToThousand(
+                      name="추천 월 납입 금액"
+                      amount={roundToThousand(
                         targetAmount / (savingPeriod * (1 + selectedSavingsProduct.annualRate * 0.5))
                       )}
                     />

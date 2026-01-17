@@ -1,19 +1,19 @@
 import { colors, ListRow } from 'tosslib';
 
 interface CalculationResultItemProps {
-  label: string;
-  value: number;
+  name: string;
+  amount: number;
 }
 
-export function CalculationResultItem({ label, value }: CalculationResultItemProps) {
+export function CalculationResultItem({ name, amount }: CalculationResultItemProps) {
   return (
     <ListRow
       contents={
         <ListRow.Texts
           type="2RowTypeA"
-          top={label}
+          top={name}
           topProps={{ color: colors.grey600 }}
-          bottom={`${value.toLocaleString('ko-KR')}원`}
+          bottom={`${amount.toLocaleString('ko-KR')}원`}
           bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
         />
       }
