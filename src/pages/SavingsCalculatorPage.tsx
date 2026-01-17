@@ -34,7 +34,7 @@ export function SavingsCalculatorPage() {
     queryFn: getSavingsProducts,
   });
 
-  const filteredProductList = useMemo(() => {
+  const filteredProducs = useMemo(() => {
     if (formData.monthlyAmount === 0) {
       return products;
     }
@@ -83,18 +83,18 @@ export function SavingsCalculatorPage() {
   }, [formData, selectedProduct]);
 
   const recommendedProducts = useMemo(() => {
-    return [...filteredProductList].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-  }, [filteredProductList]);
+    return [...filteredProducs].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  }, [filteredProducs]);
 
   useEffect(() => {
     setFormData({ targetAmount, monthlyAmount, terms });
   }, [targetAmount, monthlyAmount, terms]);
 
   useEffect(() => {
-    if (selectedProductId && !filteredProductList.some(product => product.id === selectedProductId)) {
+    if (selectedProductId && !filteredProducs.some(product => product.id === selectedProductId)) {
       setSelectedProductId(null);
     }
-  }, [filteredProductList, selectedProductId]);
+  }, [filteredProducs, selectedProductId]);
 
   return (
     <>
@@ -169,10 +169,10 @@ export function SavingsCalculatorPage() {
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중입니다..." />} />
         ) : isError ? (
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중에 오류가 발생했습니다." />} />
-        ) : filteredProductList.length === 0 ? (
+        ) : filteredProducs.length === 0 ? (
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />
         ) : (
-          filteredProductList.map(product => (
+          filteredProducs.map(product => (
             <ListRow
               key={product.id}
               contents={
