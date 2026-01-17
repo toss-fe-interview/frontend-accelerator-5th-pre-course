@@ -1,5 +1,3 @@
-import { ErrorBoundary, Suspense } from '@suspensive/react';
-import { SuspenseQuery } from '@suspensive/react-query';
 import { useState } from 'react';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 
@@ -7,12 +5,12 @@ import { CheckCircleIcon } from 'shared/ui/CheckCircleIcon';
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
 import { Tabs } from 'shared/ui/Tabs';
 
-import { savingsProductsQueryOptions } from 'entities/savings/model/savingsProductsQuery';
 import { SavingsProductInfo } from 'entities/savings/ui/SavingsProductInfo';
 import { SavingsProductListSection } from 'entities/savings/ui/SavingsProductListSection';
 
 import { filterAvailableProducts } from 'features/savings-calculator/lib/filterAvailableProducts';
 import { SavingsCondition } from 'features/savings-calculator/model/types';
+import { SavingsProductDataBoundary } from 'features/savings-calculator/ui/boundary/SavingsProductDataBoundary';
 import { AmountInput } from 'features/savings-calculator/ui/input/AmountInput';
 import { SavingsTermSelect } from 'features/savings-calculator/ui/input/SavingsTermSelect';
 import { RecommendedProductSection } from 'features/savings-calculator/ui/recommendation/RecommendedProductSection';
@@ -67,91 +65,87 @@ export function SavingsCalculatorPage() {
           <Tabs.Tab value="results">계산 결과</Tabs.Tab>
         </Tabs.List>
 
-        <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
-          <Suspense fallback={'loading'}>
-            <SuspenseQuery {...savingsProductsQueryOptions} select={filterAvailableProducts(condition)}>
-              {({ data: availableProducts }) => (
-                <>
-                  <Tabs.Panel value="products">
-                    <SavingsProductListSection
-                      products={availableProducts}
-                      emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
-                    >
-                      {products =>
-                        products.map(product => {
-                          const isSelected = selectedProductId === product.id;
-                          return (
-                            <ListRow
-                              key={product.id}
-                              contents={<SavingsProductInfo product={product} />}
-                              right={isSelected && <CheckCircleIcon />}
-                              onClick={() => setSelectedProductId(isSelected ? null : product.id)}
-                            />
-                          );
-                        })
-                      }
-                    </SavingsProductListSection>
-                  </Tabs.Panel>
-                  <Tabs.Panel value="results">
-                    <Spacing size={8} />
+        <SavingsProductDataBoundary select={filterAvailableProducts(condition)}>
+          {availableProducts => (
+            <>
+              <Tabs.Panel value="products">
+                <SavingsProductListSection
+                  products={availableProducts}
+                  emptyFallback={<EmptyListItem message="적합한 적금 상품이 없습니다." />}
+                >
+                  {products =>
+                    products.map(product => {
+                      const isSelected = selectedProductId === product.id;
+                      return (
+                        <ListRow
+                          key={product.id}
+                          contents={<SavingsProductInfo product={product} />}
+                          right={isSelected && <CheckCircleIcon />}
+                          onClick={() => setSelectedProductId(isSelected ? null : product.id)}
+                        />
+                      );
+                    })
+                  }
+                </SavingsProductListSection>
+              </Tabs.Panel>
+              <Tabs.Panel value="results">
+                <Spacing size={8} />
 
-                    <CalculationResultSection
-                      product={availableProducts.find(product => product.id === selectedProductId) ?? null}
-                      targetAmount={condition.targetAmount}
-                      monthlyAmount={condition.monthlyAmount}
-                      term={condition.term}
-                      emptyFallback={<EmptyListItem message="상품을 선택해주세요." />}
-                    >
-                      {({ finalAmount, differenceAmount, recommendedMonthlyAmount }) => (
-                        <>
-                          <ListRow contents={<CalculationResultAmount label="예상 수익 금액" amount={finalAmount} />} />
-                          <ListRow
-                            contents={<CalculationResultAmount label="목표 금액과의 차이" amount={differenceAmount} />}
-                          />
-                          <ListRow
-                            contents={
-                              <CalculationResultAmount label="추천 월 납입 금액" amount={recommendedMonthlyAmount} />
-                            }
-                          />
-                        </>
-                      )}
-                    </CalculationResultSection>
+                <CalculationResultSection
+                  product={availableProducts.find(product => product.id === selectedProductId) ?? null}
+                  targetAmount={condition.targetAmount}
+                  monthlyAmount={condition.monthlyAmount}
+                  term={condition.term}
+                  emptyFallback={<EmptyListItem message="상품을 선택해주세요." />}
+                >
+                  {({ finalAmount, differenceAmount, recommendedMonthlyAmount }) => (
+                    <>
+                      <ListRow contents={<CalculationResultAmount label="예상 수익 금액" amount={finalAmount} />} />
+                      <ListRow
+                        contents={<CalculationResultAmount label="목표 금액과의 차이" amount={differenceAmount} />}
+                      />
+                      <ListRow
+                        contents={
+                          <CalculationResultAmount label="추천 월 납입 금액" amount={recommendedMonthlyAmount} />
+                        }
+                      />
+                    </>
+                  )}
+                </CalculationResultSection>
 
-                    <Spacing size={8} />
-                    <Border height={16} />
-                    <Spacing size={8} />
+                <Spacing size={8} />
+                <Border height={16} />
+                <Spacing size={8} />
 
-                    <ListHeader
-                      title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-                    />
-                    <Spacing size={12} />
+                <ListHeader
+                  title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+                />
+                <Spacing size={12} />
 
-                    <RecommendedProductSection
-                      candidateProducts={availableProducts}
-                      emptyFallback={<EmptyListItem message="적합한 추천 상품이 없습니다." />}
-                    >
-                      {recommendedProducts =>
-                        recommendedProducts.map(product => {
-                          const isSelected = selectedProductId === product.id;
-                          return (
-                            <ListRow
-                              key={product.id}
-                              contents={<SavingsProductInfo product={product} />}
-                              right={isSelected && <CheckCircleIcon />}
-                              onClick={() => setSelectedProductId(isSelected ? null : product.id)}
-                            />
-                          );
-                        })
-                      }
-                    </RecommendedProductSection>
+                <RecommendedProductSection
+                  candidateProducts={availableProducts}
+                  emptyFallback={<EmptyListItem message="적합한 추천 상품이 없습니다." />}
+                >
+                  {recommendedProducts =>
+                    recommendedProducts.map(product => {
+                      const isSelected = selectedProductId === product.id;
+                      return (
+                        <ListRow
+                          key={product.id}
+                          contents={<SavingsProductInfo product={product} />}
+                          right={isSelected && <CheckCircleIcon />}
+                          onClick={() => setSelectedProductId(isSelected ? null : product.id)}
+                        />
+                      );
+                    })
+                  }
+                </RecommendedProductSection>
 
-                    <Spacing size={40} />
-                  </Tabs.Panel>
-                </>
-              )}
-            </SuspenseQuery>
-          </Suspense>
-        </ErrorBoundary>
+                <Spacing size={40} />
+              </Tabs.Panel>
+            </>
+          )}
+        </SavingsProductDataBoundary>
       </Tabs>
     </>
   );
