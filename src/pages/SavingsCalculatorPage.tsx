@@ -47,13 +47,13 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <GoalAmountInput value={targetAmount} onChange={v => setValue('targetAmount', v)} />
+      <GoalAmountInput value={targetAmount} onChange={value => setValue('targetAmount', value)} />
       <Spacing size={16} />
-      <MonthlyPaymentInput value={monthlyPayment} onChange={v => setValue('monthlyPayment', v)} />
+      <MonthlyPaymentInput value={monthlyPayment} onChange={value => setValue('monthlyPayment', value)} />
       <Spacing size={16} />
       <SavingPeriodSelect
         value={savingPeriod}
-        onChange={v => setValue('savingPeriod', v)}
+        onChange={value => setValue('savingPeriod', value)}
         options={[
           { value: 6, label: '6개월' },
           { value: 12, label: '12개월' },
