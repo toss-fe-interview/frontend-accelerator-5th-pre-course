@@ -54,58 +54,55 @@ export function SavingsCalculatorPage() {
           계산 결과
         </Tab.Item>
       </Tab>
-
       <Spacing size={8} />
-      {hasValidInput ? (
+      {selectTab === 'products' && (
         <>
-          {selectTab === 'products' && (
+          {!hasValidInput ? (
+            <ListRow
+              contents={<ListRow.Texts type="1RowTypeA" top="먼저 저축 기간과 월 납입 금액을 입력해주세요." />}
+            />
+          ) : hasNoMatchingProducts ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="입력한 조건에 맞는 상품이 없습니다." />} />
+          ) : (
             <>
-              {hasNoMatchingProducts ? (
-                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="입력한 조건에 맞는 상품이 없습니다." />} />
-              ) : (
-                <>
-                  {matchingProducts.map(product => {
-                    const isSelected = selectedSavingsProduct?.id === product.id;
+              {matchingProducts.map(product => {
+                const isSelected = selectedSavingsProduct?.id === product.id;
 
-                    return (
-                      <ListRow
-                        key={product.id}
-                        contents={<ProductInfoTexts product={product} />}
-                        right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
-                        onClick={() => setSelectedSavingsProduct(product)}
-                      />
-                    );
-                  })}
-                </>
-              )}
-            </>
-          )}
-          {selectTab === 'results' && (
-            <>
-              {hasNoSelectedProduct ? (
-                <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-              ) : (
-                <>
-                  <CalculationResults selectedProduct={selectedSavingsProduct} savingsInput={savingsInput} />
-
-                  <Spacing size={8} />
-                  <Border height={16} />
-                  <Spacing size={8} />
-
-                  <ListHeader
-                    title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={<ProductInfoTexts product={product} />}
+                    right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
+                    onClick={() => setSelectedSavingsProduct(product)}
                   />
-                  <Spacing size={12} />
-                  {topRatedProducts.map(product => (
-                    <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
-                  ))}
-                </>
-              )}
+                );
+              })}
             </>
           )}
         </>
-      ) : (
-        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="먼저 저축 기간과 월 납입 금액을 입력해주세요." />} />
+      )}
+      {selectTab === 'results' && (
+        <>
+          {hasNoSelectedProduct ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+          ) : (
+            <>
+              <CalculationResults selectedProduct={selectedSavingsProduct} savingsInput={savingsInput} />
+
+              <Spacing size={8} />
+              <Border height={16} />
+              <Spacing size={8} />
+
+              <ListHeader
+                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+              />
+              <Spacing size={12} />
+              {topRatedProducts.map(product => (
+                <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
+              ))}
+            </>
+          )}
+        </>
       )}
       <Spacing size={40} />
     </>
