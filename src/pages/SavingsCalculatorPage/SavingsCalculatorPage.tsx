@@ -1,9 +1,18 @@
-import { Border, NavigationBar, SelectBottomSheet, Spacing, TextField } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { SavingsProduct } from './types/types';
 import { useState } from 'react';
 
 import { formatCurrency } from './lib/formatCurrency';
 import { extractNumbers } from './lib/extractNumbers';
-import { SavingsResultTabs } from './components/SavingsResultTabs';
+import { SavingsCalculationSummary } from './components/SavingsCalculationSummary';
+import {
+  calculateDifference,
+  calculateExpectedAmount,
+  calculateRecommendedMonthlyAmount,
+} from './utils/savingsCalculations';
+import { isProductMatchingInput } from './utils/savingsProductFilters';
+import { getTopProductsByRate } from './utils/productSorting';
+import { SavingResultList } from './components/SavingResultList';
 
 export function SavingsCalculatorPage() {
   const [savingsInput, setSavingsInput] = useState({
@@ -11,6 +20,8 @@ export function SavingsCalculatorPage() {
     monthlyAmount: '',
     savingsTerm: 12,
   });
+  const [savingsProductTab, setSavingsProductTab] = useState<'products' | 'results'>('products');
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
 
   return (
     <>
@@ -49,7 +60,83 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <SavingsResultTabs savingsInput={savingsInput} />
+      <Tab onChange={value => setSavingsProductTab(value as 'products' | 'results')}>
+        <Tab.Item value="products" selected={savingsProductTab === 'products'}>
+          적금 상품
+        </Tab.Item>
+        <Tab.Item value="results" selected={savingsProductTab === 'results'}>
+          계산 결과
+        </Tab.Item>
+      </Tab>
+
+      {savingsProductTab === 'products' && (
+        <>
+          <SavingResultList
+            filterLogic={(products: SavingsProduct[]) =>
+              products.filter(product => {
+                return isProductMatchingInput(product, savingsInput);
+              })
+            }
+            selectedSavingsProduct={selectedSavingsProduct}
+            handleSelectedSavingsProduct={product => {
+              setSelectedSavingsProduct(product);
+            }}
+          />
+        </>
+      )}
+
+      {savingsProductTab === 'results' && (
+        <>
+          <Spacing size={8} />
+          {selectedSavingsProduct ? (
+            <>
+              <SavingsCalculationSummary
+                label="예상 수익 금액"
+                amount={calculateExpectedAmount({
+                  월납입액: savingsInput.monthlyAmount,
+                  저축기간: savingsInput.savingsTerm,
+                  연이자율: selectedSavingsProduct.annualRate,
+                })}
+              />
+              <SavingsCalculationSummary
+                label="목표 금액과의 차이"
+                amount={calculateDifference({
+                  목표금액: savingsInput.targetAmount,
+                  월납입액: savingsInput.monthlyAmount,
+                  저축기간: savingsInput.savingsTerm,
+                  연이자율: selectedSavingsProduct.annualRate,
+                })}
+              />
+              <SavingsCalculationSummary
+                label="추천 월 납입 금액"
+                amount={calculateRecommendedMonthlyAmount({
+                  목표금액: savingsInput.targetAmount,
+                  저축기간: savingsInput.savingsTerm,
+                  연이자율: selectedSavingsProduct.annualRate,
+                })}
+              />
+            </>
+          ) : (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+          )}
+
+          <Spacing size={8} />
+          <Border height={16} />
+          <Spacing size={8} />
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+
+          <SavingResultList
+            filterLogic={getTopProductsByRate}
+            selectedSavingsProduct={selectedSavingsProduct}
+            handleSelectedSavingsProduct={product => {
+              setSelectedSavingsProduct(product);
+            }}
+          />
+
+          <Spacing size={40} />
+        </>
+      )}
     </>
   );
 }
