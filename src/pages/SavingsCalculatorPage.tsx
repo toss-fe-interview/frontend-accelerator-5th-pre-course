@@ -17,14 +17,11 @@ import { ErrorBoundary, Suspense } from '@suspensive/react';
 
 type Tab = 'products' | 'results';
 
-const productQueries = {
-  all: 'savingsProducts',
-  list: () =>
-    queryOptions({
-      queryKey: [productQueries.all, 'list'],
-      queryFn: getSavingsProducts,
-    }),
-};
+const productQueriesOptions = () =>
+  queryOptions({
+    queryKey: ['products'],
+    queryFn: getSavingsProducts,
+  });
 
 interface SavingsFormData {
   targetAmount: number;
@@ -88,7 +85,7 @@ export function SavingsCalculatorPage() {
               <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
                 <Suspense fallback={'loading...'}>
                   <SuspenseQuery
-                    {...productQueries.list()}
+                    {...productQueriesOptions()}
                     select={products =>
                       products.filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
                     }
@@ -160,7 +157,7 @@ export function SavingsCalculatorPage() {
                 <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
                   <Suspense fallback={'loading...'}>
                     <SuspenseQuery
-                      {...productQueries.list()}
+                      {...productQueriesOptions()}
                       select={products =>
                         products
                           .filter(product => filterSavingsProducts(product, { monthlyPayment, savingPeriod }))
