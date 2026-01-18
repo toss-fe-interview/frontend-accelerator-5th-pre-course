@@ -9,7 +9,7 @@ import {
   Tab,
   TextField,
 } from 'tosslib';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { CalculationResults } from 'components/CalculationResults';
 import { ProductInfoTexts } from 'components/ProductInfoTexts';
@@ -17,6 +17,8 @@ import { SwitchCase } from 'components/common/SwitchCase';
 import { ProductListStatus, ResultsStatus, SavingsInput, SavingsProduct } from 'type';
 import { savingsProductsQuery } from 'apis/savingsProduct';
 import { formatMoney, extractDigits } from 'utils/money';
+import { isWithinAmountRange, matchesTerm } from 'utils/productFilter';
+import { RecommendedProductList } from 'components/RecommendedProductList';
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery());
@@ -29,15 +31,9 @@ export function SavingsCalculatorPage() {
 
   const [selectTab, setSelectTab] = useState<'products' | 'results'>('products');
 
-  const matchingProducts = useMemo(() => {
-    return savingsProducts.filter(product => {
-      return (
-        product.minMonthlyAmount <= savingsInput.monthlyAmount &&
-        product.maxMonthlyAmount >= savingsInput.monthlyAmount &&
-        product.availableTerms === savingsInput.term
-      );
-    });
-  }, [savingsProducts, savingsInput]);
+  const filterMatchingProducts = savingsProducts.filter(
+    product => isWithinAmountRange(product, savingsInput.monthlyAmount) && matchesTerm(product, savingsInput.term)
+  );
 
   const updateField = <K extends keyof SavingsInput>(field: K, value: SavingsInput[K]) => {
     setSavingsInput({ ...savingsInput, [field]: value });
@@ -49,7 +45,7 @@ export function SavingsCalculatorPage() {
     if (!(savingsInput.term && savingsInput.monthlyAmount)) {
       return 'needsInput';
     }
-    if (matchingProducts.length === 0) {
+    if (filterMatchingProducts.length === 0) {
       return 'noProducts';
     }
     return 'hasProducts';
@@ -122,7 +118,7 @@ export function SavingsCalculatorPage() {
             ),
             hasProducts: (
               <>
-                {matchingProducts.map(product => {
+                {filterMatchingProducts.map(product => {
                   const isSelected = selectedSavingsProduct?.id === product.id;
 
                   return (
@@ -144,27 +140,21 @@ export function SavingsCalculatorPage() {
           value={getResultsStatus()}
           caseBy={{
             noProduct: <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />,
-            hasProduct: (() => {
-              const recommendedProducts = [...matchingProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+            hasProduct: (
+              <>
+                <CalculationResults selectedProduct={selectedSavingsProduct!} savingsInput={savingsInput} />
 
-              return (
-                <>
-                  <CalculationResults selectedProduct={selectedSavingsProduct!} savingsInput={savingsInput} />
+                <Spacing size={8} />
+                <Border height={16} />
+                <Spacing size={8} />
 
-                  <Spacing size={8} />
-                  <Border height={16} />
-                  <Spacing size={8} />
-
-                  <ListHeader
-                    title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-                  />
-                  <Spacing size={12} />
-                  {recommendedProducts.map(product => (
-                    <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
-                  ))}
-                </>
-              );
-            })(),
+                <ListHeader
+                  title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+                />
+                <Spacing size={12} />
+                <RecommendedProductList products={savingsProducts} />
+              </>
+            ),
           }}
         />
       )}
