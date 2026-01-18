@@ -1,11 +1,21 @@
-import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import {
+  Assets,
+  Border,
+  ListHeader,
+  ListRow,
+  NavigationBar,
+  SelectBottomSheet,
+  Spacing,
+  Tab,
+  TextField,
+} from 'tosslib';
 import { useMemo, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { CalculationResults } from 'components/CalculationResults';
 import { ProductInfoTexts } from 'components/ProductInfoTexts';
 import { SavingsInput, SavingsProduct } from 'type';
 import { savingsProductsQuery } from 'apis/savingsProduct';
-import { formatMoney, parseMoney } from 'utils/money';
+import { formatMoney, extractDigits } from 'utils/money';
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery());
@@ -28,17 +38,11 @@ export function SavingsCalculatorPage() {
     });
   }, [savingsProducts, savingsInput]);
 
-  const topRatedProducts = [...matchingProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-
-  const hasValidInput = savingsInput.term && savingsInput.monthlyAmount;
-  const hasNoMatchingProducts = matchingProducts.length === 0;
-  const hasNoSelectedProduct = !selectedSavingsProduct;
-
   const updateField = <K extends keyof SavingsInput>(field: K, value: SavingsInput[K]) => {
     setSavingsInput({ ...savingsInput, [field]: value });
   };
 
-  const toMoneyValue = (input: string): number => Number(parseMoney(input)) || 0;
+  const toMoneyValue = (input: string): number => Number(extractDigits(input)) || 0;
 
   return (
     <>
@@ -88,11 +92,11 @@ export function SavingsCalculatorPage() {
       <Spacing size={8} />
       {selectTab === 'products' && (
         <>
-          {!hasValidInput ? (
+          {!(savingsInput.term && savingsInput.monthlyAmount) ? (
             <ListRow
               contents={<ListRow.Texts type="1RowTypeA" top="먼저 저축 기간과 월 납입 금액을 입력해주세요." />}
             />
-          ) : hasNoMatchingProducts ? (
+          ) : matchingProducts.length === 0 ? (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="입력한 조건에 맞는 상품이 없습니다." />} />
           ) : (
             <>
@@ -114,7 +118,7 @@ export function SavingsCalculatorPage() {
       )}
       {selectTab === 'results' && (
         <>
-          {hasNoSelectedProduct ? (
+          {!selectedSavingsProduct ? (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
           ) : (
             <>
@@ -128,9 +132,12 @@ export function SavingsCalculatorPage() {
                 title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
               />
               <Spacing size={12} />
-              {topRatedProducts.map(product => (
-                <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
-              ))}
+              {[...matchingProducts]
+                .sort((a, b) => b.annualRate - a.annualRate)
+                .slice(0, 2)
+                .map(product => (
+                  <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
+                ))}
             </>
           )}
         </>
