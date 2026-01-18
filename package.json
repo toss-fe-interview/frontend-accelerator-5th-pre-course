@@ -8,6 +8,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@suspensive/react": "^3.18.0",
+    "@suspensive/react-query": "^3.18.0",
+    "@tanstack/react-query": "^5.90.17",
+    "lodash": "^4.17.21",
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^7.1.1",
@@ -15,6 +19,7 @@
   },
   "devDependencies": {
     "@hono/vite-dev-server": "^0.18.0",
+    "@types/lodash": "^4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^8.18.2",

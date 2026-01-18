@@ -1,0 +1,19 @@
+import { ReactNode } from 'react';
+
+import { SavingsProduct } from 'entities/savings/model/types';
+
+interface SavingsProductListSectionProps {
+  products: SavingsProduct[];
+  emptyFallback: ReactNode;
+  children: (products: SavingsProduct[]) => ReactNode;
+}
+
+export function SavingsProductListSection({ products, emptyFallback, children }: SavingsProductListSectionProps) {
+  const isEmpty = products.length === 0;
+
+  if (isEmpty) {
+    return <>{emptyFallback}</>;
+  }
+
+  return <>{children(products)}</>;
+}
