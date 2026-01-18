@@ -1,7 +1,7 @@
 import { ErrorBoundary, Suspense } from '@suspensive/react';
 import ErrorFallback from 'components/ErrorFallback';
 import Loading from 'components/Loading';
-import LabeledAmountInput from 'features/savings/components/LabeledAmountInput';
+import LabeledNumberInput from 'features/savings/components/LabeledNumberInput';
 import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
@@ -10,9 +10,8 @@ import {
   calculateDifferenceWithTargetAmount,
   calculateRecommendedMonthlyPayment,
 } from 'features/savings/utils/calculation/savings';
-import { parseNumberInput } from 'features/savings/utils/parse/number';
 import { filterSavings, recommendSavings } from 'features/savings/utils/product/savings';
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import ProductItem from 'features/savings/components/ProductItem';
 import { formatNumberWithComma } from 'features/savings/utils/format/number';
@@ -62,14 +61,12 @@ export function SavingsCalculatorPage() {
       <NavigationBar title="적금 계산기" />
       <Spacing size={16} />
 
-      <LabeledAmountInput
+      <LabeledNumberInput
         label="목표 금액"
         placeholder="목표 금액을 입력하세요"
         unit="원"
         value={savingsValues.targetAmount}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          const newValue = parseNumberInput(e.target.value);
-
+        onChange={(newValue: number) => {
           setSavingsValues(prev => ({
             ...prev,
             targetAmount: newValue,
@@ -77,14 +74,12 @@ export function SavingsCalculatorPage() {
         }}
       />
       <Spacing size={16} />
-      <LabeledAmountInput
+      <LabeledNumberInput
         label="월 납입액"
         placeholder="희망 월 납입액을 입력하세요"
         unit="원"
         value={savingsValues.monthlyPaymentAmount}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          const newValue = parseNumberInput(e.target.value);
-
+        onChange={(newValue: number) => {
           setSavingsValues(prev => ({
             ...prev,
             monthlyPaymentAmount: newValue,

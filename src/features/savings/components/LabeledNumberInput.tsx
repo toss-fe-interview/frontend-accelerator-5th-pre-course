@@ -1,23 +1,28 @@
 import { ChangeEvent } from 'react';
 import { TextField } from 'tosslib';
 import { formatNumberWithComma } from '../utils/format/number';
+import { parseNumberInput } from '../utils/parse/number';
 
 interface LabeledAmountInputProps {
   label: string;
   placeholder: string;
   unit: string;
   value: number;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange: (newValue: number) => void;
 }
 
-export default function LabeledAmountInput({ label, placeholder, unit, value, onChange }: LabeledAmountInputProps) {
+export default function LabeledNumberInput({ label, placeholder, unit, value, onChange }: LabeledAmountInputProps) {
   return (
     <TextField
       label={label}
       placeholder={placeholder}
       suffix={unit}
       value={formatNumberWithComma(value)}
-      onChange={onChange}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+        const newValue = parseNumberInput(e.target.value);
+
+        onChange(newValue);
+      }}
     />
   );
 }
