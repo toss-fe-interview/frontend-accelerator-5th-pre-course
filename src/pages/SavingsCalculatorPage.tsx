@@ -78,9 +78,9 @@ export function SavingsCalculatorPage() {
               const { expectedRevenue, diffFromTarget, recommendedAmount } = props.data;
               return (
                 <>
-                  <ResultRow label="예상 수익" value={`${expectedRevenue.toLocaleString()}원`} />
-                  <ResultRow label="목표 금액과의 차이" value={`${diffFromTarget.toLocaleString()}원`} />
-                  <ResultRow label="추천 월 납입액" value={`${recommendedAmount.toLocaleString()}원`} />
+                  <ResultRow title="예상 수익" value={`${expectedRevenue.toLocaleString()}원`} />
+                  <ResultRow title="목표 금액과의 차이" value={`${diffFromTarget.toLocaleString()}원`} />
+                  <ResultRow title="추천 월 납입액" value={`${recommendedAmount.toLocaleString()}원`} />
                 </>
               );
             }}

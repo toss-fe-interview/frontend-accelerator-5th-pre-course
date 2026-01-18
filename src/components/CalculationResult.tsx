@@ -117,13 +117,13 @@ export function CalculationResult({ children }: CalculationResultProps) {
   );
 }
 
-export function ResultRow({ label, value }: { label: string; value: string }) {
+export function ResultRow({ title, value }: { title: string; value: string }) {
   return (
     <ListRow
       contents={
         <ListRow.Texts
           type="2RowTypeA"
-          top={label}
+          top={title}
           bottom={value}
           bottomProps={{ color: colors.blue600, fontWeight: 'bold' }}
         />
