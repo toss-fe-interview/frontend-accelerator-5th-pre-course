@@ -10,7 +10,7 @@ import {
   calculateDifferenceWithTargetAmount,
   calculateRecommendedMonthlyPayment,
 } from 'features/savings/utils/calculation/savings';
-import { filterSavings, recommendSavings } from 'features/savings/utils/product/savings';
+import { filterSavings, recommendSavings } from 'features/savings/utils/savingsRules';
 import { useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import ProductItem from 'features/savings/components/ProductItem';
