@@ -1,7 +1,6 @@
 import {
   Assets,
   Border,
-  colors,
   ListHeader,
   ListRow,
   NavigationBar,
@@ -10,19 +9,71 @@ import {
   Tab,
   TextField,
 } from 'tosslib';
+import { useState } from 'react';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { ProductInfoTexts } from 'components/ProductInfoTexts';
+import { ResultRow } from 'components/ResultRow';
+import { SwitchCase } from 'components/common/SwitchCase';
+import { SavingsInput, SavingsProduct } from 'type';
+import { savingsProductsQuery } from 'apis/savingsProduct';
+import { formatMoney, formatDifference, extractDigits } from 'utils/money';
+import { isWithinAmountRange, matchesTerm } from 'utils/productFilter';
+import {
+  calculateExpectedAmount,
+  calculateGoalDifference,
+  calculateRecommendedMonthlyAmount,
+} from 'utils/savingsCalculator';
+import { RecommendedProductList } from 'components/RecommendedProductList';
 
 export function SavingsCalculatorPage() {
+  const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery());
+  const [savingsInput, setSavingsInput] = useState<SavingsInput>({
+    goalAmount: 0,
+    monthlyAmount: 0,
+    term: 0,
+  });
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
+
+  const [selectTab, setSelectTab] = useState<'products' | 'results'>('products');
+
+  const filterMatchingProducts = savingsProducts.filter(
+    product => isWithinAmountRange(product, savingsInput.monthlyAmount) && matchesTerm(product, savingsInput.term)
+  );
+
+  const updateField = <K extends keyof SavingsInput>(field: K, value: SavingsInput[K]) => {
+    setSavingsInput({ ...savingsInput, [field]: value });
+  };
+
+  const toMoneyValue = (input: string): number => Number(extractDigits(input)) || 0;
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <TextField label="목표 금액" placeholder="목표 금액을 입력하세요" suffix="원" />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={formatMoney(savingsInput.goalAmount)}
+        onChange={e => updateField('goalAmount', toMoneyValue(e.target.value))}
+      />
       <Spacing size={16} />
-      <TextField label="월 납입액" placeholder="희망 월 납입액을 입력하세요" suffix="원" />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={formatMoney(savingsInput.monthlyAmount)}
+        onChange={e => updateField('monthlyAmount', toMoneyValue(e.target.value))}
+      />
       <Spacing size={16} />
-      <SelectBottomSheet label="저축 기간" title="저축 기간을 선택해주세요" value={12} onChange={() => {}}>
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={savingsInput.term}
+        onChange={value => updateField('term', value)}
+      >
         <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
         <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
@@ -32,122 +83,110 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={() => {}}>
-        <Tab.Item value="products" selected={true}>
+      <Tab onChange={value => setSelectTab(value as 'products' | 'results')}>
+        <Tab.Item value="products" selected={selectTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={false}>
+        <Tab.Item value="results" selected={selectTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 3.2%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'100,000원 ~ 500,000원 | 12개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        right={<Assets.Icon name="icon-check-circle-green" />}
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={'연 이자율: 2.8%'}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={'50,000원 ~ 1,000,000원 | 24개월'}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-
-      {/* 아래는 계산 결과 탭 내용이에요. 계산 결과 탭을 구현할 때 주석을 해제해주세요. */}
-      {/* <Spacing size={8} />
-
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="예상 수익 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`1,000,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="목표 금액과의 차이"
-            topProps={{ color: colors.grey600 }}
-            bottom={`-500,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="2RowTypeA"
-            top="추천 월 납입 금액"
-            topProps={{ color: colors.grey600 }}
-            bottom={`100,000원`}
-            bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-          />
-        }
-      />
-
       <Spacing size={8} />
-      <Border height={16} />
-      <Spacing size={8} />
+      {selectTab === 'products' && (
+        <SwitchCase
+          value={
+            !(savingsInput.term && savingsInput.monthlyAmount)
+              ? 'needsInput'
+              : filterMatchingProducts.length === 0
+                ? 'noProducts'
+                : 'hasProducts'
+          }
+          caseBy={{
+            needsInput: (
+              <ListRow
+                contents={<ListRow.Texts type="1RowTypeA" top="먼저 저축 기간과 월 납입 금액을 입력해주세요." />}
+              />
+            ),
+            noProducts: (
+              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="입력한 조건에 맞는 상품이 없습니다." />} />
+            ),
+            hasProducts: (
+              <>
+                {filterMatchingProducts.map(product => {
+                  const isSelected = selectedSavingsProduct?.id === product.id;
 
-      <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-      <Spacing size={12} />
+                  return (
+                    <ListRow
+                      key={product.id}
+                      contents={<ProductInfoTexts product={product} />}
+                      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
+                      onClick={() => setSelectedSavingsProduct(product)}
+                    />
+                  );
+                })}
+              </>
+            ),
+          }}
+        />
+      )}
+      {selectTab === 'results' && (
+        <SwitchCase
+          value={selectedSavingsProduct ? 'hasProduct' : 'noProduct'}
+          caseBy={{
+            noProduct: <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />,
+            hasProduct: (
+              <>
+                <ResultRow
+                  label="예상 수익 금액"
+                  displayValue={`${formatMoney(
+                    Math.round(
+                      calculateExpectedAmount({
+                        monthlyAmount: savingsInput.monthlyAmount,
+                        term: savingsInput.term,
+                        annualRate: selectedSavingsProduct!.annualRate,
+                      })
+                    )
+                  )}원`}
+                />
+                <ResultRow
+                  label="목표 금액과의 차이"
+                  displayValue={formatDifference(
+                    calculateGoalDifference({
+                      goalAmount: savingsInput.goalAmount,
+                      expectedAmount: calculateExpectedAmount({
+                        monthlyAmount: savingsInput.monthlyAmount,
+                        term: savingsInput.term,
+                        annualRate: selectedSavingsProduct!.annualRate,
+                      }),
+                    })
+                  )}
+                />
+                <ResultRow
+                  label="추천 월 납입 금액"
+                  displayValue={`${formatMoney(
+                    calculateRecommendedMonthlyAmount({
+                      goalAmount: savingsInput.goalAmount,
+                      term: savingsInput.term,
+                      annualRate: selectedSavingsProduct!.annualRate,
+                    })
+                  )}원`}
+                />
 
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'기본 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 3.2%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`100,000원 ~ 500,000원 | 12개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
-      <ListRow
-        contents={
-          <ListRow.Texts
-            type="3RowTypeA"
-            top={'고급 정기적금'}
-            topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-            middle={`연 이자율: 2.8%`}
-            middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-            bottom={`50,000원 ~ 1,000,000원 | 24개월`}
-            bottomProps={{ fontSize: 13, color: colors.grey600 }}
-          />
-        }
-        onClick={() => {}}
-      />
+                <Spacing size={8} />
+                <Border height={16} />
+                <Spacing size={8} />
 
-      <Spacing size={40} /> */}
-
-      {/* 아래는 사용자가 적금 상품을 선택하지 않고 계산 결과 탭을 선택했을 때 출력해주세요. */}
-      {/* <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} /> */}
+                <ListHeader
+                  title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+                />
+                <Spacing size={12} />
+                <RecommendedProductList products={savingsProducts} />
+              </>
+            ),
+          }}
+        />
+      )}
+      <Spacing size={40} />
     </>
   );
 }
