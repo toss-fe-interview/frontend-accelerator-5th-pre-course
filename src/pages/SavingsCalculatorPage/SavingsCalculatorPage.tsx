@@ -100,7 +100,6 @@ export function SavingsCalculatorPage() {
               <Tab.Item value={TAB.results}>계산 결과</Tab.Item>
 
               <Tab.Content value={TAB.products}>
-                {/* 해당 컴포넌트 명도 변경해봐야할거 같음, 왜냐하면 적금 상품 리스트인데, 기능에 초점 맞춰서 FilteredSavingsProducts 으로 나온듯! */}
                 <FilteredSavingsProducts savingsProducts={savingsProducts} filter={{ monthlyPayment, term }}>
                   {_ =>
                     match(_)
@@ -109,7 +108,7 @@ export function SavingsCalculatorPage() {
                           <ProductItem
                             key={product.id}
                             product={product}
-                            selectedProduct={selectedProduct}
+                            isSelected={selectedProduct?.id === product.id}
                             onSelectProduct={handleSelectProduct}
                           />
                         ))
@@ -158,7 +157,7 @@ export function SavingsCalculatorPage() {
                           <ProductItem
                             key={product.id}
                             product={product}
-                            selectedProduct={selectedProduct}
+                            isSelected={selectedProduct?.id === product.id}
                             onSelectProduct={handleSelectProduct}
                           />
                         ))

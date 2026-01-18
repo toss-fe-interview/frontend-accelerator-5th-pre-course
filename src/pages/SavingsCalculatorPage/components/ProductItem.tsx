@@ -4,12 +4,11 @@ import { Assets, colors, ListRow } from 'tosslib';
 
 interface ProductItemProps {
   product: SavingsProduct;
-  selectedProduct: SavingsProduct | null;
+  isSelected: boolean;
   onSelectProduct: (product: SavingsProduct) => void;
 }
 
-export function ProductItem({ product, selectedProduct, onSelectProduct }: ProductItemProps) {
-  const isSelected = selectedProduct?.id === product.id;
+export function ProductItem({ product, isSelected, onSelectProduct }: ProductItemProps) {
   const 납입조건 = `${formatCurrency(product.minMonthlyAmount)}원 ~ ${formatCurrency(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`;
 
   return (
