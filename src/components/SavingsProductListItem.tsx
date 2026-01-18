@@ -34,7 +34,7 @@ export function SavingsProductListItem({
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
-      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
+      right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
       onClick={onSelect}
     />
   );

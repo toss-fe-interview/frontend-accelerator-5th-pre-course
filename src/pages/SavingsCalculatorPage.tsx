@@ -1,16 +1,13 @@
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 
 import {
   calculateExpectedProfit,
   calculateDifferenceProfit,
   calculateRecommendedMonthlyAmount,
-  filterByConditions,
   isWithinAmountRange,
   hasMatchingTerm,
-  pipe,
   sortByAnnualRate,
-  take,
 } from 'utils/calculateSavings';
 import { SavingsProduct } from 'types/savings';
 import { getSavingsProductsQueryOptions } from 'api/savings-products';
@@ -19,8 +16,10 @@ import { SuspenseQuery } from '@suspensive/react-query';
 
 import { AmountField } from 'components/AmountField';
 import { TermSelect } from 'components/TermSelect';
-import { SavingsProductListItem } from 'components/SavingsProductListItem';
 import { LabelValueRow } from 'components/LabelValueRow';
+import { formatAmount } from 'utils/format';
+
+type TabValue = 'products' | 'results';
 
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
@@ -63,11 +62,11 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={value => setCurrentTab(value as 'products' | 'results')}>
-        <Tab.Item value="products" selected={isSelected(currentTab, 'products')}>
+      <Tab onChange={value => setCurrentTab(value as TabValue)}>
+        <Tab.Item value="products" selected={currentTab === 'products'}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={isSelected(currentTab, 'results')}>
+        <Tab.Item value="results" selected={currentTab === 'results'}>
           계산 결과
         </Tab.Item>
       </Tab>
@@ -79,28 +78,34 @@ export function SavingsCalculatorPage() {
                 return (
                   <SuspenseQuery
                     {...getSavingsProductsQueryOptions()}
-                    select={pipe(
-                      filterByConditions<SavingsProduct>(
-                        product => isWithinAmountRange(product, monthlyAmount),
-                        product => hasMatchingTerm(product, savingsTerm)
+                    select={(products: SavingsProduct[]) =>
+                      products.filter(
+                        product => isWithinAmountRange(product, monthlyAmount) && hasMatchingTerm(product, savingsTerm)
                       )
-                    )}
+                    }
                   >
                     {({ data: filteredSavingsProducts }: { data: SavingsProduct[] }) =>
-                      filteredSavingsProducts.map(product => (
-                        <SavingsProductListItem
-                          key={product.id}
-                          name={product.name}
-                          annualRate={product.annualRate}
-                          monthlyAmountRange={{
-                            min: product.minMonthlyAmount,
-                            max: product.maxMonthlyAmount,
-                          }}
-                          availableTerms={product.availableTerms}
-                          isSelected={selectedProduct?.id === product.id}
-                          onSelect={() => setSelectedProduct(product)}
-                        />
-                      ))
+                      filteredSavingsProducts.map(product => {
+                        const isSelected = selectedProduct?.id === product.id;
+                        return (
+                          <ListRow
+                            key={product.id}
+                            contents={
+                              <ListRow.Texts
+                                type="3RowTypeA"
+                                top={product.name}
+                                middle={`연 이자율: ${product.annualRate}%`}
+                                bottom={`${formatAmount(product.minMonthlyAmount)}원 ~ ${formatAmount(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                                topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                                middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                                bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                              />
+                            }
+                            right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
+                            onClick={() => setSelectedProduct(product)}
+                          />
+                        );
+                      })
                     }
                   </SuspenseQuery>
                 );
@@ -108,14 +113,15 @@ export function SavingsCalculatorPage() {
                 return (
                   <SuspenseQuery
                     {...getSavingsProductsQueryOptions()}
-                    select={pipe(
-                      filterByConditions<SavingsProduct>(
-                        product => isWithinAmountRange(product, monthlyAmount),
-                        product => hasMatchingTerm(product, savingsTerm)
-                      ),
-                      sortByAnnualRate('desc'),
-                      take(2)
-                    )}
+                    select={(products: SavingsProduct[]) =>
+                      [...products]
+                        .filter(
+                          product =>
+                            isWithinAmountRange(product, monthlyAmount) && hasMatchingTerm(product, savingsTerm)
+                        )
+                        .sort(sortByAnnualRate.desc)
+                        .slice(0, 2)
+                    }
                   >
                     {({ data: recommendedSavingsProducts }: { data: SavingsProduct[] }) => {
                       if (!selectedProduct) {
@@ -156,20 +162,27 @@ export function SavingsCalculatorPage() {
                             />
                             <Spacing size={12} />
 
-                            {recommendedSavingsProducts.map(product => (
-                              <SavingsProductListItem
-                                key={product.id}
-                                name={product.name}
-                                annualRate={product.annualRate}
-                                monthlyAmountRange={{
-                                  min: product.minMonthlyAmount,
-                                  max: product.maxMonthlyAmount,
-                                }}
-                                availableTerms={product.availableTerms}
-                                isSelected={selectedProduct?.id === product.id}
-                                onSelect={() => setSelectedProduct(product)}
-                              />
-                            ))}
+                            {recommendedSavingsProducts.map(product => {
+                              const isSelected = selectedProduct?.id === product.id;
+                              return (
+                                <ListRow
+                                  key={product.id}
+                                  contents={
+                                    <ListRow.Texts
+                                      type="3RowTypeA"
+                                      top={product.name}
+                                      middle={`연 이자율: ${product.annualRate}%`}
+                                      bottom={`${formatAmount(product.minMonthlyAmount)}원 ~ ${formatAmount(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
+                                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+                                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+                                      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+                                    />
+                                  }
+                                  right={isSelected && <Assets.Icon name="icon-check-circle-green" />}
+                                  onClick={() => setSelectedProduct(product)}
+                                />
+                              );
+                            })}
 
                             <Spacing size={40} />
                           </>
@@ -185,7 +198,3 @@ export function SavingsCalculatorPage() {
     </>
   );
 }
-
-const isSelected = (current: 'products' | 'results', target: 'products' | 'results'): boolean => {
-  return current === target;
-};

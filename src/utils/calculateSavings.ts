@@ -50,20 +50,7 @@ export const hasMatchingTerm = (product: SavingsProduct, savingsTerm: number | n
   return savingsTerm === product.availableTerms;
 };
 
-export type FilterCondition<T> = (item: T) => boolean;
-export const filterByConditions =
-  <T>(...conditions: Array<FilterCondition<T>>) =>
-  (items: T[]) =>
-    items.filter(item => conditions.every(condition => condition(item)));
-
-export const sortByAnnualRate =
-  (order: 'asc' | 'desc' = 'desc') =>
-  (products: SavingsProduct[]) =>
-    [...products].sort((a, b) => (order === 'asc' ? a.annualRate - b.annualRate : b.annualRate - a.annualRate));
-
-export const take = (count: number) => (products: SavingsProduct[]) => products.slice(0, count);
-
-export const pipe =
-  (...fns: Array<(arg: any) => any>) =>
-  (value: any) =>
-    fns.reduce((acc, fn) => fn(acc), value);
+export const sortByAnnualRate = {
+  asc: (a: SavingsProduct, b: SavingsProduct) => a.annualRate - b.annualRate,
+  desc: (a: SavingsProduct, b: SavingsProduct) => b.annualRate - a.annualRate,
+};
