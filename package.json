@@ -3,13 +3,16 @@
   "private": true,
   "packageManager": "yarn@4.6.0",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "test": "yarn vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@tanstack/react-query": "^5.90.16",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.71.1",
     "react-router-dom": "^7.1.1",
     "tosslib": "file:./tosslib.tgz"
   },
@@ -30,6 +33,7 @@
     "prettier": "^3.4.2",
     "typescript": "~5.7.2",
     "vite": "^6.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.17"
   }
 }
