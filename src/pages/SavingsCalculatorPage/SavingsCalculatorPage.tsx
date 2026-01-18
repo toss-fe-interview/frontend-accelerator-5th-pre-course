@@ -4,7 +4,7 @@ import { Tab } from 'components/Tab';
 import { SavingsFilterForm } from './types/saving-filter-form';
 import { AsyncBoundary } from 'components/AsyncBoundary';
 import { SavingProductErrorFallback } from './components/fallback/SavingProductErrorFallback';
-import { CurrencyTextField } from './components/fields/CurrencyTextField';
+import { NumberField } from './components/fields/NumberField';
 import { SelectTermField } from './components/fields/SelectTermField';
 import { useEffect, useRef, useState } from 'react';
 import { SavingsProduct } from './models/savings-products.dto';
@@ -63,13 +63,13 @@ export function SavingsCalculatorPage() {
       <Spacing size={16} />
 
       <div css={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <CurrencyTextField
+        <NumberField
           label="목표 금액"
           placeholder="목표 금액을 입력하세요"
           value={targetAmount}
           onChange={value => form.setValue('targetAmount', value)}
         />
-        <CurrencyTextField
+        <NumberField
           label="월 납입액"
           placeholder="희망 월 납입액을 입력하세요"
           value={monthlyPayment}

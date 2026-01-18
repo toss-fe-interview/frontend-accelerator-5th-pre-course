@@ -10,7 +10,7 @@ interface Props extends Omit<TextFieldProps, 'value' | 'onChange'> {
   onChange: (value: number | null) => void;
 }
 
-export function CurrencyTextField({ value, onChange, suffix = '원', ...props }: Props) {
+export function NumberField({ value, onChange, suffix = '원', ...props }: Props) {
   return (
     <TextField
       suffix={suffix}
