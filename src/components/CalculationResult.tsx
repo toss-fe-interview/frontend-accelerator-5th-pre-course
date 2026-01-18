@@ -31,14 +31,16 @@ interface ValidationInput {
   monthlyAmount: number | null;
 }
 
-type ValidationResult = { isValid: false; missingField: MissingField } | { isValid: true; params: CalculationParams };
+type NullableParamsValidationResult =
+  | { isValid: false; missingField: MissingField }
+  | { isValid: true; params: CalculationParams };
 
-function validateCalculationParams({
+function validateNullableParams({
   selectedProduct,
   targetAmount,
   term,
   monthlyAmount,
-}: ValidationInput): ValidationResult {
+}: ValidationInput): NullableParamsValidationResult {
   if (selectedProduct === null) {
     return { isValid: false, missingField: 'product' };
   }
@@ -85,7 +87,7 @@ export function CalculationResult({ children }: CalculationResultProps) {
 
   const selectedProduct = products.length > 0 ? products[0] : null;
 
-  const validation = validateCalculationParams({
+  const validation = validateNullableParams({
     selectedProduct,
     targetAmount,
     term: selectedTerm ?? 12,
