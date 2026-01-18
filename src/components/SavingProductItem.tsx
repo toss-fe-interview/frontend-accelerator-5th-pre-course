@@ -2,13 +2,13 @@ import { ListRow, colors, Assets } from 'tosslib';
 import { SavingsProduct } from 'types/savings';
 import { formatNumber } from 'utils/format';
 
-interface SavingProductProps {
+interface SavingProductItemProps {
   product: SavingsProduct;
   isSelected: boolean;
   onSelect?: () => void;
 }
 
-const SavingProduct = ({ product, isSelected, onSelect }: SavingProductProps) => {
+const SavingProductItem = ({ product, isSelected, onSelect }: SavingProductItemProps) => {
   return (
     <ListRow
       contents={
@@ -28,4 +28,4 @@ const SavingProduct = ({ product, isSelected, onSelect }: SavingProductProps) =>
   );
 };
 
-export default SavingProduct;
+export default SavingProductItem;

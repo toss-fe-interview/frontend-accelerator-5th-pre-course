@@ -15,7 +15,7 @@ import {
 import { SavingsFormInput } from 'types/savings';
 import { formatNumber } from 'utils/format';
 import NumberInput from 'components/NumberInput';
-import SavingProduct from 'components/SavingProduct';
+import SavingProductItem from 'components/SavingProductItem';
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
@@ -159,7 +159,7 @@ export function SavingsCalculatorPage() {
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />
         ) : (
           filteredProducs.map(product => (
-            <SavingProduct
+            <SavingProductItem
               key={product.id}
               product={product}
               isSelected={product.id === selectedProductId}
@@ -221,7 +221,7 @@ export function SavingsCalculatorPage() {
               />
               <Spacing size={12} />
               {recommendedProducts.map(product => (
-                <SavingProduct
+                <SavingProductItem
                   key={product.id}
                   product={product}
                   isSelected={product.id === selectedProductId}
