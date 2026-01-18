@@ -1,7 +1,6 @@
-import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
 
-import { formatAmount } from 'utils/format';
 import {
   calculateExpectedProfit,
   calculateDifferenceProfit,
@@ -16,6 +15,7 @@ import { orderBy, take } from 'es-toolkit';
 import { AmountField } from 'components/AmountField';
 import { TermSelect } from 'components/TermSelect';
 import { SavingsProductListItem } from 'components/SavingsProductListItem';
+import { LabelValueRow } from 'components/LabelValueRow';
 
 const isSelected = (current: 'products' | 'results', target: 'products' | 'results'): boolean => {
   return current === target;
@@ -36,17 +36,14 @@ function hasMatchingTerm(product: SavingsProduct, savingsTerm: number | null): b
 }
 
 export function SavingsCalculatorPage() {
-  // 목표금액
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
-  // 월 납입액
+
   const [monthlyAmount, setMonthlyAmount] = useState<number | null>(null);
-  // 저축 기간
+
   const [savingsTerm, setSavingsTerm] = useState<number | null>(null);
 
-  // 현재 탭
   const [currentTab, setCurrentTab] = useState<'products' | 'results'>('products');
 
-  // 선택된 상품
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   return (
@@ -152,43 +149,12 @@ export function SavingsCalculatorPage() {
                         <>
                           <Spacing size={8} />
                           <>
-                            <ListRow
-                              contents={
-                                <ListRow.Texts
-                                  type="2RowTypeA"
-                                  top="예상 수익 금액"
-                                  topProps={{ color: colors.grey600 }}
-                                  bottom={`${formatAmount(expectedProfit)}원`}
-                                  bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                                />
-                              }
-                            />
-                            <ListRow
-                              contents={
-                                <ListRow.Texts
-                                  type="2RowTypeA"
-                                  top="목표 금액과의 차이"
-                                  topProps={{ color: colors.grey600 }}
-                                  bottom={`${formatAmount(differenceProfit)}원`}
-                                  bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                                />
-                              }
-                            />
-                            <ListRow
-                              contents={
-                                <ListRow.Texts
-                                  type="2RowTypeA"
-                                  top="추천 월 납입 금액"
-                                  topProps={{ color: colors.grey600 }}
-                                  bottom={`${formatAmount(recommendedMonthlyAmount)}원`}
-                                  bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                                />
-                              }
-                            />
+                            <LabelValueRow label="예상 수익 금액" value={expectedProfit} />
+                            <LabelValueRow label="목표 금액과의 차이" value={differenceProfit} />
+                            <LabelValueRow label="추천 월 납입 금액" value={recommendedMonthlyAmount} />
                             <Spacing size={8} />
                             <Border height={16} />
                             <Spacing size={8} />
-
                             <ListHeader
                               title={
                                 <ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>
