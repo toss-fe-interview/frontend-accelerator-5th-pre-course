@@ -1,17 +1,19 @@
 import ErrorBoundary from 'common/components/ErrorBoundary';
-import MonthlyPaymentInput from 'product/components/MonthlyPaymentInput';
-import PriceInput from 'product/components/PriceInput';
 import ResultSection from 'product/components/ResultSection';
 import TermSelectBottomSheet from 'product/components/TermSelectBottomSheet';
 import { Suspense, useState } from 'react';
-import { Border, NavigationBar, Spacing } from 'tosslib';
+import { Border, NavigationBar, Spacing, TextField } from 'tosslib';
 
 const validateIsNumberWithComma = (value: string) => {
-  return /^[\d,]*$/.test(value);
+  return /^(\d+,?)*\d*$/.test(value);
 };
 
-const formatNumberWithComma = (value: string) => {
-  return value.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const formatWithThousandComma = (value: string) => {
+  if (value === '') {
+    return '';
+  }
+
+  return Number(value.replace(/,/g, '')).toLocaleString();
 };
 
 export function SavingsCalculatorPage() {
@@ -25,32 +27,46 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <PriceInput
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
         value={price}
-        onChange={value => {
+        onChange={e => {
+          const value = e.target.value;
+
           if (!validateIsNumberWithComma(value)) {
             return;
           }
 
-          const formattedValue = formatNumberWithComma(value);
+          const formattedValue = formatWithThousandComma(value);
 
           setPrice(formattedValue);
         }}
       />
+
       <Spacing size={16} />
-      <MonthlyPaymentInput
+
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
         value={monthlyPayment}
-        onChange={value => {
+        onChange={e => {
+          const value = e.target.value;
+
           if (!validateIsNumberWithComma(value)) {
             return;
           }
 
-          const formattedValue = formatNumberWithComma(value);
+          const formattedValue = formatWithThousandComma(value);
 
           setMonthlyPayment(formattedValue);
         }}
       />
+
       <Spacing size={16} />
+
       <TermSelectBottomSheet
         value={term}
         onChange={value => {
