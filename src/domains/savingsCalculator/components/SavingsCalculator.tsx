@@ -1,4 +1,4 @@
-import { round1000, toInterestMultiplier } from '../utils/calculate';
+import { round1000 } from '../utils/calculate';
 
 interface SavingsCalculatorInputs {
   targetAmount: number;
@@ -21,7 +21,10 @@ export const savingsCalculator = ({ targetAmount, monthlyPayment, term }: Saving
   return {
     toExpectedProfit(annualRate: number) {
       const totalUserPayment = monthlyPayment * term;
-      return totalUserPayment * toInterestMultiplier(annualRate);
+      const averageInterestRate = annualRate * 0.5;
+      const interestMultiplier = averageInterestRate + 1;
+
+      return totalUserPayment * interestMultiplier;
     },
     toDiffFromTargetAmount(annualRate: number) {
       return targetAmount - this.toExpectedProfit(annualRate); // 목표 금액과 예상 수익간 차이
