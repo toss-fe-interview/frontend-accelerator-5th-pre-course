@@ -15,11 +15,7 @@ export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
-  const {
-    data: products = [],
-    isLoading,
-    isError,
-  } = useQuery(savingsProductQueryOptions());
+  const { data: products = [] } = useQuery(savingsProductQueryOptions());
 
   const { control, watch } = useForm<SavingsFormInput>({
     defaultValues: {
@@ -44,17 +40,14 @@ export function SavingsCalculatorPage() {
     terms,
     annualRate: selectedProduct?.annualRate ?? 0,
   });
-  
-  const isSelectedProductVisible = filteredProducts.some(
-    product => product.id === selectedProductId
-  );
-  
+
+  const isSelectedProductVisible = filteredProducts.some(product => product.id === selectedProductId);
+
   useEffect(() => {
     if (selectedProductId && !isSelectedProductVisible) {
       setSelectedProductId(null);
     }
-  }, [filteredProducts, selectedProductId]);
-
+  }, [selectedProductId, isSelectedProductVisible]);
 
   return (
     <>
@@ -119,11 +112,7 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
       {selectedTab === 'productList' ? (
-        isLoading ? (
-          <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중입니다..." />} />
-        ) : isError ? (
-          <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중에 오류가 발생했습니다." />} />
-        ) : filteredProducts.length === 0 ? (
+        filteredProducts.length === 0 ? (
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />
         ) : (
           filteredProducts.map(product => (
@@ -151,11 +140,7 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
           {recommendedProducts.map(product => (
-            <SavingProductItem
-              key={product.id}
-              product={product}
-              isSelected={product.id === selectedProductId}
-            />
+            <SavingProductItem key={product.id} product={product} isSelected={product.id === selectedProductId} />
           ))}
 
           <Spacing size={40} />
