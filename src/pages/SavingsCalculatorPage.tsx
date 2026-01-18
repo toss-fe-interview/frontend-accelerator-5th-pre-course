@@ -6,7 +6,7 @@ import { savingsProductsQueryOptions } from 'features/savings/hooks/quries/savin
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
 import { calculateSavingsResults } from 'features/savings/utils/calculation/savings';
-import { filterSavings, recommendSavings } from 'features/savings/utils/savingsRules';
+import { isMatchedProduct, recommendSavings } from 'features/savings/utils/savingsRules';
 import { useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
 import ProductItem from 'features/savings/components/ProductItem';
@@ -24,10 +24,9 @@ export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<SavingsTabs>('products');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQueryOptions);
-  const filteredSavingsProducts = filterSavings(savingsProducts, {
-    monthlyPaymentAmount: savingsValues.monthlyPaymentAmount,
-    savingsPeriod: savingsValues.savingsPeriod,
-  });
+  const filteredSavingsProducts = savingsProducts.filter(product =>
+    isMatchedProduct(product, savingsValues.monthlyPaymentAmount, savingsValues.savingsPeriod)
+  );
 
   const selectedProduct = filteredSavingsProducts.find(product => product.id === selectedProductId);
 
