@@ -27,11 +27,10 @@ export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<SavingsTabs>('products');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQueryOptions);
-  const filteredSavingsProducts = filterSavings(
-    savingsProducts,
-    savingsValues.monthlyPaymentAmount,
-    savingsValues.savingsPeriod
-  );
+  const filteredSavingsProducts = filterSavings(savingsProducts, {
+    monthlyPaymentAmount: savingsValues.monthlyPaymentAmount,
+    savingsPeriod: savingsValues.savingsPeriod,
+  });
 
   const selectedProduct = filteredSavingsProducts.find(product => product.id === selectedProductId);
 
