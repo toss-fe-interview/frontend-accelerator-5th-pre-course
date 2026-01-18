@@ -32,15 +32,6 @@ export function SavingsCalculatorPage() {
   const monthlyAmount = searchParams.get('monthlyAmount') || '';
   const period = Number(searchParams.get('period')) || 0;
 
-  const expectedProfit = calcExpectProfit({ selectedProduct, monthlyAmount, period });
-  const differentAmount = calcDiffAmount({ goalAmount: numericFormatter(goalAmount), expectedProfit });
-  const recommendAmountForMonth = calcRecommendAmountForMonth({ selectedProduct, goalAmount, period });
-
-  const matchedProducts = getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period });
-  const recommendedProducts = getRecommendedProduct({
-    product: [...matchedProducts],
-    options: { offset: 0, limit: 2 },
-  });
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -92,12 +83,15 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
       {currentTab === TABS.PRODUCTS &&
-        (matchedProducts.length === 0 ? savingsProducts : matchedProducts).map(product => {
+        (getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period }).length === 0
+          ? savingsProducts
+          : getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period })
+        ).map(savingProduct => {
           return (
             <SavingsProductItem
-              key={product.id}
-              product={product}
-              isSelected={product.id === selectedProduct?.id}
+              key={savingProduct.id}
+              product={savingProduct}
+              isSelected={savingProduct.id === selectedProduct?.id}
               onSelect={setSelectedProduct}
             />
           );
@@ -108,9 +102,33 @@ export function SavingsCalculatorPage() {
           {selectedProduct ? (
             <>
               <Spacing size={8} />
-              <ListRow contents={<ResultRow subject="목표 금액" amount={expectedProfit} />} />
-              <ListRow contents={<ResultRow subject="목표 금액과의 차이" amount={differentAmount} />} />
-              <ListRow contents={<ResultRow subject="추천 월 납입 금액" amount={recommendAmountForMonth} />} />
+              <ListRow
+                contents={
+                  <ResultRow
+                    subject="목표 금액"
+                    amount={calcExpectProfit({ selectedProduct, monthlyAmount, period })}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ResultRow
+                    subject="목표 금액과의 차이"
+                    amount={calcDiffAmount({
+                      goalAmount: numericFormatter(goalAmount),
+                      expectedProfit: calcExpectProfit({ selectedProduct, monthlyAmount, period }),
+                    })}
+                  />
+                }
+              />
+              <ListRow
+                contents={
+                  <ResultRow
+                    subject="추천 월 납입 금액"
+                    amount={calcRecommendAmountForMonth({ selectedProduct, goalAmount, period })}
+                  />
+                }
+              />
             </>
           ) : (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
@@ -122,9 +140,16 @@ export function SavingsCalculatorPage() {
 
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
-          {recommendedProducts.map(product => {
+          {getRecommendedProduct({
+            product: [...getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period })],
+            options: { offset: 0, limit: 2 },
+          }).map(recommendedProduct => {
             return (
-              <SavingsProductItem key={product.id} product={product} isSelected={product.id === selectedProduct?.id} />
+              <SavingsProductItem
+                key={recommendedProduct.id}
+                product={recommendedProduct}
+                isSelected={recommendedProduct.id === selectedProduct?.id}
+              />
             );
           })}
 
