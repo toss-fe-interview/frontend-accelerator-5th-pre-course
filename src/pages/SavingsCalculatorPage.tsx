@@ -38,7 +38,17 @@ export function SavingsCalculatorPage() {
         onChange={setMonthlyPayment}
       />
       <Spacing size={16} />
-      <TermSelect label="저축 기간" prompt="저축 기간을 선택해주세요" value={term} onChange={setTerm} />
+      <TermSelect
+        label="저축 기간"
+        prompt="저축 기간을 선택해주세요"
+        value={term}
+        onChange={setTerm}
+        options={[
+          { value: 6, label: '6개월' },
+          { value: 12, label: '12개월' },
+          { value: 24, label: '24개월' },
+        ]}
+      />
 
       <Spacing size={24} />
       <Border height={16} />
