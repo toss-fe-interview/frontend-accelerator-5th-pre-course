@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import CalculationResult from 'domains/savingsCalculator/components/CalculationResult';
 import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
-import { getRecommendedProducts, rangeIn } from 'domains/savingsCalculator/utils/filter';
+import { getRecommendedProducts, validatorSavingsProduct } from 'domains/savingsCalculator/utils/filter';
 import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
 
 import SavingsQuery from 'shared/query/saving';
@@ -27,23 +27,16 @@ export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProductType | null>(null);
   const [activeTabId, setActiveTabId] = useState<'products' | 'results'>('products');
 
-  const validateMatchedProduct = (product: SavingsProductType) => {
-    const 저축_기간이_일치함 = product.availableTerms === term;
-    const 월_납입한도_내에_있음 = rangeIn(monthlyPayment, {
-      min: product.minMonthlyAmount,
-      max: product.maxMonthlyAmount,
-    });
-
-    return 저축_기간이_일치함 && 월_납입한도_내에_있음;
-  };
-
-  const { data: matchedProducts = [] } = useQuery(
+  const { data: matchedSavingsProducts = [] } = useQuery(
     SavingsQuery.getSavingsProducts({
-      select: data => data.filter(validateMatchedProduct),
+      select: data =>
+        data
+          .filter(product => validatorSavingsProduct(product).isSameTerm(term))
+          .filter(product => validatorSavingsProduct(product).isInMonthlyPaymentRange(monthlyPayment)),
     })
   );
 
-  const hasNoMatchedProducts = matchedProducts.length === 0;
+  const hasNoMatchedProducts = matchedSavingsProducts.length === 0;
 
   return (
     <>
@@ -106,7 +99,7 @@ export function SavingsCalculatorPage() {
           {hasNoMatchedProducts ? (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
           ) : (
-            matchedProducts.map(product => {
+            matchedSavingsProducts.map(product => {
               const isSelected = selectedProduct?.id === product.id;
 
               return (
@@ -167,7 +160,7 @@ export function SavingsCalculatorPage() {
           {hasNoMatchedProducts ? (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
           ) : (
-            getRecommendedProducts(matchedProducts).map(product => {
+            getRecommendedProducts(matchedSavingsProducts).map(product => {
               const isSelected = selectedProduct?.id === product.id;
 
               return (

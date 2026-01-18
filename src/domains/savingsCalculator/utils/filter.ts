@@ -16,3 +16,15 @@ export const sortByAnnualRateDesc = (a: SavingsProductType, b: SavingsProductTyp
 export const getRecommendedProducts = (products: SavingsProductType[]) => {
   return products.sort(sortByAnnualRateDesc).slice(0, 2);
 };
+
+export const validatorSavingsProduct = (product: SavingsProductType) => {
+  return {
+    isSameTerm: (userTerm: number) => product.availableTerms === userTerm,
+    isInMonthlyPaymentRange: (userMonthlyPayment: number) => {
+      return rangeIn(userMonthlyPayment, {
+        min: product.minMonthlyAmount,
+        max: product.maxMonthlyAmount,
+      });
+    },
+  };
+};
