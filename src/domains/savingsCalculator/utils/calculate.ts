@@ -24,7 +24,8 @@ const savingsCalculator = ({ targetAmount, monthlyPayment, term }: CalculatorInp
       return targetAmount - this.toExpectedProfit(annualRate); // 목표 금액과 예상 수익간 차이
     },
     toRecommendedMonthlyPayment(annualRate: number) {
-      return round1000(targetAmount / (term * toInterestMultiplier(annualRate)));
+      const expectedProfitPerMonthlyPayment = this.toExpectedProfit(annualRate) / monthlyPayment;
+      return round1000(targetAmount / expectedProfitPerMonthlyPayment);
     },
   };
 };
