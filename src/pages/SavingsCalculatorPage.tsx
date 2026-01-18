@@ -1,7 +1,7 @@
 import AmountInput from 'components/AmountInput';
 import { useState } from 'react';
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
-import { SavingsProduct, Term } from 'savingsCalculator/types';
+import { Assets, Border, colors, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { SavingsProduct as SavingsProductType, Term } from 'savingsCalculator/types';
 
 import TermSelect from 'savingsCalculator/TermSelect';
 import SavingsProductList from 'savingsCalculator/SavingsProductList';
@@ -13,7 +13,7 @@ export function SavingsCalculatorPage() {
   const [monthlyPayment, setMonthlyPayment] = useState<number>(0);
   const [term, setTerm] = useState<Term>(12);
 
-  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
+  const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProductType | null>(null);
 
   const [selectedTab, setSelectedTab] = useState<'products' | 'results'>('products');
 
@@ -66,13 +66,17 @@ export function SavingsCalculatorPage() {
       {selectedTab === 'products' && (
         <SavingsProductList
           filter={{ monthlyPayment, term }}
-          renderListItem={product => (
-            <SavingsProductList.Item
-              savingsProduct={product}
-              isSelected={selectedSavingsProduct?.id === product.id}
-              onSelect={setSelectedSavingsProduct}
-            />
-          )}
+          renderListItem={savingsProduct => {
+            const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
+            return (
+              <ListRow
+                key={savingsProduct.id}
+                contents={<SavingsProduct savingsProduct={savingsProduct} />}
+                right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
+                onClick={() => setSelectedSavingsProduct(savingsProduct)}
+              />
+            );
+          }}
         />
       )}
 
@@ -107,12 +111,16 @@ export function SavingsCalculatorPage() {
 
           <RecommendedSavingsProductList
             filter={{ monthlyPayment, term }}
-            renderListItem={product => (
-              <RecommendedSavingsProductList.Item
-                savingsProduct={product}
-                isSelected={selectedSavingsProduct?.id === product.id}
-              />
-            )}
+            renderListItem={savingsProduct => {
+              const isSelected = selectedSavingsProduct?.id === savingsProduct.id;
+              return (
+                <ListRow
+                  key={savingsProduct.id}
+                  contents={<SavingsProduct savingsProduct={savingsProduct} />}
+                  right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
+                />
+              );
+            }}
           />
 
           <Spacing size={40} />
@@ -133,3 +141,17 @@ const 목표_금액과의_차이_계산하기 = (targetAmount: number, expectedI
 const 추천_월_납입_금액_계산하기 = (targetAmount: number, term: number, annualRate: number) => {
   return Math.round(targetAmount / term / (1 + annualRate * 0.5));
 };
+
+function SavingsProduct({ savingsProduct }: { savingsProduct: SavingsProductType }) {
+  return (
+    <ListRow.Texts
+      type="3RowTypeA"
+      top={savingsProduct.name}
+      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
+      middle={`연 이자율: ${savingsProduct.annualRate}%`}
+      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
+      bottom={`${savingsProduct.minMonthlyAmount.toLocaleString('ko-KR')}원 ~ ${savingsProduct.maxMonthlyAmount.toLocaleString('ko-KR')}원 | ${savingsProduct.availableTerms}개월`}
+      bottomProps={{ fontSize: 13, color: colors.grey600 }}
+    />
+  );
+}
