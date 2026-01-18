@@ -1,18 +1,17 @@
 import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 
 import CalculationResult from 'domains/savingsCalculator/components/CalculationResult';
 import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
 import { getRecommendedProducts, validatorSavingsProduct } from 'domains/savingsCalculator/utils/filter';
 
-import SavingsQuery from 'shared/query/saving';
 import IconCheckCircle from 'shared/components/Icon/IconCheckCircle';
 import { SavingsProductType } from 'shared/types/api/savings';
 import CurrencyInput from 'domains/savingsCalculator/components/form/CurrencyInput';
 import Select from 'domains/savingsCalculator/components/form/Select';
 import { SAVINGS_PRODUCT_TABS } from 'domains/savingsCalculator/constants/savings';
 import SavingsCalculator from 'domains/savingsCalculator/components/SavingsCalculator';
+import GetSavingsProducts from 'domains/savingsCalculator/components/api/GetSavingsProductst';
 
 type SavingsProductTabId = (typeof SAVINGS_PRODUCT_TABS)[keyof typeof SAVINGS_PRODUCT_TABS];
 
@@ -30,16 +29,11 @@ export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProductType | null>(null);
   const [activeTabId, setActiveTabId] = useState<SavingsProductTabId>(SAVINGS_PRODUCT_TABS.PRODUCTS);
 
-  const { data: matchedSavingsProducts = [] } = useQuery(
-    SavingsQuery.getSavingsProducts({
-      select: data =>
-        data
-          .filter(product => validatorSavingsProduct(product).isSameTerm(term))
-          .filter(product => validatorSavingsProduct(product).isInMonthlyPaymentRange(monthlyPayment)),
-    })
-  );
-
-  const hasNoMatchedProducts = matchedSavingsProducts.length === 0;
+  const getValidSavingsProducts = (products: SavingsProductType[]) => {
+    return products
+      .filter(product => validatorSavingsProduct(product).isSameTerm(term))
+      .filter(product => validatorSavingsProduct(product).isInMonthlyPaymentRange(monthlyPayment));
+  };
 
   return (
     <>
@@ -86,25 +80,16 @@ export function SavingsCalculatorPage() {
       </Tab>
 
       {activeTabId === SAVINGS_PRODUCT_TABS.PRODUCTS && (
-        <>
-          {/* 본질이 뭘까? 
-               - 목표금액, 월 납입액, 저축기간에 따라서 필터링 조건에 맞는 적금 상품을 보여준다. 
-               - 사용자 입력이 없으면 ? 보여주지 않는다 or 모두 보여준다 
-                - 모두 보여준다
-                   -> Case 1) 적금 상품을 선택 가능  -> 계산 결과에 어떻게 보여줄지 결정 & 사용자의 제품 흐름이 입력보다 적금 상품을 선택하는 것부터 시작할 수 있음 
-                   -> Case 2) 적금 상품을 선택 불가능 -> 추가 방어 처리 필요
-                   => 고려할 사항이 늘어남 (x)
-                - 보여주지 않는다 
-                   -> 사용자가 입력부터 시작하게 강제하여 자연스럽게 제품이 의도한 방향으로 흘러갈 수 있음 (o)
-                   -> 보여줄 상품이 없다는 건 == 조건에 맞는 상품이 없다는 것 (hasNoMatchingProducts)
-                   -> 보여줄 상품들 === 조건에 맞는 상품들 (matchingProducts)
-          */}
-          {hasNoMatchedProducts ? (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
-          ) : (
-            matchedSavingsProducts.map(product => {
-              const isSelected = selectedProduct?.id === product.id;
+        <GetSavingsProducts queryOptions={{ select: getValidSavingsProducts }}>
+          {matchedSavingsProducts => {
+            const hasNoMatchedProducts = matchedSavingsProducts.length === 0;
 
+            if (hasNoMatchedProducts) {
+              return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />;
+            }
+
+            return matchedSavingsProducts.map(product => {
+              const isSelected = selectedProduct?.id === product.id;
               return (
                 <ListRow
                   key={product.id}
@@ -113,9 +98,9 @@ export function SavingsCalculatorPage() {
                   onClick={() => setSelectedProduct(product)}
                 />
               );
-            })
-          )}
-        </>
+            });
+          }}
+        </GetSavingsProducts>
       )}
 
       {activeTabId === SAVINGS_PRODUCT_TABS.RESULTS && (
@@ -162,21 +147,27 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {hasNoMatchedProducts ? (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />
-          ) : (
-            getRecommendedProducts(matchedSavingsProducts).map(product => {
-              const isSelected = selectedProduct?.id === product.id;
+          <GetSavingsProducts queryOptions={{ select: getValidSavingsProducts }}>
+            {savingsProducts => {
+              const recommendedSavingsProducts = getRecommendedProducts(savingsProducts);
+              const hasNoRecommendedProducts = recommendedSavingsProducts.length === 0;
 
-              return (
-                <ListRow
-                  key={product.id}
-                  contents={<SavingsProduct product={product} />}
-                  right={isSelected && <IconCheckCircle />}
-                />
-              );
-            })
-          )}
+              if (hasNoRecommendedProducts) {
+                return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없어요." />} />;
+              }
+
+              return recommendedSavingsProducts.map(product => {
+                const isSelected = selectedProduct?.id === product.id;
+                return (
+                  <ListRow
+                    key={product.id}
+                    contents={<SavingsProduct product={product} />}
+                    right={isSelected && <IconCheckCircle />}
+                  />
+                );
+              });
+            }}
+          </GetSavingsProducts>
         </>
       )}
     </>
