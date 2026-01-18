@@ -11,13 +11,18 @@ import {
 } from 'tosslib';
 import { useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { CalculationResults } from 'components/CalculationResults';
 import { ProductInfoTexts } from 'components/ProductInfoTexts';
+import { ResultRow } from 'components/ResultRow';
 import { SwitchCase } from 'components/common/SwitchCase';
 import { SavingsInput, SavingsProduct } from 'type';
 import { savingsProductsQuery } from 'apis/savingsProduct';
-import { formatMoney, extractDigits } from 'utils/money';
+import { formatMoney, formatDifference, extractDigits } from 'utils/money';
 import { isWithinAmountRange, matchesTerm } from 'utils/productFilter';
+import {
+  calculateExpectedAmount,
+  calculateGoalDifference,
+  calculateRecommendedMonthlyAmount,
+} from 'utils/savingsCalculator';
 import { RecommendedProductList } from 'components/RecommendedProductList';
 
 export function SavingsCalculatorPage() {
@@ -131,7 +136,41 @@ export function SavingsCalculatorPage() {
             noProduct: <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />,
             hasProduct: (
               <>
-                <CalculationResults selectedProduct={selectedSavingsProduct!} savingsInput={savingsInput} />
+                <ResultRow
+                  label="예상 수익 금액"
+                  displayValue={`${formatMoney(
+                    Math.round(
+                      calculateExpectedAmount({
+                        monthlyAmount: savingsInput.monthlyAmount,
+                        term: savingsInput.term,
+                        annualRate: selectedSavingsProduct!.annualRate,
+                      })
+                    )
+                  )}원`}
+                />
+                <ResultRow
+                  label="목표 금액과의 차이"
+                  displayValue={formatDifference(
+                    calculateGoalDifference({
+                      goalAmount: savingsInput.goalAmount,
+                      expectedAmount: calculateExpectedAmount({
+                        monthlyAmount: savingsInput.monthlyAmount,
+                        term: savingsInput.term,
+                        annualRate: selectedSavingsProduct!.annualRate,
+                      }),
+                    })
+                  )}
+                />
+                <ResultRow
+                  label="추천 월 납입 금액"
+                  displayValue={`${formatMoney(
+                    calculateRecommendedMonthlyAmount({
+                      goalAmount: savingsInput.goalAmount,
+                      term: savingsInput.term,
+                      annualRate: selectedSavingsProduct!.annualRate,
+                    })
+                  )}원`}
+                />
 
                 <Spacing size={8} />
                 <Border height={16} />
