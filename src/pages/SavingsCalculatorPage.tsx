@@ -81,8 +81,8 @@ export function SavingsCalculatorPage() {
                     {...getSavingsProductsQueryOptions()}
                     select={pipe(
                       filterByConditions<SavingsProduct>(
-                        (product: SavingsProduct) => isWithinAmountRange(product, monthlyAmount),
-                        (product: SavingsProduct) => hasMatchingTerm(product, savingsTerm)
+                        product => isWithinAmountRange(product, monthlyAmount),
+                        product => hasMatchingTerm(product, savingsTerm)
                       )
                     )}
                   >
@@ -110,8 +110,8 @@ export function SavingsCalculatorPage() {
                     {...getSavingsProductsQueryOptions()}
                     select={pipe(
                       filterByConditions<SavingsProduct>(
-                        (product: SavingsProduct) => isWithinAmountRange(product, monthlyAmount),
-                        (product: SavingsProduct) => hasMatchingTerm(product, savingsTerm)
+                        product => isWithinAmountRange(product, monthlyAmount),
+                        product => hasMatchingTerm(product, savingsTerm)
                       ),
                       sortByAnnualRate('desc'),
                       take(2)
