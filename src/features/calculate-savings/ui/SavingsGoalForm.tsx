@@ -1,7 +1,7 @@
 import { Controller, useForm } from 'react-hook-form';
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
 import { useEffect } from 'react';
-import { formatNumber } from 'shared/lib/format';
+import { formatPrice } from 'shared/lib/format';
 
 interface SavingsGoalFormData {
   targetAmount: number;
@@ -48,7 +48,7 @@ const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
             label="목표 금액"
             placeholder="목표 금액을 입력하세요"
             suffix="원"
-            value={field.value > 0 ? formatNumber(field.value) : ''}
+            value={field.value > 0 ? formatPrice(field.value) : ''}
             onChange={e => {
               const value = e.target.value.replace(/,/g, '');
               const numberValue = parseInt(value, 10);
@@ -67,7 +67,7 @@ const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
             label="월 납입액"
             placeholder="희망 월 납입액을 입력하세요"
             suffix="원"
-            value={field.value > 0 ? formatNumber(field.value) : ''}
+            value={field.value > 0 ? formatPrice(field.value) : ''}
             onChange={e => {
               const value = e.target.value.replace(/,/g, '');
               const numberValue = parseInt(value, 10);

@@ -1,9 +1,9 @@
-function formatNumber(value: number) {
-  return value.toLocaleString('ko-KR');
+function formatPrice(value: number, locale = 'ko-KR') {
+  return value.toLocaleString(locale);
 }
 
 function formatCurrency(value: number) {
-  return `${formatNumber(value)}원`;
+  return `${formatPrice(value)}원`;
 }
 
-export { formatNumber, formatCurrency };
+export { formatPrice, formatCurrency };
