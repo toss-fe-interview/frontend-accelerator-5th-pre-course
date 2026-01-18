@@ -15,10 +15,25 @@ import { SuspenseQuery } from '@suspensive/react-query';
 import { orderBy, take } from 'es-toolkit';
 import { AmountField } from 'components/AmountField';
 import { TermSelect } from 'components/TermSelect';
+import { SavingsProductListItem } from 'components/SavingsProductListItem';
 
 const isSelected = (current: 'products' | 'results', target: 'products' | 'results'): boolean => {
   return current === target;
 };
+
+function isWithinAmountRange(product: SavingsProduct, monthlyAmount: number | null): boolean {
+  if (monthlyAmount === null) {
+    return true;
+  }
+  return monthlyAmount >= product.minMonthlyAmount && monthlyAmount <= product.maxMonthlyAmount;
+}
+
+function hasMatchingTerm(product: SavingsProduct, savingsTerm: number | null): boolean {
+  if (savingsTerm === null) {
+    return true;
+  }
+  return savingsTerm === product.availableTerms;
+}
 
 export function SavingsCalculatorPage() {
   // 목표금액
@@ -82,30 +97,27 @@ export function SavingsCalculatorPage() {
             switch (currentTab) {
               case 'products':
                 return (
-                  <SuspenseQuery {...getSavingsProductsQueryOptions()}>
-                    {/* react query의 select 옵션도 써보기 */}
-                    {({ data: savingsProducts }) =>
-                      filterSavingsProducts({
-                        data: savingsProducts,
-                        filterOptions: { monthlyAmount, savingsTerm },
-                      }).map(product => (
-                        <ListRow
+                  <SuspenseQuery
+                    {...getSavingsProductsQueryOptions()}
+                    select={savingsProducts =>
+                      savingsProducts.filter(
+                        product => isWithinAmountRange(product, monthlyAmount) && hasMatchingTerm(product, savingsTerm)
+                      )
+                    }
+                  >
+                    {({ data: filteredSavingsProducts }) =>
+                      filteredSavingsProducts.map(product => (
+                        <SavingsProductListItem
                           key={product.id}
-                          contents={
-                            <ListRow.Texts
-                              type="3RowTypeA"
-                              top={product.name}
-                              topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                              middle={`연 이자율: ${product.annualRate}%`}
-                              middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                              bottom={`${formatAmount(product.minMonthlyAmount)}원 ~ ${formatAmount(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                              bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                            />
-                          }
-                          right={
-                            selectedProduct?.id === product.id ? <Assets.Icon name="icon-check-circle-green" /> : null
-                          }
-                          onClick={() => setSelectedProduct(product)}
+                          name={product.name}
+                          annualRate={product.annualRate}
+                          monthlyAmountRange={{
+                            min: product.minMonthlyAmount,
+                            max: product.maxMonthlyAmount,
+                          }}
+                          availableTerms={product.availableTerms}
+                          isSelected={selectedProduct?.id === product.id}
+                          onSelect={() => setSelectedProduct(product)}
                         />
                       ))
                     }
@@ -195,25 +207,17 @@ export function SavingsCalculatorPage() {
                               ),
                               2
                             ).map(product => (
-                              <ListRow
+                              <SavingsProductListItem
                                 key={product.id}
-                                contents={
-                                  <ListRow.Texts
-                                    type="3RowTypeA"
-                                    top={product.name}
-                                    topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                                    middle={`연 이자율: ${product.annualRate}%`}
-                                    middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                                    bottom={`${formatAmount(product.minMonthlyAmount)}원 ~ ${formatAmount(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                                    bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                                  />
-                                }
-                                right={
-                                  selectedProduct?.id === product.id ? (
-                                    <Assets.Icon name="icon-check-circle-green" />
-                                  ) : null
-                                }
-                                onClick={() => setSelectedProduct(product)}
+                                name={product.name}
+                                annualRate={product.annualRate}
+                                monthlyAmountRange={{
+                                  min: product.minMonthlyAmount,
+                                  max: product.maxMonthlyAmount,
+                                }}
+                                availableTerms={product.availableTerms}
+                                isSelected={selectedProduct?.id === product.id}
+                                onSelect={() => setSelectedProduct(product)}
                               />
                             ))}
 
