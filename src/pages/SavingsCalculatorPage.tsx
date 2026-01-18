@@ -2,20 +2,11 @@ import { useState, useMemo, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { getSavingsProducts } from 'api/savings';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Border,
-  ListRow,
-  NavigationBar,
-  Spacing,
-  Tab,
-  colors,
-  SelectBottomSheet,
-  ListHeader,
-} from 'tosslib';
+import { Border, ListRow, NavigationBar, Spacing, Tab, SelectBottomSheet, ListHeader } from 'tosslib';
 import { SavingsFormInput } from 'types/savings';
-import { formatNumber } from 'utils/format';
 import NumberInput from 'components/NumberInput';
 import SavingProductItem from 'components/SavingProductItem';
+import CalculateResultItem from 'components/CalculateResultItem';
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
@@ -72,8 +63,7 @@ export function SavingsCalculatorPage() {
     const annualRate = selectedProduct.annualRate;
     const expectedAmount = monthlyAmount * terms * (1 + annualRate * 0.01 * 0.5);
     const difference = targetAmount - expectedAmount;
-    const recommendMonthlyAmount =
-      Math.round(targetAmount / (terms * (1 + annualRate * 0.01 * 0.5)) / 1000) * 1000;
+    const recommendMonthlyAmount = Math.round(targetAmount / (terms * (1 + annualRate * 0.01 * 0.5)) / 1000) * 1000;
 
     return { expectedAmount, difference, recommendMonthlyAmount };
   }, [targetAmount, monthlyAmount, terms, selectedProduct]);
@@ -176,39 +166,9 @@ export function SavingsCalculatorPage() {
               <Spacing size={8} />
               {calculationResult && (
                 <>
-                  <ListRow
-                    contents={
-                      <ListRow.Texts
-                        type="2RowTypeA"
-                        top="예상 수익 금액"
-                        topProps={{ color: colors.grey600 }}
-                        bottom={`${formatNumber(Math.round(calculationResult.expectedAmount))}원`}
-                        bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                      />
-                    }
-                  />
-                  <ListRow
-                    contents={
-                      <ListRow.Texts
-                        type="2RowTypeA"
-                        top="목표 금액과의 차이"
-                        topProps={{ color: colors.grey600 }}
-                        bottom={`${formatNumber(Math.round(calculationResult.difference))}원`}
-                        bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                      />
-                    }
-                  />
-                  <ListRow
-                    contents={
-                      <ListRow.Texts
-                        type="2RowTypeA"
-                        top="추천 월 납입 금액"
-                        topProps={{ color: colors.grey600 }}
-                        bottom={`${formatNumber(calculationResult.recommendMonthlyAmount)}원`}
-                        bottomProps={{ fontWeight: 'bold', color: colors.blue600 }}
-                      />
-                    }
-                  />
+                  <CalculateResultItem label="예상 수익 금액" value={calculationResult.expectedAmount} />
+                  <CalculateResultItem label="목표 금액과의 차이" value={calculationResult.difference} />
+                  <CalculateResultItem label="추천 월 납입 금액" value={calculationResult.recommendMonthlyAmount} />
                 </>
               )}
 
@@ -221,11 +181,7 @@ export function SavingsCalculatorPage() {
               />
               <Spacing size={12} />
               {recommendedProducts.map(product => (
-                <SavingProductItem
-                  key={product.id}
-                  product={product}
-                  isSelected={product.id === selectedProductId}
-                />
+                <SavingProductItem key={product.id} product={product} isSelected={product.id === selectedProductId} />
               ))}
 
               <Spacing size={40} />
