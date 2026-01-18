@@ -11,12 +11,6 @@ import { colors, ListRow } from 'tosslib';
 
 type MissingField = 'product' | 'targetAmount' | 'monthlyAmount';
 
-const VALIDATION_MESSAGES: Record<MissingField, string> = {
-  product: '상품을 선택해주세요.',
-  targetAmount: '목표 금액을 입력해주세요.',
-  monthlyAmount: '월 납입액을 입력해주세요.',
-};
-
 interface CalculationParams {
   monthlyAmount: number;
   term: number;
@@ -34,6 +28,12 @@ interface ValidationInput {
 type NullableParamsValidationResult =
   | { isValid: false; missingField: MissingField }
   | { isValid: true; params: CalculationParams };
+
+const VALIDATION_MESSAGES: Record<MissingField, string> = {
+  product: '상품을 선택해주세요.',
+  targetAmount: '목표 금액을 입력해주세요.',
+  monthlyAmount: '월 납입액을 입력해주세요.',
+};
 
 function validateNullableParams({
   selectedProduct,
@@ -56,18 +56,18 @@ function validateNullableParams({
   };
 }
 
-export interface CalculationResultData {
+interface CalculationResultData {
   expectedRevenue: number;
   diffFromTarget: number;
   recommendedAmount: number;
 }
 
-export interface CalculationResultRenderProps {
+interface CalculationResultRenderProps {
   isValid: true;
   data: CalculationResultData;
 }
 
-export interface CalculationResultInvalidProps {
+interface CalculationResultInvalidProps {
   isValid: false;
   validationMessage: string;
 }
