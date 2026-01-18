@@ -14,10 +14,9 @@ interface CalculatorInput {
 }
 
 const savingsCalculator = ({ targetAmount, monthlyPayment, term }: CalculatorInput) => {
-  const totalUserPayment = monthlyPayment * term;
-
   return {
     toExpectedProfit(annualRate: number) {
+      const totalUserPayment = monthlyPayment * term;
       return totalUserPayment * toInterestMultiplier(annualRate);
     },
     toDiffFromTargetAmount(annualRate: number) {

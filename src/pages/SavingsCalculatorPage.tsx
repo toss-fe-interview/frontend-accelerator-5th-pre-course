@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import CalculationResult from 'domains/savingsCalculator/components/CalculationResult';
 import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
 import { getRecommendedProducts, validatorSavingsProduct } from 'domains/savingsCalculator/utils/filter';
-import { savingsCalculator } from 'domains/savingsCalculator/utils/calculate';
 
 import SavingsQuery from 'shared/query/saving';
 import IconCheckCircle from 'shared/components/Icon/IconCheckCircle';
@@ -13,6 +12,7 @@ import { SavingsProductType } from 'shared/types/api/savings';
 import CurrencyInput from 'domains/savingsCalculator/components/form/CurrencyInput';
 import Select from 'domains/savingsCalculator/components/form/Select';
 import { SAVINGS_PRODUCT_TABS } from 'domains/savingsCalculator/constants/savings';
+import SavingsCalculator from 'domains/savingsCalculator/components/SavingsCalculator';
 
 type SavingsProductTabId = (typeof SAVINGS_PRODUCT_TABS)[keyof typeof SAVINGS_PRODUCT_TABS];
 
@@ -40,12 +40,6 @@ export function SavingsCalculatorPage() {
   );
 
   const hasNoMatchedProducts = matchedSavingsProducts.length === 0;
-
-  const { toExpectedProfit, toDiffFromTargetAmount, toRecommendedMonthlyPayment } = savingsCalculator({
-    targetAmount,
-    monthlyPayment,
-    term,
-  });
 
   return (
     <>
@@ -115,7 +109,7 @@ export function SavingsCalculatorPage() {
                 <ListRow
                   key={product.id}
                   contents={<SavingsProduct product={product} />}
-                  right={isSelected ? <IconCheckCircle /> : undefined}
+                  right={isSelected && <IconCheckCircle />}
                   onClick={() => setSelectedProduct(product)}
                 />
               );
@@ -131,29 +125,34 @@ export function SavingsCalculatorPage() {
           {!selectedProduct ? (
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
           ) : (
-            <>
-              <ListRow
-                contents={
-                  <CalculationResult label="예상 수익 금액" value={toExpectedProfit(selectedProduct.annualRate)} />
-                }
-              />
-              <ListRow
-                contents={
-                  <CalculationResult
-                    label="목표 금액과의 차이"
-                    value={toDiffFromTargetAmount(selectedProduct.annualRate)}
+            <SavingsCalculator
+              inputs={{ targetAmount, monthlyPayment, term }}
+              ouptuts={({ toExpectedProfit, toDiffFromTargetAmount, toRecommendedMonthlyPayment }) => (
+                <>
+                  <ListRow
+                    contents={
+                      <CalculationResult label="예상 수익 금액" value={toExpectedProfit(selectedProduct.annualRate)} />
+                    }
                   />
-                }
-              />
-              <ListRow
-                contents={
-                  <CalculationResult
-                    label="추천 월 납입 금액"
-                    value={toRecommendedMonthlyPayment(selectedProduct.annualRate)}
+                  <ListRow
+                    contents={
+                      <CalculationResult
+                        label="목표 금액과의 차이"
+                        value={toDiffFromTargetAmount(selectedProduct.annualRate)}
+                      />
+                    }
                   />
-                }
-              />
-            </>
+                  <ListRow
+                    contents={
+                      <CalculationResult
+                        label="추천 월 납입 금액"
+                        value={toRecommendedMonthlyPayment(selectedProduct.annualRate)}
+                      />
+                    }
+                  />
+                </>
+              )}
+            />
           )}
 
           <Spacing size={8} />
@@ -173,7 +172,7 @@ export function SavingsCalculatorPage() {
                 <ListRow
                   key={product.id}
                   contents={<SavingsProduct product={product} />}
-                  right={isSelected ? <IconCheckCircle /> : undefined}
+                  right={isSelected && <IconCheckCircle />}
                 />
               );
             })
