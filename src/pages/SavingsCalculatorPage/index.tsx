@@ -6,16 +6,15 @@ import {
   calculateExpectedProfit,
   calculateRecommendedMonthlyAmount,
 } from 'features/calculate-savings/lib/calculate-savings';
-import CalculationResult from 'features/calculate-savings/ui/CalculationResult';
 import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
-import RecommendedProducts from 'features/recommend-products/ui/RecommendedProducts';
 import { savingsProductsQueryOptions } from 'features/savings-product/api/useSavingsProducts';
 import { parseAsInteger, useQueryStates } from 'nuqs';
 import { useState } from 'react';
 import { descending, inRange, isEqual } from 'shared/lib/compare';
 import AsyncBoundary from 'shared/ui/AsyncBoundary';
-import { Border, NavigationBar, Spacing, Tab, ListRow } from 'tosslib';
+import { Border, NavigationBar, Spacing, Tab, ListRow, ListHeader } from 'tosslib';
 import { DEFAULT_TERM_MONTHS, RECOMMENDED_PRODUCTS_COUNT, TAB_VALUES, TabValue } from './model/constants';
+import CalculationResultItem from 'features/calculate-savings/ui/CalculationResultItem';
 
 export function SavingsCalculatorPage() {
   const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
@@ -76,7 +75,7 @@ export function SavingsCalculatorPage() {
                       key={product.id}
                       product={product}
                       selected={selectedProduct?.id === product.id}
-                      onClick={() => setSelectedProduct(product)}
+                      onSelect={() => setSelectedProduct(product)}
                     />
                   ))}
 
@@ -98,15 +97,32 @@ export function SavingsCalculatorPage() {
 
                         return (
                           <>
-                            <CalculationResult
-                              expectedProfit={expectedProfit}
-                              difference={difference}
-                              recommendedMonthlyAmount={recommendedMonthlyAmount}
+                            <Spacing size={8} />
+
+                            <CalculationResultItem label="예상 수익 금액" value={expectedProfit} />
+                            <CalculationResultItem label="목표 금액과의 차이" value={difference} />
+                            <CalculationResultItem label="추천 월 납입 금액" value={recommendedMonthlyAmount} />
+
+                            <Spacing size={8} />
+                            <Border height={16} />
+                            <Spacing size={8} />
+
+                            <ListHeader
+                              title={
+                                <ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>
+                              }
                             />
-                            <RecommendedProducts
-                              products={recommendedProducts}
-                              selectedProductId={selectedProduct.id}
-                            />
+                            <Spacing size={12} />
+
+                            {recommendedProducts.map(product => (
+                              <SavingsProductItem
+                                key={product.id}
+                                product={product}
+                                selected={selectedProduct.id === product.id}
+                              />
+                            ))}
+
+                            <Spacing size={40} />
                           </>
                         );
                       })()

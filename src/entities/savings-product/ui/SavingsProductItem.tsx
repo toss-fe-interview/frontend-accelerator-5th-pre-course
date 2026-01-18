@@ -5,10 +5,10 @@ import { formatCurrency } from 'shared/lib/format';
 interface SavingsProductItemProps {
   product: SavingsProduct;
   selected: boolean;
-  onClick: () => void;
+  onSelect?: () => void;
 }
 
-const SavingsProductItem = ({ product, selected, onClick }: SavingsProductItemProps) => {
+const SavingsProductItem = ({ product, selected, onSelect }: SavingsProductItemProps) => {
   return (
     <ListRow
       contents={
@@ -23,7 +23,7 @@ const SavingsProductItem = ({ product, selected, onClick }: SavingsProductItemPr
         />
       }
       right={selected ? <Assets.Icon name="icon-check-circle-green" /> : null}
-      onClick={onClick}
+      onClick={onSelect}
     />
   );
 };
