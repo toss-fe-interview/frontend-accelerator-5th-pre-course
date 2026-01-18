@@ -13,7 +13,9 @@ export function useSavingsProducts() {
         const data = await http.get<SavingsProduct[]>('/api/savings-products');
         setProducts(data);
       } catch (e) {
-        setError(e as Error);
+        if (e instanceof Error) {
+          setError(e);
+        }
       } finally {
         setIsLoading(false);
       }
