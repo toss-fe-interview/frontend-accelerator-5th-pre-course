@@ -4,7 +4,7 @@ interface SelectProps<T> {
   label: string;
   title: string;
   selectedValue: T;
-  options: { value: T; label: string }[];
+  options: Array<{ value: T; label: string }>;
   onChange: (value: T) => void;
 }
 
