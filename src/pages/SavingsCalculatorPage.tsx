@@ -8,9 +8,10 @@ import {
   calcDiffAmount,
   calcExpectProfit,
   calcRecommendAmountForMonth,
-  getMatchingSavingsProducts,
-  getRecommendedProduct,
+  getMatchedSavingsProducts,
   handleAmountChange,
+  slicer,
+  sortByRate,
 } from 'features/savings/utils/savings';
 import { useSetQueryParams } from 'hooks/useSetQueryParams';
 import { useTab } from 'hooks/useTab';
@@ -18,8 +19,9 @@ import { useTab } from 'hooks/useTab';
 import { useState } from 'react';
 import { SavingsProduct } from 'model/types';
 
-import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
+import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab, TextField } from 'tosslib';
 import { numericFormatter } from 'utils/number';
+import SelectSavingsPeriodBottomSheet from 'features/savings/components/SelectSavingsPeriodBottomSheet';
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
@@ -43,7 +45,10 @@ export function SavingsCalculatorPage() {
         suffix="원"
         value={goalAmount}
         onChange={e => {
-          handleAmountChange(e, value => setQueryParams('goalAmount', value));
+          handleAmountChange(e, value => {
+            setQueryParams('goalAmount', value);
+            setSelectedProduct(null);
+          });
         }}
       />
       <Spacing size={16} />
@@ -53,22 +58,21 @@ export function SavingsCalculatorPage() {
         suffix="원"
         value={monthlyAmount}
         onChange={e => {
-          handleAmountChange(e, value => setQueryParams('monthlyAmount', value));
+          handleAmountChange(e, value => {
+            setQueryParams('monthlyAmount', value);
+            setSelectedProduct(null);
+          });
         }}
       />
       <Spacing size={16} />
-      <SelectBottomSheet
+      <SelectSavingsPeriodBottomSheet
         label="저축 기간"
-        title="저축 기간을 선택해주세요"
-        value={period}
+        period={period}
         onChange={value => {
           setQueryParams('period', value.toString());
+          setSelectedProduct(null);
         }}
-      >
-        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
-      </SelectBottomSheet>
+      />
 
       <Spacing size={24} />
       <Border height={16} />
@@ -83,9 +87,9 @@ export function SavingsCalculatorPage() {
         </Tab.Item>
       </Tab>
       {currentTab === TABS.PRODUCTS &&
-        (getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period }).length === 0
+        (getMatchedSavingsProducts({ savingsProducts, monthlyAmount, period }).length === 0
           ? savingsProducts
-          : getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period })
+          : getMatchedSavingsProducts({ savingsProducts, monthlyAmount, period })
         ).map(savingProduct => {
           return (
             <SavingsProductItem
@@ -140,9 +144,9 @@ export function SavingsCalculatorPage() {
 
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
-          {getRecommendedProduct({
-            product: [...getMatchingSavingsProducts({ savingsProducts, monthlyAmount, period })],
-            options: { offset: 0, limit: 2 },
+          {slicer(sortByRate([...getMatchedSavingsProducts({ savingsProducts, monthlyAmount, period })], 'desc'), {
+            offset: 0,
+            limit: 2,
           }).map(recommendedProduct => {
             return (
               <SavingsProductItem

@@ -17,7 +17,7 @@ export const calcExpectProfit = ({
     : 0;
 };
 
-export const getMatchingSavingsProducts = ({
+export const getMatchedSavingsProducts = ({
   savingsProducts,
   monthlyAmount,
   period,
@@ -61,16 +61,18 @@ export const sortByRate = <T extends { annualRate: number }>(base: T[], order: '
     return [...base].sort((a, b) => a.annualRate - b.annualRate);
   }
 };
+export const slicer = <T>(list: T[], { offset, limit }: { offset: number; limit: number }) => {
+  return list.slice(offset, limit);
+};
 
 export const getRecommendedProduct = ({
-  product,
-  options,
+  sortBy,
+  filter,
 }: {
-  product: SavingsProduct[];
-  options: { offset: number; limit: number };
+  sortBy: SavingsProduct[];
+  filter: { offset: number; limit: number };
 }) => {
-  const sorted = sortByRate([...product], 'desc');
-  return sorted.slice(options.offset, options.limit);
+  return sortBy.slice(filter.offset, filter.limit);
 };
 
 export const handleAmountChange = (e: ChangeEvent<HTMLInputElement>, onChange: (value: string) => void) => {
