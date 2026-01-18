@@ -18,20 +18,28 @@ interface SavingsCalculatorProps {
 }
 
 export const savingsCalculator = ({ targetAmount, monthlyPayment, term }: SavingsCalculatorInputs) => {
-  return {
-    toExpectedProfit(annualRate: number) {
-      const totalUserPayment = monthlyPayment * term;
-      const averageInterestRate = annualRate * 0.5;
-      const interestMultiplier = averageInterestRate + 1;
+  const 목표금액 = targetAmount;
+  const 월_납입금액 = monthlyPayment;
+  const 저축기간 = term;
 
-      return totalUserPayment * interestMultiplier;
+  return {
+    toExpectedProfit(연이율: number) {
+      const 총_납입금액 = 월_납입금액 * 저축기간;
+      const 평균이자율 = 연이율 * 0.5;
+      const 이자율계수 = 평균이자율 + 1;
+
+      return 총_납입금액 * 이자율계수;
     },
-    toDiffFromTargetAmount(annualRate: number) {
-      return targetAmount - this.toExpectedProfit(annualRate); // 목표 금액과 예상 수익간 차이
+    toDiffFromTargetAmount(연이율: number) {
+      const 총_예상수익 = this.toExpectedProfit(연이율);
+
+      return 목표금액 - 총_예상수익;
     },
-    toRecommendedMonthlyPayment(annualRate: number) {
-      const expectedProfitPerMonthlyPayment = this.toExpectedProfit(annualRate) / monthlyPayment;
-      return round1000(targetAmount / expectedProfitPerMonthlyPayment);
+    toRecommendedMonthlyPayment(연이율: number) {
+      const 총_예상수익 = this.toExpectedProfit(연이율);
+      const 월_납입금액당_예상수익 = 총_예상수익 / 월_납입금액;
+
+      return round1000(목표금액 / 월_납입금액당_예상수익);
     },
   };
 };
