@@ -5,12 +5,12 @@ export const isSavingsProductMatched = (
   monthlyPaymentAmount: number,
   savingsPeriod: number
 ) => {
-  const isMonthlyAmountValid =
+  const isMonthlyAmountMatched =
     savingsProduct.minMonthlyAmount <= monthlyPaymentAmount && monthlyPaymentAmount <= savingsProduct.maxMonthlyAmount;
 
-  const isPeriodValid = savingsProduct.availableTerms === savingsPeriod;
+  const isPeriodValidMatched = savingsProduct.availableTerms === savingsPeriod;
 
-  return isMonthlyAmountValid && isPeriodValid;
+  return isMonthlyAmountMatched && isPeriodValidMatched;
 };
 
 export const recommendSavings = (savingsProducts: SavingsProduct[], limit: number) => {
