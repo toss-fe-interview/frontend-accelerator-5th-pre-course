@@ -1,14 +1,13 @@
 import { SavingProduct } from 'queries/types';
 
-export const filterSavingsProduct = (product: SavingProduct, term: number, monthlyAmount?: number) => {
-  const isSameTerm = product.availableTerms === term;
+export const filterByTerm = (product: SavingProduct, term: number) => {
+  return product.availableTerms === term;
+};
 
-  if (!isSameTerm) return false;
+export const filterByMonthlyAmount = (product: SavingProduct, monthlyAmount: number | null) => {
+  if (!monthlyAmount) {
+    return true;
+  }
 
-  if (!monthlyAmount) return true;
-
-  const isMonthlyAmountInRange =
-    product.minMonthlyAmount <= monthlyAmount && monthlyAmount <= product.maxMonthlyAmount;
-
-  return isMonthlyAmountInRange;
+  return product.minMonthlyAmount <= monthlyAmount && monthlyAmount <= product.maxMonthlyAmount;
 };
