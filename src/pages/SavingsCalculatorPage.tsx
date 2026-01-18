@@ -3,12 +3,12 @@ import { savingsProductQueryOptions } from 'api/savings-products/savingsProducts
 import { SavingsProduct } from 'api/savings-products/types';
 import CalculattionResultListItem from 'components/savings-products/CalculationResultListItem';
 import SavingsProductItem from 'components/savings-products/SavingsProductItem';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { calculateExpectedProfit, calculateSuggestMonthlyPayment, diff } from 'utils/calculate';
 import { formatNumberToKo } from 'utils/formatting';
 import { parseFormattedNumber } from 'utils/parse';
-import { filterSavingsProducts } from 'utils/savings-filter';
+import { isMonthlyPaymentInRange, isTermMatching } from 'utils/savings-filter';
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts = [] } = useQuery(savingsProductQueryOptions());
@@ -22,17 +22,9 @@ export function SavingsCalculatorPage() {
 
   const hasAllFilterValues = monthlyPayment !== undefined && availableTerms !== undefined && targetAmount !== undefined;
 
-  const filteredProducts = useMemo(() => {
-    if (!hasAllFilterValues) {
-      return [];
-    }
-
-    return filterSavingsProducts(savingsProducts, {
-      monthlyPayment,
-      availableTerms,
-      targetAmount,
-    });
-  }, [savingsProducts, monthlyPayment, availableTerms, targetAmount, hasAllFilterValues]);
+  const joinAvailableProducts = savingsProducts.filter(product => {
+    return isMonthlyPaymentInRange(monthlyPayment, product) && isTermMatching(availableTerms, product);
+  });
 
   return (
     <>
@@ -85,7 +77,7 @@ export function SavingsCalculatorPage() {
 
       {tabValue === 'products' &&
         (() => {
-          const displayProducts = hasAllFilterValues ? filteredProducts : savingsProducts;
+          const displayProducts = hasAllFilterValues ? joinAvailableProducts : savingsProducts;
 
           return displayProducts.length > 0 ? (
             <>
@@ -167,8 +159,8 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {filteredProducts.length > 0 ? (
-            [...filteredProducts]
+          {joinAvailableProducts.length > 0 ? (
+            [...joinAvailableProducts]
               .sort((a, b) => b.annualRate - a.annualRate)
               .slice(0, 2)
               .map(product => (
