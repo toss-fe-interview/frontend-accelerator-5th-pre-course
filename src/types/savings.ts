@@ -13,8 +13,7 @@ export interface SavingsFormInput {
   terms: number;
 }
 
-export interface CalculateSavingsParams {
-  formData: SavingsFormInput;
+export interface CalculateSavingsParams extends SavingsFormInput {
   annualRate: number;
 }
 

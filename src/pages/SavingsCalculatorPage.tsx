@@ -7,6 +7,8 @@ import { SavingsFormInput } from 'types/savings';
 import NumberInput from 'components/NumberInput';
 import SavingProductItem from 'components/SavingProductItem';
 import CalculateResultItem from 'components/CalculateResultItem';
+import { filterSavingProducts } from 'utils/filterSavingProducts';
+import { calculateSavingsResult } from 'utils/calculateSavingsResult';
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
@@ -34,18 +36,8 @@ export function SavingsCalculatorPage() {
   const monthlyAmount = watch('monthlyAmount');
   const terms = watch('terms');
 
-  const filteredProducs = useMemo(() => {
-    if (monthlyAmount === 0) {
-      return products;
-    }
-
-    return products.filter(product => {
-      const isMonthlyAmountValid =
-        monthlyAmount >= product.minMonthlyAmount && monthlyAmount <= product.maxMonthlyAmount;
-      const isTermsValid = product.availableTerms === terms;
-
-      return isMonthlyAmountValid && isTermsValid;
-    });
+  const filteredProducts = useMemo(() => {
+    return filterSavingProducts(products, monthlyAmount, terms);
   }, [monthlyAmount, terms, products]);
 
   const selectedProduct = useMemo(() => {
@@ -56,27 +48,22 @@ export function SavingsCalculatorPage() {
     return products.find(product => product.id === selectedProductId) ?? null;
   }, [products, selectedProductId]);
 
-  const calculationResult = useMemo(() => {
-    if (!selectedProduct) {
-      return null;
-    }
-    const annualRate = selectedProduct.annualRate;
-    const expectedAmount = monthlyAmount * terms * (1 + annualRate * 0.01 * 0.5);
-    const difference = targetAmount - expectedAmount;
-    const recommendMonthlyAmount = Math.round(targetAmount / (terms * (1 + annualRate * 0.01 * 0.5)) / 1000) * 1000;
-
-    return { expectedAmount, difference, recommendMonthlyAmount };
-  }, [targetAmount, monthlyAmount, terms, selectedProduct]);
+  const { expectedAmount, difference, recommendMonthlyAmount } = calculateSavingsResult({
+    targetAmount,
+    monthlyAmount,
+    terms,
+    annualRate: selectedProduct?.annualRate ?? 0,
+  });
 
   const recommendedProducts = useMemo(() => {
-    return [...filteredProducs].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-  }, [filteredProducs]);
+    return [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
+  }, [filteredProducts]);
 
   useEffect(() => {
-    if (selectedProductId && !filteredProducs.some(product => product.id === selectedProductId)) {
+    if (selectedProductId && !filteredProducts.some(product => product.id === selectedProductId)) {
       setSelectedProductId(null);
     }
-  }, [filteredProducs, selectedProductId]);
+  }, [filteredProducts, selectedProductId]);
 
   return (
     <>
@@ -145,10 +132,10 @@ export function SavingsCalculatorPage() {
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중입니다..." />} />
         ) : isError ? (
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 불러오는 중에 오류가 발생했습니다." />} />
-        ) : filteredProducs.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />
         ) : (
-          filteredProducs.map(product => (
+          filteredProducts.map(product => (
             <SavingProductItem
               key={product.id}
               product={product}
@@ -157,36 +144,30 @@ export function SavingsCalculatorPage() {
             />
           ))
         )
+      ) : !selectedProduct ? (
+        <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
       ) : (
         <>
-          {!selectedProduct ? (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-          ) : (
-            <>
-              <Spacing size={8} />
-              {calculationResult && (
-                <>
-                  <CalculateResultItem label="예상 수익 금액" value={calculationResult.expectedAmount} />
-                  <CalculateResultItem label="목표 금액과의 차이" value={calculationResult.difference} />
-                  <CalculateResultItem label="추천 월 납입 금액" value={calculationResult.recommendMonthlyAmount} />
-                </>
-              )}
+          <Spacing size={8} />
+          <CalculateResultItem label="예상 수익 금액" value={expectedAmount} />
+          <CalculateResultItem label="목표 금액과의 차이" value={difference} />
+          <CalculateResultItem label="추천 월 납입 금액" value={recommendMonthlyAmount} />
 
-              <Spacing size={8} />
-              <Border height={16} />
-              <Spacing size={8} />
+          <Spacing size={8} />
+          <Border height={16} />
+          <Spacing size={8} />
 
-              <ListHeader
-                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-              />
-              <Spacing size={12} />
-              {recommendedProducts.map(product => (
-                <SavingProductItem key={product.id} product={product} isSelected={product.id === selectedProductId} />
-              ))}
+          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
+          <Spacing size={12} />
+          {recommendedProducts.map(product => (
+            <SavingProductItem
+              key={product.id}
+              product={product}
+              isSelected={product.id === selectedProductId}
+            />
+          ))}
 
-              <Spacing size={40} />
-            </>
-          )}
+          <Spacing size={40} />
         </>
       )}
     </>
