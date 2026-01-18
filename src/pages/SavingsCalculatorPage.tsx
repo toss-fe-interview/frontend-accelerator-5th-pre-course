@@ -9,13 +9,13 @@ import {
   Spacing,
   Tab,
   colors,
-  Assets,
   SelectBottomSheet,
   ListHeader,
 } from 'tosslib';
 import { SavingsFormInput } from 'types/savings';
 import { formatNumber } from 'utils/format';
 import NumberInput from 'components/NumberInput';
+import SavingProduct from 'components/SavingProduct';
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
@@ -168,21 +168,11 @@ export function SavingsCalculatorPage() {
           <ListRow contents={<ListRow.Texts type="1RowTypeA" top="조건에 맞는 상품이 없습니다." />} />
         ) : (
           filteredProducs.map(product => (
-            <ListRow
+            <SavingProduct
               key={product.id}
-              contents={
-                <ListRow.Texts
-                  type="3RowTypeA"
-                  top={product.name}
-                  topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                  middle={`연 이자율: ${product.annualRate}%`}
-                  middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                  bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                  bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                />
-              }
-              right={product.id === selectedProductId ? <Assets.Icon name="icon-check-circle-green" /> : null}
-              onClick={() => setSelectedProductId(product.id)}
+              product={product}
+              isSelected={product.id === selectedProductId}
+              onSelect={() => setSelectedProductId(product.id)}
             />
           ))
         )
@@ -240,20 +230,10 @@ export function SavingsCalculatorPage() {
               />
               <Spacing size={12} />
               {recommendedProducts.map(product => (
-                <ListRow
+                <SavingProduct
                   key={product.id}
-                  contents={
-                    <ListRow.Texts
-                      type="3RowTypeA"
-                      top={product.name}
-                      topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
-                      middle={`연 이자율: ${product.annualRate}%`}
-                      middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-                      bottom={`${formatNumber(product.minMonthlyAmount)}원 ~ ${formatNumber(product.maxMonthlyAmount)}원 | ${product.availableTerms}개월`}
-                      bottomProps={{ fontSize: 13, color: colors.grey600 }}
-                    />
-                  }
-                  right={product.id === selectedProductId ? <Assets.Icon name="icon-check-circle-green" /> : null}
+                  product={product}
+                  isSelected={product.id === selectedProductId}
                 />
               ))}
 
