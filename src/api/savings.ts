@@ -1,4 +1,5 @@
 import { http } from 'tosslib';
+import { queryOptions } from '@tanstack/react-query';
 import { SavingsProduct } from 'types/savings';
 
 export const getSavingsProducts = async (): Promise<SavingsProduct[]> => {
@@ -10,3 +11,9 @@ export const getSavingsProducts = async (): Promise<SavingsProduct[]> => {
     throw error;
   }
 };
+
+export const savingsProductQueryOptions = () =>
+  queryOptions({
+    queryKey: ['savings-products'],
+    queryFn: getSavingsProducts,
+  });

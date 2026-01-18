@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { getSavingsProducts } from 'api/savings';
+import { savingsProductQueryOptions } from 'api/savings';
 import { useQuery } from '@tanstack/react-query';
 import { Border, ListRow, NavigationBar, Spacing, Tab, SelectBottomSheet, ListHeader } from 'tosslib';
 import { SavingsFormInput } from 'types/savings';
@@ -18,10 +18,7 @@ export function SavingsCalculatorPage() {
     data: products = [],
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ['savings-products'],
-    queryFn: getSavingsProducts,
-  });
+  } = useQuery(savingsProductQueryOptions());
 
   const { control, watch } = useForm<SavingsFormInput>({
     defaultValues: {
