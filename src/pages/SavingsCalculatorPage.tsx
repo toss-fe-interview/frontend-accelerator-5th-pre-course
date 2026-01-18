@@ -16,38 +16,26 @@ const TAB_VALUES = {
 
 type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
-interface InputValues {
-  targetAmount: string;
-  monthlyDeposit: string;
-  term: number;
-}
-
 export function SavingsCalculatorPage() {
   const { products, isLoading, error } = useSavingsProducts();
-  const [values, setValues] = useState<InputValues>({
-    targetAmount: '',
-    monthlyDeposit: '',
-    term: 12,
-  });
+  const [targetAmount, setTargetAmount] = useState('');
+  const [monthlyDeposit, setMonthlyDeposit] = useState('');
+  const [term, setTerm] = useState(12);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
 
-  const handleChange = (partial: Partial<InputValues>) => {
-    setValues(prev => ({ ...prev, ...partial }));
-  };
-
   const { availableProducts, selectedProduct, recommendedProducts } = useSavingsProductOptions({
     products,
-    monthlyDeposit: values.monthlyDeposit,
-    term: values.term,
+    monthlyDeposit,
+    term,
     selectedProductId,
   });
 
   const goalEstimate = useSavingsGoalEstimate({
     selectedProduct,
-    monthlyDeposit: values.monthlyDeposit,
-    targetAmount: values.targetAmount,
-    term: values.term,
+    monthlyDeposit,
+    targetAmount,
+    term,
   });
 
   if (isLoading) {
@@ -62,9 +50,9 @@ export function SavingsCalculatorPage() {
     <>
       <NavigationBar title="적금 계산기" />
 
-      <CurrencyInput label="목표 금액" field="targetAmount" value={values.targetAmount} onChange={handleChange} />
-      <CurrencyInput label="월 납입액" field="monthlyDeposit" value={values.monthlyDeposit} onChange={handleChange} />
-      <TermSelect label="저축 기간" value={values.term} onChange={handleChange} />
+      <CurrencyInput label="목표 금액" value={targetAmount} onChange={setTargetAmount} />
+      <CurrencyInput label="월 납입액" value={monthlyDeposit} onChange={setMonthlyDeposit} />
+      <TermSelect label="저축 기간" value={term} onChange={setTerm} />
 
       <Spacing size={24} />
       <Border height={16} />

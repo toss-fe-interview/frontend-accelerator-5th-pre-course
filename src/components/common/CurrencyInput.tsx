@@ -3,12 +3,11 @@ import { extractDigits } from 'utils/number';
 
 interface CurrencyInputProps {
   label: string;
-  field: string;
   value: string;
-  onChange: (partial: Record<string, string>) => void;
+  onChange: (value: string) => void;
 }
 
-export function CurrencyInput({ label, field, value, onChange }: CurrencyInputProps) {
+export function CurrencyInput({ label, value, onChange }: CurrencyInputProps) {
   return (
     <>
       <Spacing size={16} />
@@ -17,7 +16,7 @@ export function CurrencyInput({ label, field, value, onChange }: CurrencyInputPr
         placeholder={`${label}을 입력하세요`}
         suffix="원"
         value={value}
-        onChange={e => onChange({ [field]: extractDigits(e.target.value) })}
+        onChange={e => onChange(extractDigits(e.target.value))}
       />
     </>
   );
