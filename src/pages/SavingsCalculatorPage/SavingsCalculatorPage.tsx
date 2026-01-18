@@ -143,7 +143,7 @@ export function SavingsCalculatorPage() {
             <ListRow contents={<ListRow.Texts type="1RowTypeA" top="추천 상품을 불러오지 못했습니다." />} />
           ) : (
             getTopProductsByRate(
-              savingsProducts.filter(p => isProductMatchingInput(p, savingsInput)),
+              savingsProducts.filter(product => isProductMatchingInput(product, savingsInput)),
               2
             ).map(product => {
               const isSelected = selectedSavingsProduct?.id === product.id;
