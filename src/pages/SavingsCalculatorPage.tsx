@@ -5,45 +5,28 @@ import {
   calculateExpectedProfit,
   calculateDifferenceProfit,
   calculateRecommendedMonthlyAmount,
+  filterByConditions,
+  isWithinAmountRange,
+  hasMatchingTerm,
+  pipe,
+  sortByAnnualRate,
+  take,
 } from 'utils/calculateSavings';
 import { SavingsProduct } from 'types/savings';
 import { getSavingsProductsQueryOptions } from 'api/savings-products';
 import { ErrorBoundary, Suspense } from '@suspensive/react';
 import { SuspenseQuery } from '@suspensive/react-query';
 
-import { orderBy, take } from 'es-toolkit';
 import { AmountField } from 'components/AmountField';
 import { TermSelect } from 'components/TermSelect';
 import { SavingsProductListItem } from 'components/SavingsProductListItem';
 import { LabelValueRow } from 'components/LabelValueRow';
 
-const isSelected = (current: 'products' | 'results', target: 'products' | 'results'): boolean => {
-  return current === target;
-};
-
-function isWithinAmountRange(product: SavingsProduct, monthlyAmount: number | null): boolean {
-  if (monthlyAmount === null) {
-    return true;
-  }
-  return monthlyAmount >= product.minMonthlyAmount && monthlyAmount <= product.maxMonthlyAmount;
-}
-
-function hasMatchingTerm(product: SavingsProduct, savingsTerm: number | null): boolean {
-  if (savingsTerm === null) {
-    return true;
-  }
-  return savingsTerm === product.availableTerms;
-}
-
 export function SavingsCalculatorPage() {
   const [targetAmount, setTargetAmount] = useState<number | null>(null);
-
   const [monthlyAmount, setMonthlyAmount] = useState<number | null>(null);
-
   const [savingsTerm, setSavingsTerm] = useState<number | null>(null);
-
   const [currentTab, setCurrentTab] = useState<'products' | 'results'>('products');
-
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
   return (
@@ -96,13 +79,14 @@ export function SavingsCalculatorPage() {
                 return (
                   <SuspenseQuery
                     {...getSavingsProductsQueryOptions()}
-                    select={savingsProducts =>
-                      savingsProducts.filter(
-                        product => isWithinAmountRange(product, monthlyAmount) && hasMatchingTerm(product, savingsTerm)
+                    select={pipe(
+                      filterByConditions<SavingsProduct>(
+                        (product: SavingsProduct) => isWithinAmountRange(product, monthlyAmount),
+                        (product: SavingsProduct) => hasMatchingTerm(product, savingsTerm)
                       )
-                    }
+                    )}
                   >
-                    {({ data: filteredSavingsProducts }) =>
+                    {({ data: filteredSavingsProducts }: { data: SavingsProduct[] }) =>
                       filteredSavingsProducts.map(product => (
                         <SavingsProductListItem
                           key={product.id}
@@ -122,8 +106,18 @@ export function SavingsCalculatorPage() {
                 );
               case 'results':
                 return (
-                  <SuspenseQuery {...getSavingsProductsQueryOptions()}>
-                    {({ data: savingsProducts }) => {
+                  <SuspenseQuery
+                    {...getSavingsProductsQueryOptions()}
+                    select={pipe(
+                      filterByConditions<SavingsProduct>(
+                        (product: SavingsProduct) => isWithinAmountRange(product, monthlyAmount),
+                        (product: SavingsProduct) => hasMatchingTerm(product, savingsTerm)
+                      ),
+                      sortByAnnualRate('desc'),
+                      take(2)
+                    )}
+                  >
+                    {({ data: recommendedSavingsProducts }: { data: SavingsProduct[] }) => {
                       if (!selectedProduct) {
                         return <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />;
                       }
@@ -162,17 +156,7 @@ export function SavingsCalculatorPage() {
                             />
                             <Spacing size={12} />
 
-                            {take(
-                              orderBy(
-                                filterSavingsProducts({
-                                  data: savingsProducts,
-                                  filterOptions: { monthlyAmount, savingsTerm },
-                                }),
-                                ['annualRate'],
-                                ['desc']
-                              ),
-                              2
-                            ).map(product => (
+                            {recommendedSavingsProducts.map(product => (
                               <SavingsProductListItem
                                 key={product.id}
                                 name={product.name}
@@ -202,34 +186,6 @@ export function SavingsCalculatorPage() {
   );
 }
 
-interface FilterProductsProps {
-  data: SavingsProduct[];
-  filterOptions: {
-    monthlyAmount: number | null;
-    savingsTerm: number | null;
-  };
-}
-
-function filterSavingsProducts({ data, filterOptions }: FilterProductsProps) {
-  const { monthlyAmount, savingsTerm } = filterOptions;
-
-  const predicates: Array<(product: SavingsProduct) => boolean> = [];
-
-  if (monthlyAmount !== null) {
-    predicates.push(product => {
-      const isWithinMonthlyAmountRange =
-        monthlyAmount >= product.minMonthlyAmount && monthlyAmount <= product.maxMonthlyAmount;
-      return isWithinMonthlyAmountRange;
-    });
-  }
-
-  if (savingsTerm !== null) {
-    predicates.push(product => savingsTerm === product.availableTerms);
-  }
-
-  if (predicates.length === 0) {
-    return data;
-  }
-
-  return data.filter(product => predicates.every(predicate => predicate(product)));
-}
+const isSelected = (current: 'products' | 'results', target: 'products' | 'results'): boolean => {
+  return current === target;
+};
