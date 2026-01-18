@@ -6,7 +6,7 @@ import { savingsProductsQueryOptions } from 'features/savings/hooks/quries/savin
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
 import {
-  calculateEstimatedEaringsAmount,
+  calculateEstimatedEarningsAmount,
   calculateDifferenceWithTargetAmount,
   calculateRecommendedMonthlyPayment,
 } from 'features/savings/utils/calculation/savings';
@@ -38,7 +38,7 @@ export function SavingsCalculatorPage() {
   const savingsCalculations = (() => {
     if (!selectedProduct) return null;
 
-    const estimatedEarnings = calculateEstimatedEaringsAmount(
+    const estimatedEarnings = calculateEstimatedEarningsAmount(
       savingsValues.monthlyPaymentAmount,
       savingsValues.savingsPeriod,
       selectedProduct.annualRate

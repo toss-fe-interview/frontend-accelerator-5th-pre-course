@@ -2,7 +2,7 @@ const roundThousand = (number: number) => {
   return Math.round(number / 1000) * 1000;
 };
 
-export const calculateEstimatedEaringsAmount = (
+export const calculateEstimatedEarningsAmount = (
   monthlyPaymentAmount: number,
   savingsPeriod: number,
   annualRate: number
