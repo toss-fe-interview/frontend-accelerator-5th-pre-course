@@ -1,11 +1,11 @@
-import { Assets, Border, ListHeader, ListRow, NavigationBar, Spacing, Tab } from 'tosslib';
+import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab, TextField } from 'tosslib';
 import { useMemo, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { SavingsSearchCriteria } from 'components/SavingsSearchCriteria';
 import { CalculationResults } from 'components/CalculationResults';
 import { ProductInfoTexts } from 'components/ProductInfoTexts';
 import { SavingsInput, SavingsProduct } from 'type';
 import { savingsProductsQuery } from 'apis/savingsProduct';
+import { formatMoney, parseMoney } from 'utils/money';
 
 export function SavingsCalculatorPage() {
   const { data: savingsProducts } = useSuspenseQuery(savingsProductsQuery());
@@ -34,13 +34,44 @@ export function SavingsCalculatorPage() {
   const hasNoMatchingProducts = matchingProducts.length === 0;
   const hasNoSelectedProduct = !selectedSavingsProduct;
 
+  const updateField = <K extends keyof SavingsInput>(field: K, value: SavingsInput[K]) => {
+    setSavingsInput({ ...savingsInput, [field]: value });
+  };
+
+  const toMoneyValue = (input: string): number => Number(parseMoney(input)) || 0;
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
 
       <Spacing size={16} />
 
-      <SavingsSearchCriteria savingsInput={savingsInput} setSavingsInput={setSavingsInput} />
+      <TextField
+        label="목표 금액"
+        placeholder="목표 금액을 입력하세요"
+        suffix="원"
+        value={formatMoney(savingsInput.goalAmount)}
+        onChange={e => updateField('goalAmount', toMoneyValue(e.target.value))}
+      />
+      <Spacing size={16} />
+      <TextField
+        label="월 납입액"
+        placeholder="희망 월 납입액을 입력하세요"
+        suffix="원"
+        value={formatMoney(savingsInput.monthlyAmount)}
+        onChange={e => updateField('monthlyAmount', toMoneyValue(e.target.value))}
+      />
+      <Spacing size={16} />
+      <SelectBottomSheet
+        label="저축 기간"
+        title="저축 기간을 선택해주세요"
+        value={savingsInput.term}
+        onChange={value => updateField('term', value)}
+      >
+        <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
+        <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
+        <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+      </SelectBottomSheet>
 
       <Spacing size={24} />
       <Border height={16} />
