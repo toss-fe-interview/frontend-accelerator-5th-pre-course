@@ -1,6 +1,6 @@
-import * as httpClient from 'shared/api/httpClient';
+import { http } from 'tosslib';
 import { SavingsProduct } from '../model/types';
 
 export async function getSavingsProducts(): Promise<SavingsProduct[]> {
-  return await httpClient.get<SavingsProduct[]>('/savings-products');
+  return await http.get<SavingsProduct[]>('/api/savings-products');
 }
