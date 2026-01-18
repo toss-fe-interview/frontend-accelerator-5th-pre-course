@@ -1,0 +1,133 @@
+import { SuspenseQuery } from '@suspensive/react-query';
+import { SavingsProduct } from 'entities/savings-product/model/types';
+import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
+import { 목표금액과의차이계산, 예상수익계산, 추천월납입액계산 } from 'features/calculate-savings/lib/calculate-savings';
+import SavingsGoalForm, { useSavingsGoalForm } from 'features/calculate-savings/ui/SavingsGoalForm';
+import { savingsProductsQueryOptions } from 'features/savings-product/api/useSavingsProducts';
+import { useState } from 'react';
+import { descending, inRange, isEqual, isNotNull } from 'shared/lib/compare';
+import AsyncBoundary from 'shared/ui/AsyncBoundary';
+import { Border, NavigationBar, Spacing, Tab, ListRow, ListHeader } from 'tosslib';
+import { DEFAULT_TERM_MONTHS, RECOMMENDED_PRODUCTS_COUNT, TAB_VALUES, TabValue } from './model/constants';
+import CalculationResultItem from 'features/calculate-savings/ui/CalculationResultItem';
+
+export function SavingsCalculatorPage() {
+  const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
+  const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
+  const { control, formData: savingsGoal } = useSavingsGoalForm({
+    term: DEFAULT_TERM_MONTHS,
+  });
+
+  return (
+    <>
+      <NavigationBar title="적금 계산기" />
+
+      <Spacing size={16} />
+
+      <SavingsGoalForm control={control} />
+
+      <Spacing size={24} />
+      <Border height={16} />
+      <Spacing size={8} />
+
+      <Tab onChange={value => setActiveTab(value as TabValue)}>
+        <Tab.Item value={TAB_VALUES.PRODUCTS} selected={activeTab === TAB_VALUES.PRODUCTS}>
+          적금 상품
+        </Tab.Item>
+        <Tab.Item value={TAB_VALUES.RESULTS} selected={activeTab === TAB_VALUES.RESULTS}>
+          계산 결과
+        </Tab.Item>
+      </Tab>
+
+      <AsyncBoundary loadingMessage="불러오는 중입니다..." errorMessage="오류가 발생했습니다.">
+        <SuspenseQuery {...savingsProductsQueryOptions()}>
+          {({ data: allProducts }) => {
+            const products = isNotNull(savingsGoal.monthlyAmount)
+              ? allProducts.filter(
+                  product =>
+                    inRange({
+                      value: savingsGoal.monthlyAmount!,
+                      min: product.minMonthlyAmount,
+                      max: product.maxMonthlyAmount,
+                    }) && isEqual(product.availableTerms, savingsGoal.term)
+                )
+              : allProducts;
+
+            const recommendedProducts = selectedProduct
+              ? [...products]
+                  .sort((a, b) => descending(a.annualRate, b.annualRate))
+                  .slice(0, RECOMMENDED_PRODUCTS_COUNT)
+              : [];
+
+            return (
+              <>
+                {activeTab === TAB_VALUES.PRODUCTS &&
+                  products.map(product => (
+                    <SavingsProductItem
+                      key={product.id}
+                      product={product}
+                      selected={selectedProduct?.id === product.id}
+                      onSelect={() => setSelectedProduct(product)}
+                    />
+                  ))}
+
+                {activeTab === TAB_VALUES.RESULTS && (
+                  <>
+                    {selectedProduct ? (
+                      (() => {
+                        const 예상수익 = 예상수익계산(
+                          savingsGoal.monthlyAmount ?? 0,
+                          savingsGoal.term,
+                          selectedProduct.annualRate
+                        );
+                        const 목표금액과의차이 = 목표금액과의차이계산(savingsGoal.targetAmount ?? 0, 예상수익);
+                        const 추천월납입액 = 추천월납입액계산(
+                          savingsGoal.targetAmount ?? 0,
+                          savingsGoal.term,
+                          selectedProduct.annualRate
+                        );
+
+                        return (
+                          <>
+                            <Spacing size={8} />
+
+                            <CalculationResultItem label="예상 수익 금액" value={예상수익} />
+                            <CalculationResultItem label="목표 금액과의 차이" value={목표금액과의차이} />
+                            <CalculationResultItem label="추천 월 납입 금액" value={추천월납입액} />
+
+                            <Spacing size={8} />
+                            <Border height={16} />
+                            <Spacing size={8} />
+
+                            <ListHeader
+                              title={
+                                <ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>
+                              }
+                            />
+                            <Spacing size={12} />
+
+                            {recommendedProducts.map(product => (
+                              <SavingsProductItem
+                                key={product.id}
+                                product={product}
+                                selected={selectedProduct.id === product.id}
+                              />
+                            ))}
+
+                            <Spacing size={40} />
+                          </>
+                        );
+                      })()
+                    ) : (
+                      <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
+                    )}
+                  </>
+                )}
+              </>
+            );
+          }}
+        </SuspenseQuery>
+      </AsyncBoundary>
+    </>
+  );
+}

@@ -1,10 +1,15 @@
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { SavingsCalculatorPage } from './SavingsCalculatorPage';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <SavingsCalculatorPage />,
+    element: (
+      <NuqsAdapter>
+        <SavingsCalculatorPage />
+      </NuqsAdapter>
+    ),
   },
   {
     path: '*',
