@@ -30,9 +30,9 @@ export function SavingsCalculatorPage() {
 
   const selectedProduct = filteredSavingsProducts.find(product => product.id === selectedProductId);
 
-  const savingsCalculations = selectedProduct ? calculateSavingsResults(selectedProduct, savingsValues) : null;
+  const savingsCalculationResults = selectedProduct ? calculateSavingsResults(selectedProduct, savingsValues) : null;
 
-  const isProductNotSelected = !selectedProductId || !selectedProduct || !savingsCalculations;
+  const isProductNotSelected = !selectedProductId || !selectedProduct || !savingsCalculationResults;
 
   return (
     <>
@@ -135,7 +135,7 @@ export function SavingsCalculatorPage() {
                       contents={
                         <ResultItem
                           label="예상 수익 금액"
-                          value={`${formatNumberWithComma(savingsCalculations.estimatedEarnings)}원`}
+                          value={`${formatNumberWithComma(savingsCalculationResults.estimatedEarnings)}원`}
                         />
                       }
                     />
@@ -143,7 +143,7 @@ export function SavingsCalculatorPage() {
                       contents={
                         <ResultItem
                           label="목표 금액과의 차이"
-                          value={`${formatNumberWithComma(savingsCalculations.diffWithTargetAmount)}원`}
+                          value={`${formatNumberWithComma(savingsCalculationResults.diffWithTargetAmount)}원`}
                         />
                       }
                     />
@@ -151,7 +151,7 @@ export function SavingsCalculatorPage() {
                       contents={
                         <ResultItem
                           label="추천 월 납입 금액"
-                          value={`${formatNumberWithComma(savingsCalculations.recommendedMonthlyPayment)}원`}
+                          value={`${formatNumberWithComma(savingsCalculationResults.recommendedMonthlyPayment)}원`}
                         />
                       }
                     />
