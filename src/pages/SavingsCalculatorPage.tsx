@@ -14,7 +14,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { CalculationResults } from 'components/CalculationResults';
 import { ProductInfoTexts } from 'components/ProductInfoTexts';
 import { SwitchCase } from 'components/common/SwitchCase';
-import { ProductListStatus, ResultsStatus, SavingsInput, SavingsProduct } from 'type';
+import { SavingsInput, SavingsProduct } from 'type';
 import { savingsProductsQuery } from 'apis/savingsProduct';
 import { formatMoney, extractDigits } from 'utils/money';
 import { isWithinAmountRange, matchesTerm } from 'utils/productFilter';
@@ -40,23 +40,6 @@ export function SavingsCalculatorPage() {
   };
 
   const toMoneyValue = (input: string): number => Number(extractDigits(input)) || 0;
-
-  const getProductListStatus = (): ProductListStatus => {
-    if (!(savingsInput.term && savingsInput.monthlyAmount)) {
-      return 'needsInput';
-    }
-    if (filterMatchingProducts.length === 0) {
-      return 'noProducts';
-    }
-    return 'hasProducts';
-  };
-
-  const getResultsStatus = (): ResultsStatus => {
-    if (!selectedSavingsProduct) {
-      return 'noProduct';
-    }
-    return 'hasProduct';
-  };
 
   return (
     <>
@@ -106,7 +89,13 @@ export function SavingsCalculatorPage() {
       <Spacing size={8} />
       {selectTab === 'products' && (
         <SwitchCase
-          value={getProductListStatus()}
+          value={
+            !(savingsInput.term && savingsInput.monthlyAmount)
+              ? 'needsInput'
+              : filterMatchingProducts.length === 0
+                ? 'noProducts'
+                : 'hasProducts'
+          }
           caseBy={{
             needsInput: (
               <ListRow
@@ -137,7 +126,7 @@ export function SavingsCalculatorPage() {
       )}
       {selectTab === 'results' && (
         <SwitchCase
-          value={getResultsStatus()}
+          value={selectedSavingsProduct ? 'hasProduct' : 'noProduct'}
           caseBy={{
             noProduct: <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />,
             hasProduct: (
