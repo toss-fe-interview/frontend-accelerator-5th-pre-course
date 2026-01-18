@@ -1,10 +1,14 @@
 import { SavingsProduct } from 'features/savings/types/savingsProduct';
 
-export const isMatchedProduct = (product: SavingsProduct, monthlyPaymentAmount: number, savingsPeriod: number) => {
+export const isSavingsProductMatched = (
+  savingsProduct: SavingsProduct,
+  monthlyPaymentAmount: number,
+  savingsPeriod: number
+) => {
   const isMonthlyAmountValid =
-    product.minMonthlyAmount <= monthlyPaymentAmount && monthlyPaymentAmount <= product.maxMonthlyAmount;
+    savingsProduct.minMonthlyAmount <= monthlyPaymentAmount && monthlyPaymentAmount <= savingsProduct.maxMonthlyAmount;
 
-  const isPeriodValid = product.availableTerms === savingsPeriod;
+  const isPeriodValid = savingsProduct.availableTerms === savingsPeriod;
 
   return isMonthlyAmountValid && isPeriodValid;
 };
