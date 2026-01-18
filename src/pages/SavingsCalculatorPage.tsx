@@ -6,11 +6,11 @@ import TermSelectBottomSheet from 'product/components/TermSelectBottomSheet';
 import { Suspense, useState } from 'react';
 import { Border, NavigationBar, Spacing } from 'tosslib';
 
-const validateInputNumber = (value: string) => {
+const validateIsNumberWithComma = (value: string) => {
   return /^[\d,]*$/.test(value);
 };
 
-const formatValue = (value: string) => {
+const formatNumberWithComma = (value: string) => {
   return value.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
@@ -28,11 +28,11 @@ export function SavingsCalculatorPage() {
       <PriceInput
         value={price}
         onChange={value => {
-          if (!validateInputNumber(value)) {
+          if (!validateIsNumberWithComma(value)) {
             return;
           }
 
-          const formattedValue = formatValue(value);
+          const formattedValue = formatNumberWithComma(value);
 
           setPrice(formattedValue);
         }}
@@ -41,11 +41,11 @@ export function SavingsCalculatorPage() {
       <MonthlyPaymentInput
         value={monthlyPayment}
         onChange={value => {
-          if (!validateInputNumber(value)) {
+          if (!validateIsNumberWithComma(value)) {
             return;
           }
 
-          const formattedValue = formatValue(value);
+          const formattedValue = formatNumberWithComma(value);
 
           setMonthlyPayment(formattedValue);
         }}
