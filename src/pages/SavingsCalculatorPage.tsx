@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { savingsProductQueryOptions } from 'api/savings';
 import { useQuery } from '@tanstack/react-query';
@@ -9,6 +9,7 @@ import SavingProductItem from 'components/SavingsProductItem';
 import CalculateResultItem from 'components/CalculateResultItem';
 import { filterSavingsProducts } from 'utils/filterSavingsProducts';
 import { calculateSavingsResult } from 'utils/calculateSavingsResult';
+import { getTopProductsByAnnualRate } from 'utils/sortSavingsProducts';
 
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
@@ -33,17 +34,9 @@ export function SavingsCalculatorPage() {
   const monthlyAmount = watch('monthlyAmount');
   const terms = watch('terms');
 
-  const filteredProducts = useMemo(() => {
-    return filterSavingsProducts(products, monthlyAmount, terms);
-  }, [monthlyAmount, terms, products]);
-
-  const selectedProduct = useMemo(() => {
-    if (!selectedProductId) {
-      return null;
-    }
-
-    return products.find(product => product.id === selectedProductId) ?? null;
-  }, [products, selectedProductId]);
+  const filteredProducts = filterSavingsProducts(products, monthlyAmount, terms);
+  const selectedProduct = products.find(product => product.id === selectedProductId) ?? null;
+  const recommendedProducts = getTopProductsByAnnualRate(filteredProducts, 2);
 
   const { expectedAmount, difference, recommendMonthlyAmount } = calculateSavingsResult({
     targetAmount,
@@ -51,10 +44,6 @@ export function SavingsCalculatorPage() {
     terms,
     annualRate: selectedProduct?.annualRate ?? 0,
   });
-
-  const recommendedProducts = useMemo(() => {
-    return [...filteredProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
-  }, [filteredProducts]);
 
   useEffect(() => {
     if (selectedProductId && !filteredProducts.some(product => product.id === selectedProductId)) {
