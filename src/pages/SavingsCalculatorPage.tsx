@@ -5,9 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Border, ListRow, NavigationBar, Spacing, Tab, SelectBottomSheet, ListHeader } from 'tosslib';
 import { SavingsFormInput } from 'types/savings';
 import NumberInput from 'components/NumberInput';
-import SavingProductItem from 'components/SavingProductItem';
+import SavingProductItem from 'components/SavingsProductItem';
 import CalculateResultItem from 'components/CalculateResultItem';
-import { filterSavingProducts } from 'utils/filterSavingProducts';
+import { filterSavingsProducts } from 'utils/filterSavingsProducts';
 import { calculateSavingsResult } from 'utils/calculateSavingsResult';
 
 export function SavingsCalculatorPage() {
@@ -37,7 +37,7 @@ export function SavingsCalculatorPage() {
   const terms = watch('terms');
 
   const filteredProducts = useMemo(() => {
-    return filterSavingProducts(products, monthlyAmount, terms);
+    return filterSavingsProducts(products, monthlyAmount, terms);
   }, [monthlyAmount, terms, products]);
 
   const selectedProduct = useMemo(() => {

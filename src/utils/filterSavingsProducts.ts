@@ -1,6 +1,6 @@
 import { SavingsProduct } from 'types/savings';
 
-export const filterSavingProducts = (products: SavingsProduct[], monthlyAmount: number, terms: number): SavingsProduct[] => {
+export const filterSavingsProducts = (products: SavingsProduct[], monthlyAmount: number, terms: number): SavingsProduct[] => {
   if (monthlyAmount === 0) {
     return products;
   }
