@@ -20,11 +20,6 @@ import SavingProduct from 'components/SavingProduct';
 export function SavingsCalculatorPage() {
   const [selectedTab, setSelectedTab] = useState<'productList' | 'calculationResult'>('productList');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<SavingsFormInput>({
-    targetAmount: 0,
-    monthlyAmount: 0,
-    terms: 12,
-  });
 
   const {
     data: products = [],
@@ -34,28 +29,6 @@ export function SavingsCalculatorPage() {
     queryKey: ['savings-products'],
     queryFn: getSavingsProducts,
   });
-
-  const filteredProducs = useMemo(() => {
-    if (formData.monthlyAmount === 0) {
-      return products;
-    }
-
-    return products.filter(product => {
-      const isMonthlyAmountValid =
-        formData.monthlyAmount >= product.minMonthlyAmount && formData.monthlyAmount <= product.maxMonthlyAmount;
-      const isTermsValid = product.availableTerms === formData.terms;
-
-      return isMonthlyAmountValid && isTermsValid;
-    });
-  }, [formData.monthlyAmount, formData.terms, products]);
-
-  const selectedProduct = useMemo(() => {
-    if (!selectedProductId) {
-      return null;
-    }
-
-    return products.find(product => product.id === selectedProductId) ?? null;
-  }, [products, selectedProductId]);
 
   const { control, watch } = useForm<SavingsFormInput>({
     defaultValues: {
@@ -70,26 +43,44 @@ export function SavingsCalculatorPage() {
   const monthlyAmount = watch('monthlyAmount');
   const terms = watch('terms');
 
+  const filteredProducs = useMemo(() => {
+    if (monthlyAmount === 0) {
+      return products;
+    }
+
+    return products.filter(product => {
+      const isMonthlyAmountValid =
+        monthlyAmount >= product.minMonthlyAmount && monthlyAmount <= product.maxMonthlyAmount;
+      const isTermsValid = product.availableTerms === terms;
+
+      return isMonthlyAmountValid && isTermsValid;
+    });
+  }, [monthlyAmount, terms, products]);
+
+  const selectedProduct = useMemo(() => {
+    if (!selectedProductId) {
+      return null;
+    }
+
+    return products.find(product => product.id === selectedProductId) ?? null;
+  }, [products, selectedProductId]);
+
   const calculationResult = useMemo(() => {
     if (!selectedProduct) {
       return null;
     }
     const annualRate = selectedProduct.annualRate;
-    const expectedAmount = formData.monthlyAmount * formData.terms * (1 + annualRate * 0.01 * 0.5);
-    const difference = formData.targetAmount - expectedAmount;
+    const expectedAmount = monthlyAmount * terms * (1 + annualRate * 0.01 * 0.5);
+    const difference = targetAmount - expectedAmount;
     const recommendMonthlyAmount =
-      Math.round(formData.targetAmount / (formData.terms * (1 + annualRate * 0.01 * 0.5)) / 1000) * 1000;
+      Math.round(targetAmount / (terms * (1 + annualRate * 0.01 * 0.5)) / 1000) * 1000;
 
     return { expectedAmount, difference, recommendMonthlyAmount };
-  }, [formData, selectedProduct]);
+  }, [targetAmount, monthlyAmount, terms, selectedProduct]);
 
   const recommendedProducts = useMemo(() => {
     return [...filteredProducs].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
   }, [filteredProducs]);
-
-  useEffect(() => {
-    setFormData({ targetAmount, monthlyAmount, terms });
-  }, [targetAmount, monthlyAmount, terms]);
 
   useEffect(() => {
     if (selectedProductId && !filteredProducs.some(product => product.id === selectedProductId)) {
