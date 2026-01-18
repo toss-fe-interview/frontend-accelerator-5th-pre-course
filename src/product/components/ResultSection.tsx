@@ -2,7 +2,6 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import MatchCase from 'common/components/MatchCase';
 import { savingsProductsQueryOptions } from 'product/queries';
 import { SavingProduct } from 'product/type/internal';
-import { getFilteredProducts } from 'product/utils/getFilteredProducts';
 import { Suspense, useState } from 'react';
 import { ListRow, Tab } from 'tosslib';
 import SavingProducts from './SavingProducts';
@@ -10,6 +9,7 @@ import SavingResults from './SavingResults';
 import RecommendedProducts from './RecommendedProducts';
 import { get예상수익금액, get목표금액과의차이, get추천월납입금액 } from 'product/utils/getResults';
 import ErrorBoundary from 'common/components/ErrorBoundary';
+import { productFilter } from 'product/utils/getFilteredProducts';
 
 interface Props {
   price: string;
@@ -22,12 +22,8 @@ const ResultSection = ({ price, monthlyPayment, term }: Props) => {
 
   const { data: savingsProductsData } = useSuspenseQuery({
     ...savingsProductsQueryOptions,
-    select: data => getFilteredProducts(data, monthlyPayment, term),
+    select: data => data.filter(product => productFilter({ product, monthlyPayment, term })),
   });
-
-  const selectProduct = (product: SavingProduct) => {
-    setSelectedProduct(product);
-  };
 
   return (
     <>
@@ -50,10 +46,9 @@ const ResultSection = ({ price, monthlyPayment, term }: Props) => {
 
             return (
               <SavingProducts
-                type="select"
                 data={savingsProductsData}
                 selectedProduct={selectedProduct}
-                selectProduct={selectProduct}
+                selectProduct={product => setSelectedProduct(product)}
               />
             );
           },

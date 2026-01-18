@@ -1,13 +1,17 @@
 import { SavingProduct } from 'product/type/internal';
 
-export const getFilteredProducts = (products: SavingProduct[], monthlyPayment: string, term: number | null) => {
-  return products.filter(product => {
-    if (
-      product.minMonthlyAmount > Number(monthlyPayment.replace(/,/g, '')) ||
-      product.maxMonthlyAmount < Number(monthlyPayment.replace(/,/g, ''))
-    ) {
-      return;
-    }
-    return product.availableTerms === term;
-  });
+export const productFilter = ({
+  product,
+  monthlyPayment,
+  term,
+}: {
+  product: SavingProduct;
+  monthlyPayment: string;
+  term: number | null;
+}) => {
+  const isMonthlyPaymentOverMin = product.minMonthlyAmount <= Number(monthlyPayment.replace(/,/g, ''));
+  const isMonthlyPaymentUnderMax = product.maxMonthlyAmount >= Number(monthlyPayment.replace(/,/g, ''));
+  const isTermSame = product.availableTerms === term;
+
+  return [isMonthlyPaymentOverMin, isMonthlyPaymentUnderMax, isTermSame].every(Boolean);
 };

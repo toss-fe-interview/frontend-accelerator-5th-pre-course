@@ -1,25 +1,28 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import SavingProducts from './SavingProducts';
 import { savingsProductsQueryOptions } from 'product/queries';
-import { getFilteredProducts } from 'product/utils/getFilteredProducts';
-import { SavingProduct } from 'product/type/internal';
+import type { SavingProduct as SavingProductType } from 'product/type/internal';
+import SavingProduct from './SavingProduct';
+import { productFilter } from 'product/utils/getFilteredProducts';
 
 interface Props {
   monthlyPayment: string;
   term: number | null;
-  selectedProduct: SavingProduct;
+  selectedProduct: SavingProductType;
 }
 
 const RecommendedProducts = ({ monthlyPayment, term, selectedProduct }: Props) => {
   const { data: recommendedProducts } = useSuspenseQuery({
     ...savingsProductsQueryOptions,
     select: data =>
-      getFilteredProducts(data, monthlyPayment, term)
+      data
+        .filter(product => productFilter({ product, monthlyPayment, term }))
         .sort((a, b) => b.annualRate - a.annualRate)
         .slice(0, 2),
   });
 
-  return <SavingProducts type="recommended" data={recommendedProducts} selectedProduct={selectedProduct} />;
+  return recommendedProducts.map(product => (
+    <SavingProduct key={product.id} product={product} selected={selectedProduct?.id === product.id} />
+  ));
 };
 
 export default RecommendedProducts;
