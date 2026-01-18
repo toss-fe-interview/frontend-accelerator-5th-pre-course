@@ -2,11 +2,10 @@ import { SuspenseQuery } from '@suspensive/react-query';
 import { SavingsProduct } from 'entities/savings-product/model/types';
 import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
 import { 목표금액과의차이계산, 예상수익계산, 추천월납입액계산 } from 'features/calculate-savings/lib/calculate-savings';
-import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
+import SavingsGoalForm, { useSavingsGoalForm } from 'features/calculate-savings/ui/SavingsGoalForm';
 import { savingsProductsQueryOptions } from 'features/savings-product/api/useSavingsProducts';
-import { parseAsInteger, useQueryStates } from 'nuqs';
 import { useState } from 'react';
-import { descending, inRange, isEqual } from 'shared/lib/compare';
+import { descending, inRange, isEqual, isNotNull } from 'shared/lib/compare';
 import AsyncBoundary from 'shared/ui/AsyncBoundary';
 import { Border, NavigationBar, Spacing, Tab, ListRow, ListHeader } from 'tosslib';
 import { DEFAULT_TERM_MONTHS, RECOMMENDED_PRODUCTS_COUNT, TAB_VALUES, TabValue } from './model/constants';
@@ -15,10 +14,8 @@ import CalculationResultItem from 'features/calculate-savings/ui/CalculationResu
 export function SavingsCalculatorPage() {
   const [activeTab, setActiveTab] = useState<TabValue>(TAB_VALUES.PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
-  const [savingsGoal, setSavingsGoal] = useQueryStates({
-    targetAmount: parseAsInteger.withDefault(0),
-    monthlyAmount: parseAsInteger.withDefault(0),
-    term: parseAsInteger.withDefault(DEFAULT_TERM_MONTHS),
+  const { control, formData: savingsGoal } = useSavingsGoalForm({
+    term: DEFAULT_TERM_MONTHS,
   });
 
   return (
@@ -27,7 +24,7 @@ export function SavingsCalculatorPage() {
 
       <Spacing size={16} />
 
-      <SavingsGoalForm defaultValues={savingsGoal} onChange={setSavingsGoal} />
+      <SavingsGoalForm control={control} />
 
       <Spacing size={24} />
       <Border height={16} />
@@ -45,17 +42,16 @@ export function SavingsCalculatorPage() {
       <AsyncBoundary loadingMessage="불러오는 중입니다..." errorMessage="오류가 발생했습니다.">
         <SuspenseQuery {...savingsProductsQueryOptions()}>
           {({ data: allProducts }) => {
-            const products =
-              savingsGoal.monthlyAmount > 0
-                ? allProducts.filter(
-                    product =>
-                      inRange({
-                        value: savingsGoal.monthlyAmount,
-                        min: product.minMonthlyAmount,
-                        max: product.maxMonthlyAmount,
-                      }) && isEqual(product.availableTerms, savingsGoal.term)
-                  )
-                : allProducts;
+            const products = isNotNull(savingsGoal.monthlyAmount)
+              ? allProducts.filter(
+                  product =>
+                    inRange({
+                      value: savingsGoal.monthlyAmount!,
+                      min: product.minMonthlyAmount,
+                      max: product.maxMonthlyAmount,
+                    }) && isEqual(product.availableTerms, savingsGoal.term)
+                )
+              : allProducts;
 
             const recommendedProducts = selectedProduct
               ? [...products]
@@ -80,13 +76,13 @@ export function SavingsCalculatorPage() {
                     {selectedProduct ? (
                       (() => {
                         const 예상수익 = 예상수익계산(
-                          savingsGoal.monthlyAmount,
+                          savingsGoal.monthlyAmount ?? 0,
                           savingsGoal.term,
                           selectedProduct.annualRate
                         );
-                        const 목표금액과의차이 = 목표금액과의차이계산(savingsGoal.targetAmount, 예상수익);
+                        const 목표금액과의차이 = 목표금액과의차이계산(savingsGoal.targetAmount ?? 0, 예상수익);
                         const 추천월납입액 = 추천월납입액계산(
-                          savingsGoal.targetAmount,
+                          savingsGoal.targetAmount ?? 0,
                           savingsGoal.term,
                           selectedProduct.annualRate
                         );

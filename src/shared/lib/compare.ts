@@ -16,4 +16,8 @@ function descending(a: number, b: number): number {
   return b - a;
 }
 
-export { inRange, isEqual, descending };
+function isNotNull<T>(value: T | null): value is T {
+  return value !== null;
+}
+
+export { inRange, isEqual, descending, isNotNull };

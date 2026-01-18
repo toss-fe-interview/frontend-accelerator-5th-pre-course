@@ -1,31 +1,28 @@
-import { Controller, useForm } from 'react-hook-form';
+import { Control, Controller, useForm, useWatch } from 'react-hook-form';
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
-import { useEffect } from 'react';
-import { formatPrice } from 'shared/lib/format';
+import { formatPrice, parsePrice } from 'shared/lib/format';
+import { isNotNull } from 'shared/lib/compare';
 
-interface SavingsGoalFormData {
-  targetAmount: number;
-  monthlyAmount: number;
+export interface SavingsGoalFormData {
+  targetAmount: number | null;
+  monthlyAmount: number | null;
   term: number;
 }
 
-interface SavingsGoalFormChangeHandler {
-  (data: SavingsGoalFormData): void;
-}
-
 const DEFAULT_VALUES: SavingsGoalFormData = {
-  targetAmount: 0,
-  monthlyAmount: 0,
+  targetAmount: null,
+  monthlyAmount: null,
   term: 12,
 };
 
-interface SavingsGoalFormProps {
-  defaultValues?: Partial<SavingsGoalFormData>;
-  onChange?: SavingsGoalFormChangeHandler;
-}
+const TERM_OPTIONS = [
+  { value: 6, label: '6개월' },
+  { value: 12, label: '12개월' },
+  { value: 24, label: '24개월' },
+] as const;
 
-const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
-  const { control, watch } = useForm<SavingsGoalFormData>({
+export const useSavingsGoalForm = (defaultValues?: Partial<SavingsGoalFormData>) => {
+  const { control } = useForm<SavingsGoalFormData>({
     defaultValues: {
       ...DEFAULT_VALUES,
       ...defaultValues,
@@ -33,11 +30,16 @@ const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    const subscription = watch(data => onChange?.(data as SavingsGoalFormData));
-    return () => subscription.unsubscribe();
-  }, [watch, onChange]);
+  const formData = useWatch({ control }) as SavingsGoalFormData;
 
+  return { control, formData };
+};
+
+interface SavingsGoalFormProps {
+  control: Control<SavingsGoalFormData>;
+}
+
+const SavingsGoalForm = ({ control }: SavingsGoalFormProps) => {
   return (
     <>
       <Controller
@@ -48,12 +50,8 @@ const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
             label="목표 금액"
             placeholder="목표 금액을 입력하세요"
             suffix="원"
-            value={field.value > 0 ? formatPrice(field.value) : ''}
-            onChange={e => {
-              const value = e.target.value.replace(/,/g, '');
-              const numberValue = parseInt(value, 10);
-              field.onChange(isNaN(numberValue) ? 0 : numberValue);
-            }}
+            value={isNotNull(field.value) ? formatPrice(field.value) : ''}
+            onChange={e => field.onChange(parsePrice(e.target.value))}
           />
         )}
       />
@@ -67,12 +65,8 @@ const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
             label="월 납입액"
             placeholder="희망 월 납입액을 입력하세요"
             suffix="원"
-            value={field.value > 0 ? formatPrice(field.value) : ''}
-            onChange={e => {
-              const value = e.target.value.replace(/,/g, '');
-              const numberValue = parseInt(value, 10);
-              field.onChange(isNaN(numberValue) ? 0 : numberValue);
-            }}
+            value={isNotNull(field.value) ? formatPrice(field.value) : ''}
+            onChange={e => field.onChange(parsePrice(e.target.value))}
           />
         )}
       />
@@ -87,9 +81,11 @@ const SavingsGoalForm = ({ defaultValues, onChange }: SavingsGoalFormProps) => {
             value={field.value}
             onChange={field.onChange}
           >
-            <SelectBottomSheet.Option value={6}>6개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={12}>12개월</SelectBottomSheet.Option>
-            <SelectBottomSheet.Option value={24}>24개월</SelectBottomSheet.Option>
+            {TERM_OPTIONS.map(option => (
+              <SelectBottomSheet.Option key={option.value} value={option.value}>
+                {option.label}
+              </SelectBottomSheet.Option>
+            ))}
           </SelectBottomSheet>
         )}
       />
