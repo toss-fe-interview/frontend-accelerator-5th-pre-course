@@ -13,7 +13,8 @@ import { useMemo, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { CalculationResults } from 'components/CalculationResults';
 import { ProductInfoTexts } from 'components/ProductInfoTexts';
-import { SavingsInput, SavingsProduct } from 'type';
+import { SwitchCase } from 'components/common/SwitchCase';
+import { ProductListStatus, ResultsStatus, SavingsInput, SavingsProduct } from 'type';
 import { savingsProductsQuery } from 'apis/savingsProduct';
 import { formatMoney, extractDigits } from 'utils/money';
 
@@ -143,17 +144,27 @@ export function SavingsCalculatorPage() {
           value={getResultsStatus()}
           caseBy={{
             noProduct: <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />,
-            hasProduct: (
-              <>
-                <CalculationResults selectedProduct={selectedSavingsProduct!} savingsInput={savingsInput} />
+            hasProduct: (() => {
+              const recommendedProducts = [...matchingProducts].sort((a, b) => b.annualRate - a.annualRate).slice(0, 2);
 
-                <Spacing size={8} />
-                <Border height={16} />
-                <Spacing size={8} />
+              return (
+                <>
+                  <CalculationResults selectedProduct={selectedSavingsProduct!} savingsInput={savingsInput} />
 
-                <RecommendedProductList products={matchingProducts} />
-              </>
-            ),
+                  <Spacing size={8} />
+                  <Border height={16} />
+                  <Spacing size={8} />
+
+                  <ListHeader
+                    title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
+                  />
+                  <Spacing size={12} />
+                  {recommendedProducts.map(product => (
+                    <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
+                  ))}
+                </>
+              );
+            })(),
           }}
         />
       )}

@@ -12,3 +12,5 @@ export interface SavingsInput {
   monthlyAmount: number;
   term: number;
 }
+export type ProductListStatus = 'needsInput' | 'noProducts' | 'hasProducts';
+export type ResultsStatus = 'noProduct' | 'hasProduct';
