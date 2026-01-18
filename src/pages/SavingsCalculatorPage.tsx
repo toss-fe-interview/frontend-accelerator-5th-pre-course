@@ -44,12 +44,17 @@ export function SavingsCalculatorPage() {
     terms,
     annualRate: selectedProduct?.annualRate ?? 0,
   });
-
+  
+  const isSelectedProductVisible = filteredProducts.some(
+    product => product.id === selectedProductId
+  );
+  
   useEffect(() => {
-    if (selectedProductId && !filteredProducts.some(product => product.id === selectedProductId)) {
+    if (selectedProductId && !isSelectedProductVisible) {
       setSelectedProductId(null);
     }
   }, [filteredProducts, selectedProductId]);
+
 
   return (
     <>

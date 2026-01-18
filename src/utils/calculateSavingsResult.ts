@@ -13,4 +13,3 @@ export const calculateSavingsResult =({
   
     return { expectedAmount, difference, recommendMonthlyAmount };
   }
-  
