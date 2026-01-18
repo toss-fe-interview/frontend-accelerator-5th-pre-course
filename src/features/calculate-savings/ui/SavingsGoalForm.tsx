@@ -1,8 +1,17 @@
 import { Controller, useForm } from 'react-hook-form';
 import { SelectBottomSheet, Spacing, TextField } from 'tosslib';
-import { SavingsGoalFormChangeHandler, SavingsGoalFormData } from '../model/types';
 import { useEffect } from 'react';
 import { formatNumber } from 'shared/lib/format';
+
+interface SavingsGoalFormData {
+  targetAmount: number;
+  monthlyAmount: number;
+  term: number;
+}
+
+interface SavingsGoalFormChangeHandler {
+  (data: SavingsGoalFormData): void;
+}
 
 const DEFAULT_VALUES: SavingsGoalFormData = {
   targetAmount: 0,
