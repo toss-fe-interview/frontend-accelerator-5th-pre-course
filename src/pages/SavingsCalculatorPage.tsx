@@ -1,7 +1,9 @@
 import map from 'lodash/fp/map';
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Border, ListHeader, ListRow, NavigationBar, Spacing } from 'tosslib';
 
+import { toggleQueryParam } from 'shared/lib/toggleQueryParam';
 import { CheckCircleIcon } from 'shared/ui/CheckCircleIcon';
 import { EmptyListItem } from 'shared/ui/EmptyListItem';
 import { Tabs } from 'shared/ui/Tabs';
@@ -26,7 +28,8 @@ export function SavingsCalculatorPage() {
     term: 12,
   });
 
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedProductId = searchParams.get('productId') ?? null;
 
   return (
     <>
@@ -82,7 +85,9 @@ export function SavingsCalculatorPage() {
                       key={product.id}
                       contents={<SavingsProductInfo product={product} />}
                       right={selectedProductId === product.id && <CheckCircleIcon />}
-                      onClick={() => setSelectedProductId(prev => (prev === product.id ? null : product.id))}
+                      onClick={() =>
+                        setSearchParams(toggleQueryParam({ name: 'productId', value: product.id }), { replace: true })
+                      }
                     />
                   ))}
                 </SavingsProductListSection>
@@ -137,7 +142,9 @@ export function SavingsCalculatorPage() {
                       key={product.id}
                       contents={<SavingsProductInfo product={product} />}
                       right={selectedProductId === product.id && <CheckCircleIcon />}
-                      onClick={() => setSelectedProductId(prev => (prev === product.id ? null : product.id))}
+                      onClick={() =>
+                        setSearchParams(toggleQueryParam({ name: 'productId', value: product.id }), { replace: true })
+                      }
                     />
                   ))}
                 </RecommendedProductSection>
