@@ -1,32 +1,23 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import ResultRow from 'features/savings/components/ResultRow';
 import SavingsProductItem from 'features/savings/components/SavingsProduct';
 
 import { TABS } from 'features/savings/constants';
 import { savingsQueries } from 'features/savings/queries';
-import {
-  calcDiffAmount,
-  calcExpectProfit,
-  calcRecommendAmountForMonth,
-  getMatchedSavingsProducts,
-  handleAmountChange,
-  slicer,
-  sortByRate,
-} from 'features/savings/utils/savings';
+import { getMatchedSavingsProducts, handleAmountChange } from 'features/savings/utils/savings';
 import { useSetQueryParams } from 'hooks/useSetQueryParams';
 import { useTab } from 'hooks/useTab';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { SavingsProduct } from 'model/types';
 
-import { Border, ListHeader, ListRow, NavigationBar, Spacing, Tab, TextField } from 'tosslib';
-import { numericFormatter } from 'utils/number';
+import { Border, NavigationBar, Spacing, Tab, TextField } from 'tosslib';
 import SelectSavingsPeriodBottomSheet from 'features/savings/components/SelectSavingsPeriodBottomSheet';
+import { ErrorBoundary } from '@suspensive/react';
+import { SuspenseQuery } from '@suspensive/react-query';
+import CalculationResult from 'features/savings/components/CalculationResult';
 
 export function SavingsCalculatorPage() {
   const [selectedProduct, setSelectedProduct] = useState<SavingsProduct | null>(null);
 
-  const { data: savingsProducts } = useSuspenseQuery(savingsQueries.list());
   const { currentTab, changeTab } = useTab({ key: 'tab', defaultTab: TABS.PRODUCTS });
 
   const { searchParams, setQueryParams } = useSetQueryParams();
@@ -86,79 +77,53 @@ export function SavingsCalculatorPage() {
           계산 결과
         </Tab.Item>
       </Tab>
-      {currentTab === TABS.PRODUCTS &&
-        (getMatchedSavingsProducts({ savingsProducts, monthlyAmount, period }).length === 0
-          ? savingsProducts
-          : getMatchedSavingsProducts({ savingsProducts, monthlyAmount, period })
-        ).map(savingProduct => {
-          return (
-            <SavingsProductItem
-              key={savingProduct.id}
-              product={savingProduct}
-              isSelected={savingProduct.id === selectedProduct?.id}
-              onSelect={setSelectedProduct}
-            />
-          );
-        })}
+      {currentTab === TABS.PRODUCTS && (
+        <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
+          <Suspense fallback={<>{'상품 목록을 가져오고 있어요'}</>}>
+            <SuspenseQuery {...savingsQueries.list()}>
+              {({ data: savingsProducts }) => {
+                const matched = getMatchedSavingsProducts({
+                  savingsProducts,
+                  monthlyAmount,
+                  period,
+                });
+                const displayProducts = matched.length === 0 ? savingsProducts : matched;
+                return (
+                  <>
+                    {displayProducts.map(product => (
+                      <SavingsProductItem
+                        key={product.id}
+                        product={product}
+                        isSelected={product.id === selectedProduct?.id}
+                        onSelect={setSelectedProduct}
+                      />
+                    ))}
+                  </>
+                );
+              }}
+            </SuspenseQuery>
+          </Suspense>
+        </ErrorBoundary>
+      )}
 
       {currentTab === TABS.RESULTS && (
-        <>
-          {selectedProduct ? (
-            <>
-              <Spacing size={8} />
-              <ListRow
-                contents={
-                  <ResultRow
-                    subject="목표 금액"
-                    amount={calcExpectProfit({ selectedProduct, monthlyAmount, period })}
+        <ErrorBoundary fallback={({ error }) => <>{error.message}</>}>
+          <Suspense fallback={<>{'계산 결과를 가져오고 있어요'}</>}>
+            <SuspenseQuery {...savingsQueries.list()}>
+              {({ data: savingsProducts }) => {
+                return (
+                  <CalculationResult
+                    selectedProduct={selectedProduct}
+                    savingsProducts={savingsProducts}
+                    goalAmount={goalAmount}
+                    monthlyAmount={monthlyAmount}
+                    period={period}
                   />
-                }
-              />
-              <ListRow
-                contents={
-                  <ResultRow
-                    subject="목표 금액과의 차이"
-                    amount={calcDiffAmount({
-                      goalAmount: numericFormatter(goalAmount),
-                      expectedProfit: calcExpectProfit({ selectedProduct, monthlyAmount, period }),
-                    })}
-                  />
-                }
-              />
-              <ListRow
-                contents={
-                  <ResultRow
-                    subject="추천 월 납입 금액"
-                    amount={calcRecommendAmountForMonth({ selectedProduct, goalAmount, period })}
-                  />
-                }
-              />
-            </>
-          ) : (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-          )}
-
-          <Spacing size={8} />
-          <Border height={16} />
-          <Spacing size={8} />
-
-          <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
-          <Spacing size={12} />
-          {slicer(sortByRate([...getMatchedSavingsProducts({ savingsProducts, monthlyAmount, period })], 'desc'), {
-            offset: 0,
-            limit: 2,
-          }).map(recommendedProduct => {
-            return (
-              <SavingsProductItem
-                key={recommendedProduct.id}
-                product={recommendedProduct}
-                isSelected={recommendedProduct.id === selectedProduct?.id}
-              />
-            );
-          })}
-
-          <Spacing size={40} />
-        </>
+                );
+              }}
+            </SuspenseQuery>
+          </Suspense>
+        </ErrorBoundary>
       )}
     </>
   );
