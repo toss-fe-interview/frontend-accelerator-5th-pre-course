@@ -5,13 +5,16 @@ import { useQuery } from '@tanstack/react-query';
 import CalculationResult from 'domains/savingsCalculator/components/CalculationResult';
 import SavingsProduct from 'domains/savingsCalculator/components/SavingsProduct';
 import { getRecommendedProducts, validatorSavingsProduct } from 'domains/savingsCalculator/utils/filter';
-import { round1000, toMultiplier } from 'domains/savingsCalculator/utils/calculate';
+import { savingsCalculator } from 'domains/savingsCalculator/utils/calculate';
 
 import SavingsQuery from 'shared/query/saving';
 import IconCheckCircle from 'shared/components/Icon/IconCheckCircle';
 import { SavingsProductType } from 'shared/types/api/savings';
 import CurrencyInput from 'domains/savingsCalculator/components/form/CurrencyInput';
 import Select from 'domains/savingsCalculator/components/form/Select';
+import { SAVINGS_PRODUCT_TABS } from 'domains/savingsCalculator/constants/savings';
+
+type SavingsProductTabId = (typeof SAVINGS_PRODUCT_TABS)[keyof typeof SAVINGS_PRODUCT_TABS];
 
 export function SavingsCalculatorPage() {
   /** refactor : useSavingsInputs 훅 제거하기
@@ -25,7 +28,7 @@ export function SavingsCalculatorPage() {
   const [term, setTerm] = useState<6 | 12 | 24>(12);
 
   const [selectedProduct, setSelectedProduct] = useState<SavingsProductType | null>(null);
-  const [activeTabId, setActiveTabId] = useState<'products' | 'results'>('products');
+  const [activeTabId, setActiveTabId] = useState<SavingsProductTabId>(SAVINGS_PRODUCT_TABS.PRODUCTS);
 
   const { data: matchedSavingsProducts = [] } = useQuery(
     SavingsQuery.getSavingsProducts({
@@ -37,6 +40,12 @@ export function SavingsCalculatorPage() {
   );
 
   const hasNoMatchedProducts = matchedSavingsProducts.length === 0;
+
+  const { toExpectedProfit, toDiffFromTargetAmount, toRecommendedMonthlyPayment } = savingsCalculator({
+    targetAmount,
+    monthlyPayment,
+    term,
+  });
 
   return (
     <>
@@ -73,16 +82,16 @@ export function SavingsCalculatorPage() {
       <Border height={16} />
       <Spacing size={8} />
 
-      <Tab onChange={value => setActiveTabId(value as 'products' | 'results')}>
-        <Tab.Item value="products" selected={activeTabId === 'products'}>
+      <Tab onChange={value => setActiveTabId(value as SavingsProductTabId)}>
+        <Tab.Item value={SAVINGS_PRODUCT_TABS.PRODUCTS} selected={activeTabId === SAVINGS_PRODUCT_TABS.PRODUCTS}>
           적금 상품
         </Tab.Item>
-        <Tab.Item value="results" selected={activeTabId === 'results'}>
+        <Tab.Item value={SAVINGS_PRODUCT_TABS.RESULTS} selected={activeTabId === SAVINGS_PRODUCT_TABS.RESULTS}>
           계산 결과
         </Tab.Item>
       </Tab>
 
-      {activeTabId === 'products' && (
+      {activeTabId === SAVINGS_PRODUCT_TABS.PRODUCTS && (
         <>
           {/* 본질이 뭘까? 
                - 목표금액, 월 납입액, 저축기간에 따라서 필터링 조건에 맞는 적금 상품을 보여준다. 
@@ -115,7 +124,7 @@ export function SavingsCalculatorPage() {
         </>
       )}
 
-      {activeTabId === 'results' && (
+      {activeTabId === SAVINGS_PRODUCT_TABS.RESULTS && (
         <>
           <Spacing size={8} />
 
@@ -125,17 +134,14 @@ export function SavingsCalculatorPage() {
             <>
               <ListRow
                 contents={
-                  <CalculationResult
-                    label="예상 수익 금액"
-                    value={monthlyPayment * term * toMultiplier(selectedProduct.annualRate)}
-                  />
+                  <CalculationResult label="예상 수익 금액" value={toExpectedProfit(selectedProduct.annualRate)} />
                 }
               />
               <ListRow
                 contents={
                   <CalculationResult
                     label="목표 금액과의 차이"
-                    value={targetAmount - monthlyPayment * term * toMultiplier(selectedProduct.annualRate)}
+                    value={toDiffFromTargetAmount(selectedProduct.annualRate)}
                   />
                 }
               />
@@ -143,7 +149,7 @@ export function SavingsCalculatorPage() {
                 contents={
                   <CalculationResult
                     label="추천 월 납입 금액"
-                    value={round1000(targetAmount / (term * toMultiplier(selectedProduct.annualRate)))}
+                    value={toRecommendedMonthlyPayment(selectedProduct.annualRate)}
                   />
                 }
               />
