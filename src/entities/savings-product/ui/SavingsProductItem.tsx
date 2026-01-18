@@ -9,6 +9,7 @@ interface SavingsProductItemProps {
 }
 
 const SavingsProductItem = ({ product, selected, onSelect }: SavingsProductItemProps) => {
+  const 월납입액 = `${formatCurrency(product.minMonthlyAmount)} ~ ${formatCurrency(product.maxMonthlyAmount)} | ${product.availableTerms}개월`;
   return (
     <ListRow
       contents={
@@ -18,7 +19,7 @@ const SavingsProductItem = ({ product, selected, onSelect }: SavingsProductItemP
           topProps={{ fontSize: 16, fontWeight: 'bold', color: colors.grey900 }}
           middle={`연 이자율: ${product.annualRate}%`}
           middleProps={{ fontSize: 14, color: colors.blue600, fontWeight: 'medium' }}
-          bottom={`${formatCurrency(product.minMonthlyAmount)} ~ ${formatCurrency(product.maxMonthlyAmount)} | ${product.availableTerms}개월`}
+          bottom={월납입액}
           bottomProps={{ fontSize: 13, color: colors.grey600 }}
         />
       }
