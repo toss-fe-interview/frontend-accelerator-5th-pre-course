@@ -5,11 +5,7 @@ import LabeledNumberInput from 'features/savings/components/LabeledNumberInput';
 import { savingsProductsQueryOptions } from 'features/savings/hooks/quries/savingsProducts.query';
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
-import {
-  calculateEstimatedEarningsAmount,
-  calculateDifferenceWithTargetAmount,
-  calculateRecommendedMonthlyPayment,
-} from 'features/savings/utils/calculation/savings';
+import { calculateSavingsResults } from 'features/savings/utils/calculation/savings';
 import { filterSavings, recommendSavings } from 'features/savings/utils/savingsRules';
 import { useState } from 'react';
 import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, Spacing, Tab } from 'tosslib';
@@ -35,25 +31,7 @@ export function SavingsCalculatorPage() {
 
   const selectedProduct = filteredSavingsProducts.find(product => product.id === selectedProductId);
 
-  const savingsCalculations = (() => {
-    if (!selectedProduct) return null;
-
-    const estimatedEarnings = calculateEstimatedEarningsAmount(
-      savingsValues.monthlyPaymentAmount,
-      savingsValues.savingsPeriod,
-      selectedProduct.annualRate
-    );
-
-    const diffWithTargetAmount = calculateDifferenceWithTargetAmount(savingsValues.targetAmount, estimatedEarnings);
-
-    const recommendedMonthlyPayment = calculateRecommendedMonthlyPayment(
-      savingsValues.targetAmount,
-      savingsValues.savingsPeriod,
-      selectedProduct.annualRate
-    );
-
-    return { estimatedEarnings, diffWithTargetAmount, recommendedMonthlyPayment };
-  })();
+  const savingsCalculations = selectedProduct ? calculateSavingsResults(selectedProduct, savingsValues) : null;
 
   const isProductNotSelected = !selectedProductId || !selectedProduct || !savingsCalculations;
 
