@@ -1,11 +1,7 @@
 import { SuspenseQuery } from '@suspensive/react-query';
 import { SavingsProduct } from 'entities/savings-product/model/types';
 import SavingsProductItem from 'entities/savings-product/ui/SavingsProductItem';
-import {
-  calculateDifference,
-  calculateExpectedProfit,
-  calculateRecommendedMonthlyAmount,
-} from 'features/calculate-savings/lib/calculate-savings';
+import { 목표금액과의차이계산, 예상수익계산, 추천월납입액계산 } from 'features/calculate-savings/lib/calculate-savings';
 import SavingsGoalForm from 'features/calculate-savings/ui/SavingsGoalForm';
 import { savingsProductsQueryOptions } from 'features/savings-product/api/useSavingsProducts';
 import { parseAsInteger, useQueryStates } from 'nuqs';
@@ -83,13 +79,13 @@ export function SavingsCalculatorPage() {
                   <>
                     {selectedProduct ? (
                       (() => {
-                        const expectedProfit = calculateExpectedProfit(
+                        const 예상수익 = 예상수익계산(
                           savingsGoal.monthlyAmount,
                           savingsGoal.term,
                           selectedProduct.annualRate
                         );
-                        const difference = calculateDifference(savingsGoal.targetAmount, expectedProfit);
-                        const recommendedMonthlyAmount = calculateRecommendedMonthlyAmount(
+                        const 목표금액과의차이 = 목표금액과의차이계산(savingsGoal.targetAmount, 예상수익);
+                        const 추천월납입액 = 추천월납입액계산(
                           savingsGoal.targetAmount,
                           savingsGoal.term,
                           selectedProduct.annualRate
@@ -99,9 +95,9 @@ export function SavingsCalculatorPage() {
                           <>
                             <Spacing size={8} />
 
-                            <CalculationResultItem label="예상 수익 금액" value={expectedProfit} />
-                            <CalculationResultItem label="목표 금액과의 차이" value={difference} />
-                            <CalculationResultItem label="추천 월 납입 금액" value={recommendedMonthlyAmount} />
+                            <CalculationResultItem label="예상 수익 금액" value={예상수익} />
+                            <CalculationResultItem label="목표 금액과의 차이" value={목표금액과의차이} />
+                            <CalculationResultItem label="추천 월 납입 금액" value={추천월납입액} />
 
                             <Spacing size={8} />
                             <Border height={16} />
