@@ -24,7 +24,7 @@ export function SavingsCalculatorPage() {
   const [savingsProductTab, setSavingsProductTab] = useState<'products' | 'results'>('products');
   const [selectedSavingsProduct, setSelectedSavingsProduct] = useState<SavingsProduct | null>(null);
 
-  const { data: savingsProducts = [] } = useSavingsProducts();
+  const { data: savingsProducts = [], isLoading, isError } = useSavingsProducts();
 
   return (
     <>
@@ -74,19 +74,25 @@ export function SavingsCalculatorPage() {
 
       {savingsProductTab === 'products' && (
         <>
-          {savingsProducts
-            .filter(product => isProductMatchingInput(product, savingsInput))
-            .map(product => {
-              const isSelected = selectedSavingsProduct?.id === product.id;
-              return (
-                <SavingsProductItem
-                  key={product.id}
-                  product={product}
-                  onClick={() => setSelectedSavingsProduct(isSelected ? null : product)}
-                  isSelected={isSelected}
-                />
-              );
-            })}
+          {isLoading ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="불러오는 중..." />} />
+          ) : isError ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품 정보를 불러오지 못했습니다." />} />
+          ) : (
+            savingsProducts
+              .filter(product => isProductMatchingInput(product, savingsInput))
+              .map(product => {
+                const isSelected = selectedSavingsProduct?.id === product.id;
+                return (
+                  <SavingsProductItem
+                    key={product.id}
+                    product={product}
+                    onClick={() => setSelectedSavingsProduct(isSelected ? null : product)}
+                    isSelected={isSelected}
+                  />
+                );
+              })
+          )}
         </>
       )}
 
@@ -131,20 +137,26 @@ export function SavingsCalculatorPage() {
           <ListHeader title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>} />
           <Spacing size={12} />
 
-          {getTopProductsByRate(
-            savingsProducts.filter(product => isProductMatchingInput(product, savingsInput)),
-            2
-          ).map(product => {
-            const isSelected = selectedSavingsProduct?.id === product.id;
-            return (
-              <SavingsProductItem
-                key={product.id}
-                product={product}
-                onClick={() => setSelectedSavingsProduct(isSelected ? null : product)}
-                isSelected={isSelected}
-              />
-            );
-          })}
+          {isLoading ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="불러오는 중..." />} />
+          ) : isError ? (
+            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="추천 상품을 불러오지 못했습니다." />} />
+          ) : (
+            getTopProductsByRate(
+              savingsProducts.filter(p => isProductMatchingInput(p, savingsInput)),
+              2
+            ).map(product => {
+              const isSelected = selectedSavingsProduct?.id === product.id;
+              return (
+                <SavingsProductItem
+                  key={product.id}
+                  product={product}
+                  onClick={() => setSelectedSavingsProduct(isSelected ? null : product)}
+                  isSelected={isSelected}
+                />
+              );
+            })
+          )}
 
           <Spacing size={40} />
         </>
