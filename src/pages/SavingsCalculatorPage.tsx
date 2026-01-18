@@ -44,6 +44,23 @@ export function SavingsCalculatorPage() {
 
   const toMoneyValue = (input: string): number => Number(extractDigits(input)) || 0;
 
+  const getProductListStatus = (): ProductListStatus => {
+    if (!(savingsInput.term && savingsInput.monthlyAmount)) {
+      return 'needsInput';
+    }
+    if (matchingProducts.length === 0) {
+      return 'noProducts';
+    }
+    return 'hasProducts';
+  };
+
+  const getResultsStatus = (): ResultsStatus => {
+    if (!selectedSavingsProduct) {
+      return 'noProduct';
+    }
+    return 'hasProduct';
+  };
+
   return (
     <>
       <NavigationBar title="적금 계산기" />
@@ -91,56 +108,54 @@ export function SavingsCalculatorPage() {
       </Tab>
       <Spacing size={8} />
       {selectTab === 'products' && (
-        <>
-          {!(savingsInput.term && savingsInput.monthlyAmount) ? (
-            <ListRow
-              contents={<ListRow.Texts type="1RowTypeA" top="먼저 저축 기간과 월 납입 금액을 입력해주세요." />}
-            />
-          ) : matchingProducts.length === 0 ? (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="입력한 조건에 맞는 상품이 없습니다." />} />
-          ) : (
-            <>
-              {matchingProducts.map(product => {
-                const isSelected = selectedSavingsProduct?.id === product.id;
+        <SwitchCase
+          value={getProductListStatus()}
+          caseBy={{
+            needsInput: (
+              <ListRow
+                contents={<ListRow.Texts type="1RowTypeA" top="먼저 저축 기간과 월 납입 금액을 입력해주세요." />}
+              />
+            ),
+            noProducts: (
+              <ListRow contents={<ListRow.Texts type="1RowTypeA" top="입력한 조건에 맞는 상품이 없습니다." />} />
+            ),
+            hasProducts: (
+              <>
+                {matchingProducts.map(product => {
+                  const isSelected = selectedSavingsProduct?.id === product.id;
 
-                return (
-                  <ListRow
-                    key={product.id}
-                    contents={<ProductInfoTexts product={product} />}
-                    right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
-                    onClick={() => setSelectedSavingsProduct(product)}
-                  />
-                );
-              })}
-            </>
-          )}
-        </>
+                  return (
+                    <ListRow
+                      key={product.id}
+                      contents={<ProductInfoTexts product={product} />}
+                      right={isSelected ? <Assets.Icon name="icon-check-circle-green" /> : null}
+                      onClick={() => setSelectedSavingsProduct(product)}
+                    />
+                  );
+                })}
+              </>
+            ),
+          }}
+        />
       )}
       {selectTab === 'results' && (
-        <>
-          {!selectedSavingsProduct ? (
-            <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />
-          ) : (
-            <>
-              <CalculationResults selectedProduct={selectedSavingsProduct} savingsInput={savingsInput} />
+        <SwitchCase
+          value={getResultsStatus()}
+          caseBy={{
+            noProduct: <ListRow contents={<ListRow.Texts type="1RowTypeA" top="상품을 선택해주세요." />} />,
+            hasProduct: (
+              <>
+                <CalculationResults selectedProduct={selectedSavingsProduct!} savingsInput={savingsInput} />
 
-              <Spacing size={8} />
-              <Border height={16} />
-              <Spacing size={8} />
+                <Spacing size={8} />
+                <Border height={16} />
+                <Spacing size={8} />
 
-              <ListHeader
-                title={<ListHeader.TitleParagraph fontWeight="bold">추천 상품 목록</ListHeader.TitleParagraph>}
-              />
-              <Spacing size={12} />
-              {[...matchingProducts]
-                .sort((a, b) => b.annualRate - a.annualRate)
-                .slice(0, 2)
-                .map(product => (
-                  <ListRow key={product.id} contents={<ProductInfoTexts product={product} />} />
-                ))}
-            </>
-          )}
-        </>
+                <RecommendedProductList products={matchingProducts} />
+              </>
+            ),
+          }}
+        />
       )}
       <Spacing size={40} />
     </>
