@@ -2,7 +2,7 @@ import { ErrorBoundary, Suspense } from '@suspensive/react';
 import ErrorFallback from 'components/ErrorFallback';
 import Loading from 'components/Loading';
 import LabeledNumberInput from 'features/savings/components/LabeledNumberInput';
-import { useSuspenseSavingsProducts } from 'features/savings/hooks/quries/useSuspenseSavingsProducts';
+import { savingsProductsQueryOptions } from 'features/savings/hooks/quries/savingsProducts.query';
 import { SavingsValues } from 'features/savings/types/savingsValues';
 import { SavingsTabs } from 'features/savings/types/tabs';
 import {
@@ -16,6 +16,7 @@ import { Assets, Border, ListHeader, ListRow, NavigationBar, SelectBottomSheet, 
 import ProductItem from 'features/savings/components/ProductItem';
 import { formatNumberWithComma } from 'features/savings/utils/format/number';
 import ResultItem from 'features/savings/components/ResultItem';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 export function SavingsCalculatorPage() {
   const [savingsValues, setSavingsValues] = useState<SavingsValues>({
@@ -25,7 +26,7 @@ export function SavingsCalculatorPage() {
   });
   const [selectedTab, setSelectedTab] = useState<SavingsTabs>('products');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const { data: savingsProducts } = useSuspenseSavingsProducts();
+  const { data: savingsProducts } = useSuspenseQuery(savingsProductsQueryOptions);
   const filteredSavingsProducts = filterSavings(
     savingsProducts,
     savingsValues.monthlyPaymentAmount,
