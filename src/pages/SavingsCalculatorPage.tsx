@@ -17,12 +17,13 @@ import ProductItem from 'features/savings/components/ProductItem';
 import { formatNumberWithComma } from 'features/savings/utils/format/number';
 import ResultItem from 'features/savings/components/ResultItem';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { SAVINGS_VALUES_DEFAULTS } from 'features/savings/constants/default';
 
 export function SavingsCalculatorPage() {
   const [savingsValues, setSavingsValues] = useState<SavingsValues>({
-    targetAmount: 0,
-    monthlyPaymentAmount: 0,
-    savingsPeriod: 6,
+    targetAmount: SAVINGS_VALUES_DEFAULTS.targetAmount,
+    monthlyPaymentAmount: SAVINGS_VALUES_DEFAULTS.monthlyPaymentAmount,
+    savingsPeriod: SAVINGS_VALUES_DEFAULTS.savingsPeriod,
   });
   const [selectedTab, setSelectedTab] = useState<SavingsTabs>('products');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
